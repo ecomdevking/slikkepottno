@@ -298,3 +298,45 @@
 .free-shipping-goal--done .free-shipping-goal__label--default {
   display: none;
 }
+
+/* Header free shipping bar - inline version */
+.header__icons--right {
+  align-items: flex-end !important;
+}
+.header__free-shipping-inline {
+  margin-top: 0.8rem;
+  min-width: 170px;
+  max-width: 170px;
+}
+.header__free-shipping-inline .free-shipping-goal {
+  gap: 0.5rem;
+  font-size: 1.25rem;
+  align-items: flex-end;
+  color: rgb(188, 1, 0);
+}
+.header__free-shipping-inline .free-shipping-goal__label {
+  white-space: nowrap;
+  text-align: right;
+  line-height: 1.2;
+}
+.header__free-shipping-inline .free-shipping-goal__label strong {
+  font-weight: 700;
+}
+.header__free-shipping-inline .progress-bar {
+  height: 0.5rem;
+  width: 170px;
+  min-width: 170px;
+  max-width: 170px;
+  border-radius: 1rem;
+}
+.header__free-shipping-inline .progress-bar::before {
+  --scale-x: var(--percent);
+  background-color: rgb(188, 1, 0);
+}
+
+/* Hide on mobile and tablet */
+@media (max-width: 1023px) {
+  .header__free-shipping-inline {
+    display: none;
+  }
+}

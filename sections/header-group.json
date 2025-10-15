@@ -282,7 +282,8 @@
         "navigation_color_scheme": "",
         "navigation_content_alignment": "center",
         "navigation_padding_top": 0,
-        "navigation_padding_bottom": 12
+        "navigation_padding_bottom": 12,
+        "show_free_shipping_goal": true
       }
     },
     "announcement_bar_gKg6cG": {
