@@ -1,0 +1,161 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.footer.name",
+  "type": "footer",
+  "sections": {
+    "footer": {
+      "type": "footer",
+      "blocks": {
+        "newsletter_3qCrWc": {
+          "type": "newsletter",
+          "disabled": true,
+          "settings": {
+            "block_width": 55,
+            "heading": "Bli inspirert av våre nyhetsbrev!",
+            "heading_size": "h3",
+            "newsletter_description": "<p>Meld deg på for nyheter og gode tilbud,</p><p>og motta 10% på din neste bestilling!</p>",
+            "newsletter_term": "<p>Ved å trykke \"meld meg på\" og oppgi telefonnummeret ditt ovenfor, samtykker du til å motta markedsføringsmeldinger (som rabattkoder, nyhetsmeldinger og handlekurvpåminnelser) fra Slikkepott.no AS på det oppgitte nummeret. Samtykke er ikke en betingelse for kjøp. Meldings- og datapriser kan påløpe. Meldingsfrekvensen varierer. Du kan når som helst avslutte abonnementet ved å svare STOP eller klikke på avmeldingslenken (der det er tilgjengelig) i en av våre meldinger. Se vår <a href=\"https://slikkepott.no/sikkerhet_og_personvern/\">personvernerklæring </a>og <a href=\"https://slikkepott.no/vilkar-for-mobiltjenester/\">vilkår for bruk</a>.</p>",
+            "newsletter_text_alignment": "left",
+            "form_width": 465,
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "order_first": true
+          }
+        },
+        "image_text_U9YNwJ": {
+          "type": "image_text",
+          "settings": {
+            "block_width": 25,
+            "layout": "image_left",
+            "heading": "Kundeservice",
+            "heading_size": "h6",
+            "image_width": 100,
+            "image_width_mobile": 100,
+            "overlay_opacity": 70,
+            "text": "<p>Vi er klare til å hjelpe deg, og den beste måten er å starte med vår chatbot. Prat med den som om du snakker med en virkelig person. Den kan hente fram og hjelpe til med mye mer enn du tror, og når den kommer til kort vil den sende saken videre til en ekte person hos oss. </p>",
+            "button_label": "Klikk her og få hjelp!",
+            "button_link": "",
+            "button_style": "btn--primary",
+            "color_scheme": "scheme-inverse",
+            "content_alignment": "left",
+            "open_default": false,
+            "show_divider": false
+          }
+        },
+        "menu_DEKGYP": {
+          "type": "menu",
+          "settings": {
+            "block_width": 15,
+            "heading": "MINE SIDER",
+            "heading_size": "h6",
+            "menu": "mine-sider",
+            "open_default": true,
+            "show_divider": false
+          }
+        },
+        "menu_3JPGAn": {
+          "type": "menu",
+          "settings": {
+            "block_width": 15,
+            "heading": "INFORMASJON",
+            "heading_size": "h6",
+            "menu": "informasjon",
+            "open_default": true,
+            "show_divider": false
+          }
+        },
+        "menu_4eCrBB": {
+          "type": "menu",
+          "settings": {
+            "block_width": 15,
+            "heading": "GENERELT",
+            "heading_size": "h6",
+            "menu": "generelt",
+            "open_default": true,
+            "show_divider": false
+          }
+        }
+      },
+      "block_order": [
+        "newsletter_3qCrWc",
+        "image_text_U9YNwJ",
+        "menu_DEKGYP",
+        "menu_3JPGAn",
+        "menu_4eCrBB"
+      ],
+      "custom_css": [],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "enable_follow_on_shop": true,
+        "show_social": true,
+        "social_button_style": "btn--icon",
+        "enable_country_selector": true,
+        "enable_language_selector": false,
+        "payment_enable": true,
+        "footer_layout": "standard",
+        "footer_bottom_menu": "",
+        "show_sperator_line": false,
+        "show_section_divider": true,
+        "divider_width": "fixed",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
+    "mobile_sticky_bar_aYhgJK": {
+      "type": "mobile-sticky-bar",
+      "blocks": {
+        "home_AP8mmy": {
+          "type": "home",
+          "settings": {
+            "text": "Home"
+          }
+        },
+        "cart_gnnwxQ": {
+          "type": "cart",
+          "settings": {
+            "text": "Cart"
+          }
+        },
+        "products_eYYkE8": {
+          "type": "products",
+          "settings": {
+            "text": "Products",
+            "collection": ""
+          }
+        },
+        "link_mJ6QMc": {
+          "type": "link",
+          "settings": {
+            "text": "About",
+            "url": "",
+            "icon": "map-pin"
+          }
+        }
+      },
+      "block_order": [
+        "home_AP8mmy",
+        "cart_gnnwxQ",
+        "products_eYYkE8",
+        "link_mJ6QMc"
+      ],
+      "disabled": true,
+      "settings": {
+        "enable_sticky_bar": true,
+        "show_text": true
+      }
+    }
+  },
+  "order": [
+    "footer",
+    "mobile_sticky_bar_aYhgJK"
+  ]
+}

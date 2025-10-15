@@ -1,0 +1,125 @@
+<!-- DEBUG: Collection has {{ collection.products_count }} total products (products.size shows {{ collection.products.size }}) -->
+{% if collection.products_count <= 60 %}
+  <h2 style="text-align: center;">Kanskje du også er interessert i disse produktene?</h2>
+  
+  {% assign related_products_ids = blank %}
+  {% assign found_count = 0 %}
+  
+  {% comment %} Get meaningful tags from current collection {% endcomment %}
+  {% assign collection_tags = blank %}
+  {% assign collection_name_lower = collection.title | downcase %}
+  {% assign collection_handle_lower = collection.handle | downcase %}
+  
+  {% for sample_product in collection.products limit: 10 %}
+    {% for tag in sample_product.tags limit: 6 %}
+      {% assign tag_lower = tag | downcase %}
+      {% unless tag_lower == collection_name_lower or tag_lower == collection_handle_lower %}
+        {% unless collection_tags contains tag_lower %}
+          {% assign collection_tags = collection_tags | append: tag_lower | append: ',' %}
+        {% endunless %}
+      {% endunless %}
+    {% endfor %}
+  {% endfor %}
+  {% assign tags_array = collection_tags | split: ',' %}
+  
+  <div class="related-products-grid" style="max-width: 1200px; margin: 0 auto; padding: 0 20px;">
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin: 20px 0;">
+      
+      {% comment %} First pass: 3+ matching tags {% endcomment %}
+      {% for sample_product in collection.products limit: 10 %}
+        {% if found_count >= 15 %}{% break %}{% endif %}
+        {% for other_collection in sample_product.collections limit: 10 %}
+          {% if found_count >= 15 %}{% break %}{% endif %}
+          {% if other_collection.id != collection.id %}
+            {% for related_product in other_collection.products limit: 15 %}
+              {% if found_count >= 15 %}{% break %}{% endif %}
+              
+              {% assign tag_match_count = 0 %}
+              {% for product_tag in related_product.tags limit: 10 %}
+                {% assign product_tag_lower = product_tag | downcase %}
+                {% if tags_array contains product_tag_lower %}
+                  {% assign tag_match_count = tag_match_count | plus: 1 %}
+                {% endif %}
+              {% endfor %}
+              
+              {% if tag_match_count >= 3 %}
+                {% assign skip_product = false %}
+                {% for current_product in collection.products %}
+                  {% if current_product.id == related_product.id %}
+                    {% assign skip_product = true %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+                
+                {% unless skip_product %}
+                  {% assign product_id_string = related_product.id | append: ',' %}
+                  {% unless related_products_ids contains product_id_string %}
+                    <div style="max-width: 250px;">
+                      {% render 'card-product', product: related_product %}
+                    </div>
+                    {% assign related_products_ids = related_products_ids | append: product_id_string %}
+                    {% assign found_count = found_count | plus: 1 %}
+                  {% endunless %}
+                {% endunless %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        {% endfor %}
+      {% endfor %}
+      
+      {% comment %} Second pass: 2+ matching tags {% endcomment %}
+      {% if found_count < 15 %}
+        {% for sample_product in collection.products limit: 10 %}
+          {% if found_count >= 15 %}{% break %}{% endif %}
+          {% for other_collection in sample_product.collections limit: 10 %}
+            {% if found_count >= 15 %}{% break %}{% endif %}
+            {% if other_collection.id != collection.id %}
+              {% for related_product in other_collection.products limit: 15 %}
+                {% if found_count >= 15 %}{% break %}{% endif %}
+                
+                {% assign tag_match_count = 0 %}
+                {% for product_tag in related_product.tags limit: 10 %}
+                  {% assign product_tag_lower = product_tag | downcase %}
+                  {% if tags_array contains product_tag_lower %}
+                    {% assign tag_match_count = tag_match_count | plus: 1 %}
+                  {% endif %}
+                {% endfor %}
+                
+                {% if tag_match_count >= 2 %}
+                  {% assign skip_product = false %}
+                  {% for current_product in collection.products %}
+                    {% if current_product.id == related_product.id %}
+                      {% assign skip_product = true %}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+                  
+                  {% unless skip_product %}
+                    {% assign product_id_string = related_product.id | append: ',' %}
+                    {% unless related_products_ids contains product_id_string %}
+                      <div style="max-width: 250px;">
+                        {% render 'card-product', product: related_product %}
+                      </div>
+                      {% assign related_products_ids = related_products_ids | append: product_id_string %}
+                      {% assign found_count = found_count | plus: 1 %}
+                    {% endunless %}
+                  {% endunless %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          {% endfor %}
+        {% endfor %}
+      {% endif %}
+      
+    </div>
+  </div>
+{% endif %}
+
+<style>
+@media (max-width: 768px) {
+  .related-products-grid > div {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+}
+</style>

@@ -1,0 +1,96 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "breadcrumbs_F4iNAA": {
+      "type": "breadcrumbs",
+      "settings": {
+        "container": "fixed",
+        "text_alignment": "start",
+        "padding_top": 16,
+        "padding_bottom": 20
+      }
+    },
+    "custom_liquid_r8C9k4": {
+      "type": "custom-liquid",
+      "name": "t:sections.custom-liquid.name",
+      "settings": {
+        "custom_liquid": "<style>\n  .slikkepott-blog-nav {\n    margin: 40px 0;\n    padding: 0 20px;\n    text-align: center;\n  }\n  \n  .slikkepott-blog-nav-title {\n    margin-bottom: 30px;\n    font-size: 2.5rem;\n    color: #333;\n    font-weight: 600;\n  }\n  \n  @media (max-width: 768px) {\n    .slikkepott-blog-nav-title {\n      font-size: 2rem;\n      margin-bottom: 25px;\n    }\n  }\n  \n  /* Desktop: Single horizontal row like original */\n  .slikkepott-blog-nav-grid {\n    display: flex;\n    flex-wrap: wrap;\n    justify-content: center;\n    gap: 8px 30px;\n    max-width: 1200px;\n    margin: 0 auto;\n  }\n  \n  /* Mobile: Multi-row with better spacing */\n  @media (max-width: 768px) {\n    .slikkepott-blog-nav-grid {\n      gap: 15px 20px;\n    }\n  }\n  \n  @media (max-width: 500px) {\n    .slikkepott-blog-nav-grid {\n      gap: 12px 15px;\n    }\n  }\n  \n  .slikkepott-blog-nav-button {\n    display: inline-block;\n    background: none;\n    color: #666;\n    padding: 8px 0;\n    text-decoration: none;\n    font-weight: 400;\n    font-size: 1.8rem;\n    text-align: center;\n    transition: all 0.2s ease;\n    white-space: nowrap;\n    border-bottom: 2px solid transparent;\n  }\n  \n  @media (max-width: 768px) {\n    .slikkepott-blog-nav-button {\n      font-size: 2rem;\n      padding: 6px 0;\n    }\n  }\n  \n  .slikkepott-blog-nav-button:hover {\n    color: #333;\n  }\n  \n  .slikkepott-blog-nav-button.active {\n    color: #333;\n    font-weight: 600;\n    border-bottom-color: #BC0100;\n  }\n</style>\n\n<div class=\"slikkepott-blog-nav\">\n  <h1 class=\"slikkepott-blog-nav-title\">Is</h1>\n  \n  <div class=\"slikkepott-blog-nav-grid\">\n    <a href=\"/pages/blogg\" class=\"slikkepott-blog-nav-button\">Se alle</a>\n    <a href=\"/blogs/is\" class=\"slikkepott-blog-nav-button active\">Is</a>\n    <a href=\"/blogs/cannoliboller\" class=\"slikkepott-blog-nav-button\">Cannoliboller</a>\n    <a href=\"/blogs/langpannekaker\" class=\"slikkepott-blog-nav-button\">Langpannekaker</a>\n    <a href=\"/blogs/17-mai\" class=\"slikkepott-blog-nav-button\">17. mai</a>\n    <a href=\"/blogs/fastelavn\" class=\"slikkepott-blog-nav-button\">Fastelavn</a>\n    <a href=\"/blogs/guide\" class=\"slikkepott-blog-nav-button\">Guide</a>\n    <a href=\"/blogs/halloween\" class=\"slikkepott-blog-nav-button\">Halloween</a>\n    <a href=\"/blogs/inspirasjon\" class=\"slikkepott-blog-nav-button\">Inspirasjon</a>\n    <a href=\"/blogs/jul\" class=\"slikkepott-blog-nav-button\">Jul</a>\n    <a href=\"/blogs/oppskrifter\" class=\"slikkepott-blog-nav-button\">Oppskrifter</a>\n    <a href=\"/blogs/paske\" class=\"slikkepott-blog-nav-button\">Påske</a>\n  </div>\n</div>",
+        "color_scheme": "",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    },
+    "custom_liquid_ghTeYY": {
+      "type": "custom-liquid",
+      "name": "t:sections.custom-liquid.name",
+      "settings": {
+        "custom_liquid": "<style>\n  .slikkepott-tagged-articles {\n    margin: 0;\n    padding: 0 20px;\n    padding-top: 40px;\n    padding-bottom: 40px;\n  }\n  \n  .slikkepott-tagged-title {\n    text-align: center;\n    margin-bottom: 40px;\n    font-size: 2.8rem;\n    color: #333;\n    font-weight: 600;\n  }\n  \n  @media (max-width: 768px) {\n    .slikkepott-tagged-title {\n      font-size: 2.2rem;\n    }\n  }\n  \n  /* 4 columns on desktop, 2 on mobile */\n  .slikkepott-tagged-grid {\n    display: grid;\n    grid-template-columns: repeat(4, 1fr);\n    gap: 25px;\n    max-width: 1400px;\n    margin: 0 auto;\n  }\n  \n  @media (max-width: 1200px) {\n    .slikkepott-tagged-grid {\n      grid-template-columns: repeat(3, 1fr);\n      gap: 20px;\n    }\n  }\n  \n  @media (max-width: 768px) {\n    .slikkepott-tagged-grid {\n      grid-template-columns: repeat(2, 1fr);\n      gap: 15px;\n    }\n  }\n  \n  @media (max-width: 480px) {\n    .slikkepott-tagged-grid {\n      gap: 12px;\n    }\n  }\n  \n  .slikkepott-tagged-card {\n    background: #fff;\n    border-radius: 12px;\n    overflow: hidden;\n    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);\n    transition: all 0.3s ease;\n    border: 1px solid #f0f0f0;\n    display: flex;\n    flex-direction: column;\n  }\n  \n  .slikkepott-tagged-card:hover {\n    transform: translateY(-3px);\n    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);\n  }\n  \n  .slikkepott-tagged-image {\n    width: 100%;\n    height: 200px;\n    object-fit: cover;\n    display: block;\n  }\n  \n  @media (max-width: 768px) {\n    .slikkepott-tagged-image {\n      height: 160px;\n    }\n  }\n  \n  .slikkepott-tagged-content {\n    padding: 24px;\n    flex-grow: 1;\n    display: flex;\n    flex-direction: column;\n  }\n  \n  @media (max-width: 768px) {\n    .slikkepott-tagged-content {\n      padding: 20px;\n    }\n  }\n  \n  /* Much larger, more readable text */\n  .slikkepott-tagged-article-title {\n    font-size: 1.6rem;\n    font-weight: 600;\n    color: #333;\n    margin-bottom: 16px;\n    line-height: 1.3;\n  }\n  \n  @media (max-width: 768px) {\n    .slikkepott-tagged-article-title {\n      font-size: 1.8rem;\n      margin-bottom: 14px;\n      line-height: 1.25;\n    }\n  }\n  \n  .slikkepott-tagged-excerpt {\n    color: #666;\n    font-size: 1.7rem;\n    line-height: 1.5;\n    margin-bottom: 20px;\n    flex-grow: 1;\n  }\n  \n  @media (max-width: 768px) {\n    .slikkepott-tagged-excerpt {\n      font-size: 1.rem;\n      margin-bottom: 18px;\n      line-height: 1.4;\n    }\n  }\n  \n  .slikkepott-tagged-button {\n    display: inline-block;\n    background-color: #BC0100;\n    color: white;\n    padding: 14px 20px;\n    border-radius: 6px;\n    text-decoration: none;\n    font-weight: 600;\n    font-size: 1.5rem;\n    text-align: center;\n    transition: all 0.3s ease;\n  }\n  \n  @media (max-width: 768px) {\n    .slikkepott-tagged-button {\n      font-size: 1.5rem;\n      padding: 12px 16px;\n    }\n  }\n  \n  .slikkepott-tagged-button:hover {\n    background-color: #9a0100;\n    color: white;\n    transform: translateY(-1px);\n  }\n  \n  .slikkepott-no-articles {\n    text-align: center;\n    padding: 60px 20px;\n    color: #666;\n    font-size: 1.3rem;\n  }\n  \n  .slikkepott-image-placeholder {\n    width: 100%;\n    height: 200px;\n    background: linear-gradient(135deg, #BC0100 0%, #9a0100 100%);\n    display: flex;\n    align-items: center;\n    justify-content: center;\n    color: white;\n    font-size: 3rem;\n  }\n  \n  @media (max-width: 768px) {\n    .slikkepott-image-placeholder {\n      height: 160px;\n      font-size: 2rem;\n    }\n  }\n</style>\n\n<div class=\"slikkepott-tagged-articles\">\n  <h2 class=\"slikkepott-tagged-title\">Is</h2>\n  \n  <div class=\"slikkepott-tagged-grid\">\n    \n    {% comment %} Collect all articles tagged with \"is\" from all blogs {% endcomment %}\n    {% assign target_tag = 'is' %}\n    {% assign blog_handles = 'oppskrifter,guide,inspirasjon,halloween,paske,fremgangsmater,jul,default-blog,news,cannoliboller' | split: ',' %}\n    {% assign article_count = 0 %}\n    {% assign found_articles = false %}\n    \n    {% for handle in blog_handles %}\n      {% assign current_blog = blogs[handle] %}\n      {% if current_blog %}\n        {% comment %} Use paginate to access more than 20 articles {% endcomment %}\n        {% paginate current_blog.articles by 100 %}\n          {% for article in current_blog.articles %}\n            {% comment %} Check if article has the target tag (case insensitive) {% endcomment %}\n            {% assign has_target_tag = false %}\n            {% for tag in article.tags %}\n              {% assign tag_handle = tag | handle %}\n              {% if tag_handle == target_tag or tag_handle contains target_tag %}\n                {% assign has_target_tag = true %}\n                {% break %}\n              {% endif %}\n            {% endfor %}\n            \n            {% if has_target_tag %}\n              {% assign found_articles = true %}\n              {% assign article_count = article_count | plus: 1 %}\n              \n              <div class=\"slikkepott-tagged-card\">\n                {% if article.image %}\n                  <img src=\"{{ article.image | img_url: '500x400' }}\" \n                       alt=\"{{ article.title }}\" \n                       class=\"slikkepott-tagged-image\">\n                {% else %}\n                  <div class=\"slikkepott-image-placeholder\">🍦</div>\n                {% endif %}\n                \n                <div class=\"slikkepott-tagged-content\">\n                  <h2 class=\"slikkepott-tagged-article-title\">{{ article.title }}</h2>\n                  \n                  {% if article.excerpt != blank %}\n                    <p class=\"slikkepott-tagged-excerpt\">{{ article.excerpt | strip_html | truncate: 150 }}</p>\n                  {% else %}\n                    <p class=\"slikkepott-tagged-excerpt\">{{ article.content | strip_html | truncate: 150 }}</p>\n                  {% endif %}\n                  \n                  <a href=\"{{ article.url }}\" class=\"slikkepott-tagged-button\">Les mer</a>\n                </div>\n              </div>\n            {% endif %}\n          {% endfor %}\n        {% endpaginate %}\n      {% endif %}\n    {% endfor %}\n    \n    {% unless found_articles %}\n      <div class=\"slikkepott-no-articles\">\n        <p>Ingen artikler funnet for \"{{ target_tag }}\"</p>\n      </div>\n    {% endunless %}\n  </div>\n  \n  {% if found_articles %}\n    <p style=\"text-align: center; margin-top: 30px; color: #666; font-size: 1rem;\">\n      Viser {{ article_count }} artikler tagget med \"{{ target_tag }}\"\n    </p>\n  {% endif %}\n</div>",
+        "color_scheme": "",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    },
+    "main": {
+      "type": "main-blog",
+      "blocks": {
+        "featured_post_fgVGy7": {
+          "type": "featured_post",
+          "settings": {
+            "featured_image_ratio": "adapt",
+            "heading_size": "h1",
+            "show_section_divider": true
+          }
+        },
+        "heading_U7FQUU": {
+          "type": "heading",
+          "settings": {
+            "heading_size": "h1",
+            "content_alignment": "left"
+          }
+        },
+        "tags_cTH8Uh": {
+          "type": "tags",
+          "settings": {
+            "limit": 4,
+            "alignment": "left"
+          }
+        }
+      },
+      "block_order": [
+        "featured_post_fgVGy7",
+        "heading_U7FQUU",
+        "tags_cTH8Uh"
+      ],
+      "disabled": true,
+      "settings": {
+        "container": "fixed",
+        "post_limit": 12,
+        "columns_desktop": 3,
+        "column_gap": "medium",
+        "row_gap": "large",
+        "card_title_size": "h4",
+        "show_tags": true,
+        "show_excerpt": false,
+        "show_date": true,
+        "show_author": true,
+        "show_button": false,
+        "padding_top": 0,
+        "padding_bottom": 80
+      }
+    }
+  },
+  "order": [
+    "breadcrumbs_F4iNAA",
+    "custom_liquid_r8C9k4",
+    "custom_liquid_ghTeYY",
+    "main"
+  ]
+}

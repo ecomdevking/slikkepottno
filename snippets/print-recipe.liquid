@@ -1,0 +1,59 @@
+<style>
+@media print {
+  body * { visibility: hidden; }
+  .print-area, .print-area * { visibility: visible; }
+  .print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20px;
+  }
+  .print-logo {
+    display: block;
+    max-width: 300px;
+    margin: 0 auto 30px;
+  }
+  .social-share { display: none !important; }
+}
+
+.print-share-btn {
+  display: inline-block;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 4px;
+  color: #495057;
+  text-decoration: none;
+  cursor: pointer;
+  margin: 0 5px;
+}
+</style>
+
+<div class="social-share">
+  <!-- Your existing social buttons -->
+  
+  <button onclick="printRecipe()" class="print-share-btn">
+    🖨️ Print
+  </button>
+</div>
+
+<div class="print-area" style="display: none;">
+  <img src="https://cdn.shopify.com/s/files/1/0660/0543/4442/files/cropped-cropped-logo_single-250x57-1_88235424-6905-4d81-9ddd-e917a986d0dc.webp?v=1754548265&width=300" 
+       alt="Logo" 
+       class="print-logo"
+       width="300" 
+       height="68">
+  <div class="print-content">
+    {{ article.content }}
+  </div>
+</div>
+
+<script>
+function printRecipe() {
+  const printArea = document.querySelector('.print-area');
+  printArea.style.display = 'block';
+  window.print();
+  setTimeout(() => printArea.style.display = 'none', 1000);
+}
+</script>

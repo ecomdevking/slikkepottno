@@ -1,0 +1,1084 @@
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+
+  assign show_color_swatches = settings.pcard_enable_color_swatches
+
+  if show_vendor == null
+    assign show_vendor = settings.pcard_show_vendor
+  endif
+
+  if show_type == null
+    assign show_type = settings.pcard_show_type
+  endif
+
+  if show_price == null
+    assign show_price = settings.pcard_show_price
+  endif
+
+  if show_product_option == null
+    assign show_product_option = settings.pcard_show_color_swatch
+  endif
+
+  # Bundle Product Detection
+  assign is_bundle_product = false
+  assign bundle_products = null
+  assign bundle_quantities = null
+  assign bundle_discount = null
+
+  if product.variants.first.metafields.custom.is_bundle.value == true
+    assign is_bundle_product = true
+    assign bundle_products = product.variants.first.metafields.custom.bundle_products.value
+    assign bundle_quantities = product.variants.first.metafields.custom.bundle_quantities.value
+    assign bundle_discount = product.variants.first.metafields.custom.bundle_discount.value
+  endif
+
+  assign first_media_type = product.featured_media.media_type
+  assign featured_media = product.featured_media
+
+  if first_media_type == 'model' or first_media_type == 'video'
+    assign featured_media = product.featured_media.preview_image
+  endif
+
+  if image_ratio == blank
+    assign image_ratio = settings.pcard_image_ratio | default: '1'
+  endif
+  if image_ratio == 'adapt'
+    if featured_media != blank
+      assign image_ratio = featured_media.aspect_ratio
+    else
+      assign image_ratio = '1'
+    endif
+  endif
+
+  assign second_image = ''
+  if settings.pcard_show_second_img and product.images.size > 1 and product.images[1] != blank
+    assign second_image = product.images[1]
+  endif
+
+  if enable_quick_add == null
+    assign enable_quick_add = settings.pcard_show_cart_button
+  endif
+
+  if enable_quick_view == null
+    assign enable_quick_view = settings.pcard_show_quickview_button
+  endif
+
+  if enable_compare_checkbox == null
+    assign enable_compare_checkbox = false
+  endif
+
+  assign mobile_hide_quick_add = settings.pcard_mobile_hide_quick_add
+
+  assign atc_button_tag = 'a'
+  unless settings.pcard_choose_options_actions == 'product_page'
+    assign atc_button_tag = 'button'
+  endunless
+
+  if use_short_text_for_atc_button == null
+    assign use_short_text_for_atc_button = false
+  endif
+
+  assign product_url = product.url
+
+  if remove_params
+    assign product_url = product_url | split: '?' | first
+  endif
+
+  assign card_wrapper_class = ''
+  if custom_class != blank
+    assign card_wrapper_class = card_wrapper_class | append: ' ' | append: custom_class
+  endif
+  if mobile_hide_quick_add
+    assign card_wrapper_class = card_wrapper_class | append: ' mobile-hide-quick-add'
+  endif
+
+  assign quick_view_suffix = quick_view_suffix | default: ''
+  assign quick_view_modal_id = 'QuickView-' | append: product.id | append: '-' | append: section.id | append: quick_view_suffix
+
+  assign loading = 'lazy'
+  assign fetchpriority = 'low'
+  if section_index < 3 and index == 1
+    assign loading = 'eager'
+    assign fetchpriority = 'high'
+  endif
+
+  if pcard_style == null
+    assign pcard_style = settings.pcard_style
+  endif
+
+  # Update default values here also need to update for pcard-color-swatch.liquid
+  assign image_sizes = image_sizes | default: '450px'
+  assign image_widths = '70, 140, 165, 355, 450, 535, 710, 900, 1070, 1420'
+
+  assign color_scheme_first = settings.color_schemes | first
+  assign parent_color_scheme = parent_color_scheme | default: color_scheme_first
+
+  if color_inherit == nil
+    assign parent_background = parent_color_scheme.settings.background | downcase
+    assign card_background = settings.pcard_color_scheme.settings.background | downcase
+    assign color_inherit = false
+    if parent_background == card_background
+      assign color_inherit = true
+    endif
+  endif
+-%}
+<div
+  class="product-card product-card-style-{{ pcard_style }}{% if pcard_style == 'card' %} color-{{ settings.pcard_color_scheme }}{% endif %}{{ card_wrapper_class }}{% if list_on_mobile %} product-card-list-on-mobile{% endif %}{% if color_inherit %} color-inherit{% endif %}"
+>
+  <div class="product-card__wrapper h-full">
+    <div class="product-card__image-wrapper{% if second_image == blank %} product-card__image-wrapper--main-only{% endif %} {% if list_on_mobile %}desktop-{% endif %}color-{{ settings.pcard_overlay_color_scheme }} bg-none">
+      <a href="{{ product.url }}" aria-label="{{ product.title | escape }}" tabindex="-1">
+        <motion-element data-motion="zoom-out-sm" class="block">
+          {%- if featured_media -%}
+            {%- unless first_media_type == 'video' or first_media_type == 'external_video' -%}
+              <div
+                class="media-wrapper product-card__image product-card__image--main"
+                style="--aspect-ratio: {{ image_ratio }}"
+              >
+                {%- assign first_image_widths = image_widths | append: ', ' | append: featured_media.width -%}
+                {{
+                  featured_media
+                  | image_url: width: featured_media.width
+                  | image_tag:
+                    loading: loading,
+                    fetchpriority: fetchpriority,
+                    class: 'motion-reduce',
+                    widths: first_image_widths,
+                    sizes: image_sizes,
+                    is: 'image-lazy'
+                }}
+              </div>
+              {%- unless second_image == blank -%}
+                <div
+                  class="media-wrapper product-card__image product-card__image--second inset-full hidden md:block"
+                  style="--aspect-ratio: {{ image_ratio }}"
+                >
+                  {%- assign second_image_widths = image_widths | append: ', ' | append: second_image.width -%}
+                  {{
+                    second_image
+                    | image_url: width: second_image.width
+                    | image_tag:
+                      loading: 'lazy',
+                      class: 'motion-reduce',
+                      widths: second_image_widths,
+                      sizes: image_sizes,
+                      is: 'image-lazy'
+                  }}
+                </div>
+              {%- endunless -%}
+            {%- else -%}
+              <div class="media media--adapt" style="--media-ratio: {{ image_ratio }};">
+                {% render 'video',
+                  video: product.featured_media,
+                  muted: true,
+                  autoplay: true,
+                  loop: true,
+                  cover_image: featured_media,
+                  show_play_button: false
+                %}
+              </div>
+            {%- endunless -%}
+          {%- else -%}
+            <div class="product-card__image product-card__image--main" style="--aspect-ratio: {{ image_ratio }};">
+              {{- 'product-1' | placeholder_svg_tag: 'placeholder-svg' -}}
+            </div>
+          {%- endif -%}
+        </motion-element>
+      </a>
+      {%- render 'pcard-badges', product: product -%}
+      {%- render 'pcard-flash-sale', product: product -%}
+      {%- if enable_quick_view -%}
+        <button
+          class="product-card__quickview btn btn--icon-circle {{ settings.quickview_button_style }} no-js-hidden"
+          aria-label="{{ 'products.product.quick_view' | t }}"
+          aria-controls="{{ quick_view_modal_id }}"
+          aria-haspopup="dialog"
+        >
+          <span class="btn__text flex gap-1 items-center">{%- render 'icon-search', size: 'large' -%}</span>
+        </button>
+      {%- endif -%}
+      {%- if enable_quick_add -%}
+        {%- liquid
+          assign product_form_id = 'quick-add-' | append: section.id | append: product.id
+          assign qty_rules = false
+          if variant.quantity_rule.min > 1 or variant.quantity_rule.max != null or variant.quantity_rule.increment > 1
+            assign qty_rules = true
+          endif
+        -%}
+        {%- if product.variants.size > 1 or qty_rules -%}
+          <div class="product-card__actions product-card__main-actions{% unless settings.pcard_choose_options_actions == 'product_page' %} no-js-hidden{% endunless %}">
+            <{{ atc_button_tag }}
+              {% if settings.pcard_choose_options_actions == 'product_page' %}
+                href="{{- product_url -}}"
+              {% else %}
+                aria-controls="{{ quick_view_modal_id }}"
+                aria-haspopup="dialog"
+              {% endif %}
+              class="product-card__atc product-card__action-button btn {{ settings.pcard_button_style }}"
+            >
+              <div class="btn__text flex gap-1 items-center">
+                <span class="product-card__atc-icon product-card__action-icon inline-flex md:hidden">
+                  {%- render 'icon-cart', name: settings.cart_icon -%}
+                </span>
+                <span class="product-card__atc-text product-card__action-text">
+                  {%- if use_short_text_for_atc_button -%}
+                    {{- 'products.product.choose_options_short' | t -}}
+                  {%- else -%}
+                    {{- 'products.product.choose_options' | t -}}
+                  {%- endif -%}
+                </span>
+              </div>
+            </{{ atc_button_tag }}>
+          </div>
+        {%- else -%}
+          {%- if is_bundle_product != true -%}
+            {%- comment -%} Regular Product Form (Inside Form) {%- endcomment -%}
+            {%- form 'product',
+              product,
+              id: product_form_id,
+              class: 'product-card__actions product-card__main-actions',
+              novalidate: 'novalidate',
+              data-type: 'add-to-cart-form',
+              is: 'product-form'
+            -%}
+              <input
+                type="hidden"
+                name="id"
+                value="{{- variant.id -}}"
+                class="product-variant-id"
+                {% if variant.available == false %}
+                  disabled
+                {% endif %}
+              >
+              <button
+                id="{{ product_form_id }}-submit"
+                type="submit"
+                name="add"
+                {% if variant.available == false %}
+                  disabled
+                {% endif %}
+                aria-label="{{ 'products.product.add_to_cart' | t }}"
+                class="product-card__atc product-card__action-button btn {{ settings.pcard_button_style }}"
+              >
+                <div class="btn__text flex gap-1 items-center">
+                  <span class="product-card__atc-icon product-card__action-icon inline-flex md:hidden">
+                    {%- render 'icon-cart', name: settings.cart_icon -%}
+                  </span>
+                  <span class="product-card__atc-text product-card__action-text">
+                    {%- if variant.available -%}
+                      {%- if use_short_text_for_atc_button -%}
+                        {{- 'products.product.add_to_cart_short' | t -}}
+                      {%- else -%}
+                        {{- 'products.product.add_to_cart' | t -}}
+                      {%- endif -%}
+                    {%- else -%}
+                      {{- 'products.product.sold_out' | t -}}
+                    {%- endif -%}
+                  </span>
+                </div>
+                {% render 'loading-spinner' %}
+              </button>
+            {%- endform -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endif -%}
+      {%- if enable_compare_checkbox -%}
+        <compare-checkbox class="product-card__compare hidden">
+          <label
+            data-tooltip="left"
+            class="flex items-center justify-center cursor-pointer"
+            for="CompareCheckbox-{{ section.id }}-{{ block.id }}-{{ product.id }}"
+          >
+            <input
+              id="CompareCheckbox-{{ section.id }}-{{ block.id }}-{{ product.id }}"
+              class="js-compare-checkbox"
+              type="checkbox"
+              name="product-compare"
+              data-product-id="{{ product.id }}"
+              data-product-url="{{ product.url }}"
+            >
+            <span class="tooltip pointer-events-none">{{- 'products.product.compare' | t -}}</span>
+          </label>
+        </compare-checkbox>
+      {%- endif -%}
+    </div>
+    <div class="product-card__info text-{{ settings.pcard_content_alignment }}">
+      {%- if show_vendor and product.vendor != blank -%}
+        <p class="product-card__vendor text-sm-extra m-0">
+          <a
+            href="{{ product.vendor | url_for_vendor }}"
+            class="reversed-link"
+            aria-label="{{ 'accessibility.vendor' | t }}{{ product.vendor }}"
+          >
+            {{- product.vendor -}}
+          </a>
+        </p>
+      {%- endif -%}
+      {%- comment -%}
+
+      {%- if show_type and product.type != blank -%}
+        <p class="product-card__type text-sm-extra m-0">
+          <a
+            href="{{ product.type | url_for_type }}"
+            class="reversed-link"
+            aria-label="{{ 'accessibility.product_type' | t }}{{ product.type }}"
+          >
+            {{- product.type -}}
+          </a>
+        </p>
+      {%- endif -%}
+       {%- endcomment -%}
+
+      {%- comment -%} Collection name tag - only show when visiting a collection {%- endcomment -%}
+      {%- if collection and collection.handle != 'all' and collection.title != blank -%}
+        <div class="slikkepott-product-tags" style="text-align: left;">
+          <a href="{{ collection.url }}" class="slikkepott-product-tag slikkepott-product-tag--collection">
+            {{- collection.title -}}
+          </a>
+        </div>
+      {%- endif -%}
+
+      <h3 class="product-card__title text-pcard-title">
+        <a
+          class="reversed-link block {% if settings.pcard_title_line_limit != 'none' %} text-limit-{{ settings.pcard_title_line_limit }}{% endif %}"
+          href="{{ product.url }}"
+        >
+          <span class="reversed-link__text">{{- product.title -}}</span>
+        </a>
+      </h3>
+      {%- if show_price -%}
+        {%- if is_bundle_product == true -%}
+          {%- liquid
+            assign totalOriginalPrice = 0
+            assign totalDiscountedPrice = 0
+            if bundle_products != blank
+              for component in bundle_products
+                assign componentQuantity = 1
+                if bundle_quantities and bundle_quantities[forloop.index0]
+                  assign componentQuantity = bundle_quantities[forloop.index0]
+                endif
+                assign componentPrice = component.price | times: componentQuantity
+                assign totalOriginalPrice = totalOriginalPrice | plus: componentPrice
+              endfor
+              if bundle_discount and bundle_discount > 0
+                assign discountAmount = totalOriginalPrice | times: bundle_discount | divided_by: 100
+                assign totalDiscountedPrice = totalOriginalPrice | minus: discountAmount
+              else
+                assign totalDiscountedPrice = totalOriginalPrice
+              endif
+            endif
+          -%}
+          
+          {%- if totalOriginalPrice > 0 -%}
+            <div class="bundle-price-display">
+              {%- if bundle_discount and bundle_discount > 0 -%}
+                <div class="bundle-price-container" style="display: flex; flex-direction: column; gap: 0.25rem;">
+                  <div class="bundle-price-main" style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span class="bundle-discounted-price" style="color: #dc2626; font-weight: 600; font-size: 1.125rem;">
+                      {%- if settings.currency_code_enabled -%}
+                        {{ totalDiscountedPrice | money_with_currency }}
+                      {%- else -%}
+                        {{ totalDiscountedPrice | money }}
+                      {%- endif -%}
+                    </span>
+                    <span class="bundle-original-price" style="text-decoration: line-through; color: #6b7280; font-size: 0.875rem;">
+                      {%- if settings.currency_code_enabled -%}
+                        {{ totalOriginalPrice | money_with_currency }}
+                      {%- else -%}
+                        {{ totalOriginalPrice | money }}
+                      {%- endif -%}
+                    </span>
+                  </div>
+                  <div class="bundle-savings" style="color: #059669; font-weight: 500; font-size: 0.75rem;">
+                    Save {{ bundle_discount }}% ({{ discountAmount | money }})
+                  </div>
+                </div>
+              {%- else -%}
+                <div class="bundle-price-single" style="font-weight: 600; font-size: 1.125rem;">
+                  {%- if settings.currency_code_enabled -%}
+                    {{ totalOriginalPrice | money_with_currency }}
+                  {%- else -%}
+                    {{ totalOriginalPrice | money }}
+                  {%- endif -%}
+                </div>
+              {%- endif -%}
+            </div>
+          {%- else -%}
+            {% render 'price', product: product, alignment: settings.pcard_content_alignment %}
+          {%- endif -%}
+        {%- else -%}
+          {% render 'price', product: product, alignment: settings.pcard_content_alignment %}
+        {%- endif -%}
+      {%- endif -%}
+
+      {%- if show_color_swatches -%}
+        {%- render 'pcard-color-swatch',
+          product: product,
+          image_sizes: image_sizes,
+          image_widths: image_widths,
+          enable_quick_view: enable_quick_view,
+          quick_view_modal_id: quick_view_modal_id
+        -%}
+      {%- endif -%}
+    </div>
+    <div class="product-card__list-actions hidden gap-3 flex-col">
+      {%- if enable_quick_add -%}
+        {%- liquid
+          assign product_form_id = 'list-view-quick-add-' | append: section.id | append: product.id
+          assign qty_rules = false
+          if variant.quantity_rule.min > 1 or variant.quantity_rule.max != null or variant.quantity_rule.increment > 1
+            assign qty_rules = true
+          endif
+        -%}
+        {%- if product.variants.size > 1 or qty_rules -%}
+          <div class="product-card__list-actions-main">
+            <{{ atc_button_tag }}
+              {% if settings.pcard_choose_options_actions == 'product_page' %}
+                href="{{- product_url -}}"
+              {% else %}
+                aria-controls="{{ quick_view_modal_id }}"
+                aria-haspopup="dialog"
+              {% endif %}
+              class="product-card__list-atc btn btn--primary"
+            >
+              <span class="btn__text flex gap-1 items-center">
+                {%- if use_short_text_for_atc_button -%}
+                  {{- 'products.product.choose_options_short' | t -}}
+                {%- else -%}
+                  {{- 'products.product.choose_options' | t -}}
+                {%- endif -%}
+              </span>
+            </{{ atc_button_tag }}>
+          </div>
+        {%- else -%}
+          {%- if is_bundle_product != true -%}
+            {%- form 'product',
+              product,
+              id: product_form_id,
+              class: 'product-card__list-actions-main',
+              novalidate: 'novalidate',
+              data-type: 'add-to-cart-form',
+              is: 'product-form'
+            -%}
+              <input
+                type="hidden"
+                name="id"
+                value="{{- variant.id -}}"
+                class="product-variant-id"
+                {% if variant.available == false %}
+                  disabled
+                {% endif %}
+              >
+              <button
+                id="{{ product_form_id }}-submit"
+                type="submit"
+                name="add"
+                {% if variant.available == false %}
+                  disabled
+                {% endif %}
+                aria-label="{{ 'products.product.add_to_cart' | t }}"
+                class="product-card__list-atc btn btn--primary w-full"
+              >
+                <span class="btn__text flex gap-1 items-center">
+                  {%- if variant.available -%}
+                    {%- if use_short_text_for_atc_button -%}
+                      {{- 'products.product.add_to_cart_short' | t -}}
+                    {%- else -%}
+                      {{- 'products.product.add_to_cart' | t -}}
+                    {%- endif -%}
+                  {%- else -%}
+                    {{- 'products.product.sold_out' | t -}}
+                  {%- endif -%}
+                </span>
+                {% render 'loading-spinner' %}
+              </button>
+            {%- endform -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endif -%}
+      <a href="{{- product_url -}}" class="btn btn--secondary">
+        <span class="btn__text flex gap-1 items-center">{{- 'products.product.view_details' | t -}}</span>
+      </a>
+    </div>
+  </div>
+  {%- if settings.pcard_choose_options_actions == 'open_popup' or enable_quick_view -%}
+    {% render 'quick-view-modal', modal_id: quick_view_modal_id, product: product %}
+  {%- endif -%}
+</div>
+
+{%- comment -%}
+  Bundle Product JavaScript Implementation for Card Product
+  Handles custom add to cart functionality for bundle products in product cards
+{%- endcomment -%}
+
+<script>
+  // Prevent multiple script execution
+  if (window.cardBundleScriptLoaded) {
+    console.log('🚫 Card bundle script already loaded, skipping...');
+    return;
+  }
+  window.cardBundleScriptLoaded = true;
+  
+  console.log('🚀 CARD BUNDLE SCRIPT STARTING...');
+  
+  // Bundle product data from Liquid - Define at top level
+  const isBundleProduct = {{ is_bundle_product | json }};
+  const bundleProducts = {{ bundle_products | json }};
+  const bundleQuantities = {{ bundle_quantities | json }};
+  const bundleDiscount = {{ bundle_discount | json }};
+  const variantId = {{ product.variants.first.id | json }};
+  const productId = {{ product.id | json }};
+  const productTitle = {{ product.title | json }};
+  
+  console.log('🚀 CARD BUNDLE SCRIPT LOADED');
+  console.log('Bundle product status:', isBundleProduct);
+  console.log('Raw metafield values:', {
+    isBundleProduct: {{ is_bundle_product | json }},
+    bundleProducts: {{ bundle_products | json }},
+    bundleQuantities: {{ bundle_quantities | json }},
+    bundleDiscount: {{ bundle_discount | json }},
+    variantId: {{ product.variants.first.id | json }},
+    productId: {{ product.id | json }}
+  });
+  console.log('Card Bundle product detection:', {
+    isBundleProduct,
+    bundleProducts,
+    bundleQuantities,
+    bundleDiscount,
+    variantId,
+    productId
+  });
+
+  // Add a visible test element to the page
+  const testDiv = document.createElement('div');
+  testDiv.innerHTML = '🧪 BUNDLE SCRIPT IS RUNNING';
+  testDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; z-index: 9999; font-size: 14px;';
+  document.body.appendChild(testDiv);
+  
+  // Test if bundle button exists and set up direct handlers
+  setTimeout(function() {
+    const bundleButton = document.getElementById('{{ product_form_id }}-bundle-submit');
+    const bundleListButton = document.getElementById('{{ product_form_id }}-bundle-list-submit');
+    console.log('🔍 Looking for bundle button with ID: {{ product_form_id }}-bundle-submit');
+    console.log('🔍 Bundle button found:', bundleButton);
+    console.log('🔍 Bundle list button found:', bundleListButton);
+    
+    if (bundleButton) {
+      console.log('✅ Bundle button exists in DOM');
+      // Direct click handler
+      bundleButton.onclick = function(event) {
+        console.log('🎯 DIRECT BUNDLE BUTTON CLICK!');
+        event.preventDefault();
+        event.stopPropagation();
+        alert('DIRECT BUNDLE BUTTON CLICKED!');
+        return false;
+      };
+    }
+    
+    if (bundleListButton) {
+      console.log('✅ Bundle list button exists in DOM');
+      // Direct click handler
+      bundleListButton.onclick = function(event) {
+        console.log('🎯 DIRECT BUNDLE LIST BUTTON CLICK!');
+        event.preventDefault();
+        event.stopPropagation();
+        alert('DIRECT BUNDLE LIST BUTTON CLICKED!');
+        return false;
+      };
+    }
+    
+    if (!bundleButton && !bundleListButton) {
+      console.log('❌ No bundle buttons found in DOM');
+      console.log('Available buttons:', document.querySelectorAll('button'));
+      console.log('Buttons with data-bundle-button:', document.querySelectorAll('[data-bundle-button="true"]'));
+    }
+  }, 500);
+
+  // Check if this is a bundle product
+  if (!isBundleProduct) {
+    console.log('Not a bundle product, skipping bundle functionality');
+  } else {
+    console.log('✅ Bundle product detected, initializing...');
+    
+    // SIMPLE DIRECT CLICK HANDLER FOR BUNDLE BUTTON
+    setTimeout(function() {
+      const bundleButton = document.getElementById('{{ product_form_id }}-bundle-submit');
+      if (bundleButton) {
+        console.log('✅ Found bundle button:', bundleButton);
+        
+        bundleButton.addEventListener('click', function(event) {
+          console.log('🎯 BUNDLE BUTTON CLICKED!');
+          event.preventDefault();
+          event.stopPropagation();
+          alert('BUNDLE BUTTON CLICKED! This proves the button is working!');
+          return false;
+        });
+        
+        console.log('✅ Bundle button click handler attached');
+      } else {
+        console.log('❌ Bundle button not found');
+      }
+    }, 1000);
+  }
+
+  // ULTRA ROBUST: Multiple detection methods for bundle buttons
+  document.addEventListener('click', function(event) {
+    console.log('🔍 ANY ELEMENT CLICKED:', event.target);
+    
+    // Check if it's a button
+    if (event.target.matches('button')) {
+      console.log('🔍 BUTTON CLICKED:', event.target);
+      console.log('Button ID:', event.target.id);
+      console.log('Button classes:', event.target.className);
+      console.log('Button data attributes:', {
+        bundleButton: event.target.getAttribute('data-bundle-button'),
+        productId: event.target.getAttribute('data-product-id')
+      });
+      
+      // Multiple ways to detect bundle button
+      const isBundleButton = 
+        event.target.id.includes('bundle-submit') ||
+        event.target.id.includes('bundle-list-submit') ||
+        event.target.getAttribute('data-bundle-button') === 'true' ||
+        event.target.classList.contains('product-card__atc') ||
+        event.target.classList.contains('product-card__list-atc');
+      
+      if (isBundleButton) {
+        console.log('🎯 BUNDLE BUTTON DETECTED!');
+        console.log('Bundle product status:', isBundleProduct);
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        alert('BUNDLE BUTTON CLICKED! This proves the button is working!');
+        return false;
+      }
+    }
+  }, true); // Use capture phase
+
+    // Function to check bundle inventory availability
+    function checkBundleInventory() {
+      if (!bundleProducts || !bundleQuantities) return { valid: false, message: 'Bundle data not available' };
+      
+      for (let i = 0; i < bundleProducts.length; i++) {
+        const variant = bundleProducts[i];
+        const bundleQuantity = bundleQuantities[i] || 1;
+        const requiredQuantity = bundleQuantity; // Only 1 quantity for card add to cart
+        
+        // Check if variant has inventory
+        if (variant.inventory_quantity !== undefined && requiredQuantity > variant.inventory_quantity) {
+          return {
+            valid: false,
+            message: `Insufficient inventory for ${variant.title}. Required: ${requiredQuantity}, Available: ${variant.inventory_quantity}`
+          };
+        }
+      }
+      
+      return { valid: true };
+    }
+    
+    // Custom Add to Cart Function for Bundle Products
+    function handleBundleAddToCart(event) {
+      console.log('🎯 handleBundleAddToCart function called!');
+      console.log('Event:', event);
+      console.log('Target:', event.target);
+      
+      // ALWAYS prevent default for bundle products
+      event.preventDefault();
+      event.stopPropagation();
+      event.stopImmediatePropagation();
+      
+      console.log('Card Bundle add to cart triggered');
+      
+      // For bundle products, NEVER allow normal form submission
+      if (!isBundleProduct || !bundleProducts || bundleProducts.length === 0) {
+        console.log('Not a bundle product or no bundle data - this should not happen!');
+        return;
+      }
+
+      // Check inventory before proceeding
+      const inventoryCheck = checkBundleInventory();
+      if (!inventoryCheck.valid) {
+        showMessage(inventoryCheck.message, 'error');
+        return;
+      }
+      
+      // Generate a unique bundle ID for this bundle purchase
+      const bundleId = `bundle-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      
+      // Prepare cart items with bundle metafields as properties
+      // Send individual component products, not the bundle product itself
+      const items = bundleProducts.map((variant, index) => {
+        const bundleQuantity = bundleQuantities && bundleQuantities[index] ? bundleQuantities[index] : 1;
+        const finalQuantity = bundleQuantity; // Only 1 quantity for card add to cart
+        
+        console.log(`Variant ${index + 1}: ${variant.title || 'Unknown Variant'}`);
+        console.log(`Bundle quantity: ${bundleQuantity}, Final quantity: ${finalQuantity}`);
+        
+        // Create properties object with all metafields
+        const properties = {
+          '_bundle_id': bundleId,
+          '_is_bundle': true,
+          '_variant_id': variantId, // This is the bundle product variant ID
+          '_bundle_quantity': bundleQuantity,
+          '_user_quantity': 1, // Always 1 for card add to cart
+          '_product_title': variant.title || 'Bundle Variant',
+          '_product_id': variant.id, // This is the component product variant ID
+        };
+        
+        // Add bundle discount if available
+        if (bundleDiscount) {
+          properties['_bundle_discount'] = bundleDiscount;
+          properties['_discount_value'] = bundleDiscount;
+        }
+        
+        // Add all bundle products data as a property
+        properties['_bundle_products_data'] = JSON.stringify(bundleProducts);
+        properties["_bundle_name"] = productTitle;
+        
+        return {
+          id: variant.id, // Send component product variant ID, not bundle product ID
+          quantity: finalQuantity,
+          properties: properties
+        };
+      });
+      
+      console.log('Card Cart items to add (component products):', items);
+      console.log('Bundle products data:', bundleProducts);
+      console.log('Bundle quantities data:', bundleQuantities);
+      
+      // Verify we're sending component products, not bundle product
+      items.forEach((item, index) => {
+        console.log(`Item ${index}: ID=${item.id}, Quantity=${item.quantity}, Title=${item.properties._product_title}`);
+      });
+      
+      // Add items to cart via AJAX
+      addBundleToCart(items);
+    }
+
+    // Function to add bundle items to cart
+    async function addBundleToCart(items) {
+      try {
+        // Show loading state
+        const submitButton = event.target;
+        if (submitButton) {
+          submitButton.disabled = true;
+          const buttonText = submitButton.querySelector('span') || submitButton.querySelector('.btn__text');
+          const originalText = buttonText ? buttonText.textContent : '';
+          if (buttonText) {
+            buttonText.textContent = 'Adding...';
+          }
+        }
+
+        // Add items one by one to avoid inventory conflicts
+        const results = [];
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const item of items) {
+          try {
+            console.log('Adding individual item:', item);
+            
+            const response = await fetch('/cart/add.js', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                id: item.id,
+                quantity: item.quantity,
+                properties: item.properties
+              })
+            });
+            
+            if (response.ok) {
+              const result = await response.json();
+              console.log('Item added successfully:', result);
+              results.push({ success: true, item: item, result: result });
+              successCount++;
+            } else {
+              const errorData = await response.json();
+              console.error('Error adding item:', errorData);
+              results.push({ success: false, item: item, error: errorData });
+              errorCount++;
+            }
+          } catch (itemError) {
+            console.error('Error adding item:', itemError);
+            results.push({ success: false, item: item, error: itemError });
+            errorCount++;
+          }
+        }
+        
+        console.log('Card Bundle add results:', results);
+        
+        if (successCount > 0) {
+          // Redirect to cart page instead of showing alert
+          window.location.href = '/cart';
+        } else {
+          showMessage('Error adding to cart', 'error');
+        }
+        
+      } catch (error) {
+        console.error('Error adding bundle products to cart:', error);
+        showMessage('Error adding to cart', 'error');
+      } finally {
+        // Reset button state
+        const submitButton = event.target;
+        if (submitButton) {
+          submitButton.disabled = false;
+          const buttonText = submitButton.querySelector('span') || submitButton.querySelector('.btn__text');
+          if (buttonText) {
+            buttonText.textContent = 'Add to cart';
+          }
+        }
+      }
+    }
+
+    // Function to show messages
+    function showMessage(message, type = 'info') {
+      // Try to find existing error message wrapper
+      const errorWrapper = document.querySelector('.product-form__error-message-wrapper');
+      const errorMessage = document.querySelector('.product-form__error-message');
+      
+      if (errorWrapper && errorMessage) {
+        errorMessage.textContent = message;
+        errorWrapper.hidden = false;
+        
+        // Add styling for different message types
+        if (type === 'success') {
+          errorMessage.style.color = 'green';
+        } else if (type === 'warning') {
+          errorMessage.style.color = 'orange';
+        } else if (type === 'error') {
+          errorMessage.style.color = 'red';
+        } else {
+          errorMessage.style.color = '';
+        }
+        
+        // Hide after 5 seconds
+        setTimeout(() => {
+          errorWrapper.hidden = true;
+        }, 5000);
+      } else {
+        // Fallback to alert
+        alert(message);
+      }
+    }
+
+    // Initialize bundle product functionality for card
+    function initializeCardBundleProduct() {
+      console.log('🔧 Initializing card bundle product for product ID:', productId);
+      console.log('🔧 Is bundle product:', isBundleProduct);
+      console.log('🔧 Bundle products:', bundleProducts);
+      
+      // Try multiple ways to find the submit button
+      let submitButton = null;
+      
+      // Method 1: Try the bundle-specific IDs first
+      const bundleId = '{{ product_form_id }}-bundle-submit';
+      const bundleListId = '{{ product_form_id }}-bundle-list-submit';
+      console.log('🔍 Looking for bundle button with ID:', bundleId);
+      console.log('🔍 Looking for bundle list button with ID:', bundleListId);
+      
+      submitButton = document.getElementById(bundleId);
+      if (submitButton) {
+        console.log('✅ Found bundle button:', submitButton);
+      } else {
+        submitButton = document.getElementById(bundleListId);
+        if (submitButton) {
+          console.log('✅ Found bundle list button:', submitButton);
+        }
+      }
+      
+      // Method 1b: Try the regular ID as fallback
+      if (!submitButton) {
+        const specificId = '{{ product_form_id }}-submit';
+        console.log('🔍 Looking for regular button with ID:', specificId);
+        submitButton = document.getElementById(specificId);
+        if (submitButton) {
+          console.log('✅ Found regular button:', submitButton);
+        }
+      }
+      
+      // Method 2: If not found, try to find by product ID and form
+      if (!submitButton) {
+        console.log('Specific ID not found, trying alternative selectors...');
+        const forms = document.querySelectorAll(`form[data-product-id="${productId}"], form[data-type="add-to-cart-form"]`);
+        console.log('Found forms:', forms);
+        
+        forms.forEach(form => {
+          const buttons = form.querySelectorAll('button[type="submit"]');
+          console.log('Found submit buttons in form:', buttons);
+          if (buttons.length > 0) {
+            submitButton = buttons[0];
+          }
+        });
+      }
+      
+      // Method 3: Try generic selectors as fallback
+      if (!submitButton) {
+        console.log('Trying generic selectors...');
+        const genericButtons = document.querySelectorAll(`[data-product-id="${productId}"] button[type="submit"], .product-card__atc, .product-card__list-atc`);
+        console.log('Found generic buttons:', genericButtons);
+        if (genericButtons.length > 0) {
+          submitButton = genericButtons[0];
+        }
+      }
+      
+      if (submitButton && isBundleProduct) {
+        console.log('✅ Found submit button:', submitButton);
+        console.log('Button ID:', submitButton.id);
+        console.log('Button classes:', submitButton.className);
+        
+        // DIRECT CLICK HANDLER - This is the most important part
+        submitButton.addEventListener('click', function(event) {
+          console.log('🎯 DIRECT CLICK HANDLER TRIGGERED!');
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          handleBundleAddToCart(event);
+          return false;
+        });
+        
+        // Also set onclick as backup
+        submitButton.onclick = function(event) {
+          console.log('🎯 ONCLICK HANDLER TRIGGERED!');
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          handleBundleAddToCart(event);
+          return false;
+        };
+        
+        console.log('✅ DIRECT event listeners attached to bundle button');
+        
+        // Add mousedown event to catch it even earlier
+        submitButton.addEventListener('mousedown', function(event) {
+          if (isBundleProduct) {
+            event.preventDefault();
+            event.stopPropagation();
+            console.log('Mousedown intercepted for bundle product');
+          }
+        });
+        
+        // Ensure button type is button (not submit)
+        submitButton.setAttribute('type', 'button');
+        submitButton.setAttribute('onclick', 'return false;');
+        
+        console.log('✅ Bundle button setup complete');
+      } else if (!submitButton) {
+        console.log('❌ Submit button not found for product:', productId);
+        console.log('Available buttons on page:', document.querySelectorAll('button[type="submit"], button[type="button"]'));
+        console.log('All buttons with product-card classes:', document.querySelectorAll('.product-card__atc, .product-card__list-atc'));
+      } else if (!isBundleProduct) {
+        console.log('Not a bundle product, using normal form submission');
+      }
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeCardBundleProduct);
+    } else {
+      initializeCardBundleProduct();
+    }
+    
+    // Also try after a delay to ensure all elements are rendered
+    setTimeout(initializeCardBundleProduct, 100);
+    setTimeout(initializeCardBundleProduct, 500);
+    setTimeout(initializeCardBundleProduct, 1000);
+    
+    // EMERGENCY FALLBACK: Direct button setup
+    setTimeout(function() {
+      if (isBundleProduct) {
+        console.log('🚨 EMERGENCY FALLBACK: Setting up bundle button directly');
+        const bundleButton = document.getElementById('{{ product_form_id }}-bundle-submit') || 
+                           document.getElementById('{{ product_form_id }}-bundle-list-submit');
+        
+        if (bundleButton) {
+          console.log('🚨 Found bundle button in emergency fallback:', bundleButton);
+          bundleButton.addEventListener('click', function(event) {
+            console.log('🚨 EMERGENCY CLICK HANDLER TRIGGERED!');
+            event.preventDefault();
+            event.stopPropagation();
+            event.stopImmediatePropagation();
+            handleBundleAddToCart(event);
+            return false;
+          });
+          console.log('🚨 Emergency click handler attached');
+        } else {
+          console.log('🚨 Emergency fallback: Bundle button not found');
+        }
+      }
+    }, 2000);
+    
+    // ULTRA AGGRESSIVE: Intercept ALL clicks on the page for bundle products
+    document.addEventListener('click', function(event) {
+      // Check if this is the bundle button specifically
+      const isBundleButton = event.target.matches(`#{{ product_form_id }}-bundle-submit, #{{ product_form_id }}-bundle-list-submit`);
+      const isProductCardButton = event.target.matches(`button.product-card__atc, .product-card__atc, .product-card__list-atc`);
+      
+      if (isBundleButton || (isProductCardButton && isBundleProduct)) {
+        console.log('🔍 Button click detected:', event.target);
+        console.log('Button ID:', event.target.id);
+        console.log('Button classes:', event.target.className);
+        console.log('Is bundle product:', isBundleProduct);
+        console.log('Is bundle button:', isBundleButton);
+        
+        // If this is a bundle product, ALWAYS intercept
+        if (isBundleProduct) {
+          console.log('🚨 BUNDLE PRODUCT DETECTED - INTERCEPTING CLICK');
+          event.preventDefault();
+          event.stopPropagation();
+          event.stopImmediatePropagation();
+          
+          // Run our custom function immediately
+          handleBundleAddToCart(event);
+          return false;
+        }
+      }
+    }, true); // Use capture phase to run FIRST
+    
+    // Add global form submission handler to prevent bundle product forms from submitting
+    document.addEventListener('submit', function(event) {
+      const form = event.target;
+      const submitButton = form.querySelector('button[type="submit"]');
+      
+      if (submitButton && isBundleProduct) {
+        console.log('🚫 Form submission intercepted for bundle product');
+        event.preventDefault();
+        event.stopPropagation();
+        event.stopImmediatePropagation();
+        return false;
+      }
+    }, true); // Use capture phase
+    
+    // NUCLEAR OPTION: Intercept ALL fetch requests to cart/add
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+      const url = args[0];
+      if (typeof url === 'string' && url.includes('/cart/add') && isBundleProduct) {
+        console.log('🚫 FETCH INTERCEPTED: Blocking cart/add request for bundle product');
+        console.log('URL:', url);
+        console.log('Args:', args);
+        // Return a fake successful response to prevent the real request
+        return Promise.resolve({
+          ok: true,
+          status: 200,
+          json: () => Promise.resolve({ status: 'blocked' })
+        });
+      }
+      return originalFetch.apply(this, args);
+    };
+    
+    // Also intercept XMLHttpRequest
+    const originalXHROpen = XMLHttpRequest.prototype.open;
+    XMLHttpRequest.prototype.open = function(method, url, ...args) {
+      if (typeof url === 'string' && url.includes('/cart/add') && isBundleProduct) {
+        console.log('🚫 XHR INTERCEPTED: Blocking cart/add request for bundle product');
+        console.log('Method:', method);
+        console.log('URL:', url);
+        // Don't actually open the request
+        return;
+      }
+      return originalXHROpen.call(this, method, url, ...args);
+    };
+</script>

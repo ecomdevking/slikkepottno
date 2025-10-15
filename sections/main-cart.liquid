@@ -1,0 +1,2613 @@
+{%- style -%}
+  #shopify-section-{{ section.id }} {
+    --section-padding-top: {{ section.settings.padding_top }}px;
+    --section-padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+  
+  /* Bundle product quantity controls styling */
+  .quantity--disabled .quantity__button.disabled,
+  .quantity--disabled .quantity__input.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+  
+  .quantity--disabled .quantity__input.disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    border-color: #ddd;
+  }
+  
+  .quantity--disabled .quantity__button.disabled {
+    background-color: #f5f5f5;
+    color: #999;
+    border-color: #ddd;
+  }
+  
+  /* Add a tooltip or indicator for disabled bundle quantities */
+  .quantity--disabled::after {
+    content: "Bundle quantity locked";
+    position: absolute;
+    bottom: -20px;
+    left: 0;
+    font-size: 10px;
+    color: #666;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  
+  .quantity--disabled:hover::after {
+    opacity: 1;
+  }
+{%- endstyle -%}
+{{ 'cart.css' | asset_url | stylesheet_tag }}
+{{ 'component-custom-card.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'cart.js' | asset_url }}" defer="defer"></script>
+
+{%- if linklists['gift-wrapping'].links != blank and linklists['gift-wrapping'].links.first.type == 'product_link' -%}
+  <script src="{{ 'gift-wrapping.js' | asset_url }}" defer="defer"></script>
+{%- endif -%}
+
+<script>
+  // Bundle Product Cart Management
+  (function() {
+    console.log('Cart loaded - checking for bundle products...');
+    
+    // Function to get bundle data from cart item properties
+    function getBundleDataFromItem(item) {
+      if (!item.properties || !item.properties._is_bundle) {
+        return null;
+      }
+      
+      console.log('Bundle item properties:', item.properties);
+      
+      let productsData = null;
+      if (item.properties._bundle_products_data) {
+        try {
+          productsData = JSON.parse(item.properties._bundle_products_data);
+          console.log('Parsed products data:', productsData);
+        } catch (e) {
+          console.error('Error parsing products data:', e);
+        }
+      }
+      
+      return {
+        variantId: item.properties._variant_id,
+        discountValue: item.properties._discount_value,
+        bundleQuantity: parseInt(item.properties._bundle_quantity) || 1,
+        userQuantity: parseInt(item.properties._user_quantity) || 1,
+        isBundle: item.properties._is_bundle === 'true',
+        productsData: productsData,
+        productVariantId: item.properties._product_id
+      };
+    }
+    
+    // Function to process all cart items and find bundle products
+    function processBundleProducts() {
+      const cartItems = {{ cart.items | json }};
+      console.log('Current cart items count:', cartItems.length);
+      console.log('Current cart items:', cartItems);
+      const bundleItems = [];
+      
+      cartItems.forEach((item, index) => {
+        const bundleData = getBundleDataFromItem(item);
+        if (bundleData) {
+          console.log(`Bundle product found at index ${index}:`, {
+            item: item,
+            bundleData: bundleData
+          });
+          
+          bundleItems.push({
+            index: index,
+            item: item,
+            bundleData: bundleData
+          });
+        }
+      });
+      
+      console.log('Total bundle items found:', bundleItems.length);
+      return bundleItems;
+    }
+    
+    // Function to group products by bundle ID
+    function groupProductsByBundleVariant() {
+      // Use dynamic cart data if available, otherwise fall back to static data
+      const cartItems = window.currentCartItems || {{ cart.items | json }};
+
+      console.log(cartItems, "cartItems")
+      const bundleGroups = {};
+      
+      cartItems.forEach((item, index) => {
+        if (item.properties && item.properties._is_bundle && item.properties._bundle_id) {
+          const bundleId = item.properties._bundle_id;
+          if (!bundleGroups[bundleId]) {
+            bundleGroups[bundleId] = [];
+          }
+          bundleGroups[bundleId].push({
+            index: index,
+            item: item,
+            bundleData: getBundleDataFromItem(item)
+          });
+        }
+      });
+      
+      console.log('Bundle groups (by _bundle_id):', bundleGroups);
+      return bundleGroups;
+    }
+    
+    // Function to validate if products are actually bundled
+    function validateBundleGroup(group) {
+      console.log('Validating bundle group:', group);
+      
+      if (group.length < 2) {
+        console.log('Bundle group has less than 2 items, invalid');
+        return false; // Need at least 2 products for a bundle
+      }
+      
+      // Get the first item's data as reference
+      const firstItem = group[0];
+      const referenceProductsData = firstItem.bundleData.productsData;
+      const referenceVariantId = firstItem.item.properties._variant_id;
+      
+      if (!referenceProductsData || !Array.isArray(referenceProductsData)) {
+        console.log('No valid products data found');
+        return false;
+      }
+      
+      // Check if all items in the group have the same bundle variant ID (bundle product ID)
+      const hasSameVariantId = group.every(item => {
+        return item.item.properties._variant_id === referenceVariantId;
+      });
+      
+      if (!hasSameVariantId) {
+        console.log('Items in group have different bundle variant IDs');
+        return false;
+      }
+
+      // Get the expected component variant IDs from the bundle products data
+      const expectedVariantIds = referenceProductsData.map((item) => item.id).sort((a, b) => a - b);
+      console.log('Expected component variant IDs:', expectedVariantIds);
+
+      // Get the actual component variant IDs in the current group
+      const actualVariantIds = group.map((item) => item.bundleData.productVariantId).sort((a, b) => a - b);
+      console.log('Actual component variant IDs:', actualVariantIds);
+      
+      // Check if we have ALL the required components (not just some of them)
+      const hasAllComponents = expectedVariantIds.every(expectedId => 
+        actualVariantIds.includes(expectedId)
+      );
+      
+      console.log(`Bundle validation: Expected ${expectedVariantIds.length} components, found ${actualVariantIds.length}, hasAllComponents: ${hasAllComponents}`);
+      
+      const isValidBundle = hasAllComponents && actualVariantIds.length === expectedVariantIds.length;
+      
+      console.log(`Bundle validation for group (variantId: ${referenceVariantId}): ${isValidBundle}`);
+      return isValidBundle;
+    }
+    
+    // Function to apply bundle discounts to component products
+    function applyBundleDiscounts() {
+      const bundleGroups = groupProductsByBundleVariant();
+      // Use dynamic cart data if available, otherwise fall back to static data
+      const cartItems = window.currentCartItems || {{ cart.items | json }};
+      
+      // Process bundle groups (don't reset anything initially to preserve automatic discounts)
+      // We'll handle resets on a case-by-case basis within each bundle group
+      Object.keys(bundleGroups).forEach(bundleId => {
+        const group = bundleGroups[bundleId];
+        const isValidBundle = validateBundleGroup(group);
+        
+        console.log(`Processing bundle group ${bundleId}:`, {
+          group: group,
+          isValidBundle: isValidBundle
+        });
+        
+        if (isValidBundle) {
+          // Valid bundle group - show both original and discounted prices with bundle indicator
+          console.log(`Valid bundle group ${bundleId} - applying bundle discounts`);
+          group.forEach(({ index, item, bundleData }) => {
+            console.log(`Applying bundle discount to item ${index}:`, {
+              item: item,
+              bundleData: bundleData
+            });
+            const cartItemElement = document.querySelector(`#CartItem-${index + 1}`);
+            // Reset to original price first, then apply bundle discount
+            resetToOriginalPrice(cartItemElement, item);
+            applyBundleDiscountToCartItem(index, item, bundleData);
+            // Hide discount tags for valid bundle items
+            if (cartItemElement) {
+              toggleDiscountTags(cartItemElement, true);
+            }
+          });
+        } else {
+          // Invalid bundle group - show as regular products
+          console.log(`Invalid bundle group ${bundleId} - showing as regular products`);
+          group.forEach(({ index, item }) => {
+            const cartItemElement = document.querySelector(`#CartItem-${index + 1}`);
+            if (cartItemElement) {
+              // Check if this item has an automatic discount
+              if (item.original_price !== item.final_price) {
+                // Has automatic discount - apply automatic discount display
+                console.log(`Invalid bundle item ${index} has automatic discount - applying automatic discount display`);
+                applyAutomaticDiscountDisplay(cartItemElement, item);
+              } else {
+                // No automatic discount - reset to original price
+                resetToOriginalPrice(cartItemElement, item);
+                console.log(`Reset invalid bundle item ${index} to original price (no discount)`);
+              }
+              removeBundleIndicator(cartItemElement);
+              // Show discount tags for invalid bundle items (if they have discounts)
+              toggleDiscountTags(cartItemElement, false);
+            }
+          });
+        }
+      });
+      
+      // Ensure non-bundle products show correct prices (apply automatic discounts)
+      cartItems.forEach((item, index) => {
+        if (!item.properties || !item.properties._is_bundle) {
+          const cartItemElement = document.querySelector(`#CartItem-${index + 1}`);
+          if (cartItemElement) {
+            // Check if this product has an automatic discount
+            if (item.original_price !== item.final_price) {
+              // Has automatic discount - apply automatic discount display
+              console.log(`Item ${index} has automatic discount - applying automatic discount display`);
+              applyAutomaticDiscountDisplay(cartItemElement, item);
+              // Ensure discount tags are visible for regular products with discounts
+              toggleDiscountTags(cartItemElement, false);
+            } else {
+              // No discount - reset to ensure clean display
+              resetToOriginalPrice(cartItemElement, item);
+              removeBundleIndicator(cartItemElement);
+              console.log(`Reset non-bundle item ${index} to original price`);
+            }
+          }
+        }
+      });
+    }
+    
+    // Function to reset price display to original
+    function resetToOriginalPrice(cartItemElement, item) {
+      // Get bundle data to determine if we need to show true original price
+      const bundleData = getBundleDataFromItem(item);
+      let displayPrice = item.original_price;
+      let displayLinePrice = item.original_line_price;
+      
+      // If this is a bundle item, get the true original price
+      if (bundleData) {
+        const trueOriginalPrice = getOriginalProductPrice(item, bundleData);
+        displayPrice = trueOriginalPrice;
+        displayLinePrice = trueOriginalPrice * item.quantity;
+        console.log(`Resetting bundle item to true original price: ${displayPrice}`);
+      }
+      
+      // Reset unit prices (only .price elements, not line totals)
+      const priceElements = cartItemElement.querySelectorAll('.price');
+      
+      priceElements.forEach(priceElement => {
+        // Remove any existing discount styling
+        priceElement.classList.remove('price--on-sale');
+        
+        // Clear existing price content
+        priceElement.innerHTML = '';
+        
+        // Format original unit price
+        const formattedPrice = new Intl.NumberFormat('no-NO', {
+          style: 'currency',
+          currency: 'NOK'
+        }).format(displayPrice / 100);
+        
+        // Display original unit price
+        const priceSpan = document.createElement('span');
+        priceSpan.className = 'font-body-bolder';
+        priceSpan.textContent = formattedPrice;
+        priceElement.appendChild(priceSpan);
+      });
+      
+      // Reset line total prices (only .cart-item__total span elements)
+      const lineTotalElements = cartItemElement.querySelectorAll('.cart-item__total span');
+      lineTotalElements.forEach(element => {
+        if (element.classList.contains('font-body-bolder')) {
+          // Remove any discount styling
+          element.classList.remove('price--on-sale');
+          
+          // Format original line price
+          const formattedLinePrice = new Intl.NumberFormat('no-NO', {
+            style: 'currency',
+            currency: 'NOK'
+          }).format(displayLinePrice / 100);
+          
+          // Display original line price
+          element.innerHTML = formattedLinePrice;
+        }
+      });
+    }
+    
+    // Function to apply bundle discount to a specific cart item (shows both original and discounted prices)
+    function applyBundleDiscountToCartItem(itemIndex, item, bundleData) {
+      const cartItemElement = document.querySelector(`#CartItem-${itemIndex + 1}`);
+      if (!cartItemElement) {
+        console.log(`Cart item element not found for index ${itemIndex}`);
+        return;
+      }
+      
+      const discountPercent = parseFloat(bundleData.discountValue) || 0;
+      if (discountPercent <= 0) {
+        console.log(`Invalid discount percent: ${discountPercent}`);
+        return;
+      }
+      
+      // Get the true original product price (not the already discounted price)
+      const trueOriginalPrice = getOriginalProductPrice(item, bundleData);
+      const discountAmount = (trueOriginalPrice * discountPercent) / 100;
+      const discountedPrice = trueOriginalPrice - discountAmount;
+      
+      // Calculate discounted line price based on true original price
+      const trueOriginalLinePrice = trueOriginalPrice * item.quantity;
+      const lineDiscountAmount = (trueOriginalLinePrice * discountPercent) / 100;
+      const discountedLinePrice = trueOriginalLinePrice - lineDiscountAmount;
+      
+      console.log(`Applying bundle discount ${discountPercent}% to item ${itemIndex}:`, {
+        trueOriginalPrice: trueOriginalPrice,
+        discountAmount: discountAmount,
+        discountedPrice: discountedPrice,
+        trueOriginalLinePrice: trueOriginalLinePrice,
+        lineDiscountAmount: lineDiscountAmount,
+        discountedLinePrice: discountedLinePrice,
+        currentCartPrice: item.original_price,
+        currentCartLinePrice: item.original_line_price
+      });
+      
+      // Update price display (shows both original and discounted prices)
+      updateBundlePriceDisplay(cartItemElement, trueOriginalPrice, discountedPrice, discountPercent);
+      
+      // Update line total price (shows both original and discounted prices)
+      updateBundleLineTotalPrice(cartItemElement, trueOriginalLinePrice, discountedLinePrice, discountPercent);
+      
+      // Note: Bundle indicator is already rendered by Liquid template, no need to add via JavaScript
+    }
+    
+    // Function to remove bundle indicator
+    function removeBundleIndicator(cartItemElement) {
+      const bundleIndicator = cartItemElement.querySelector('.bundle-indicator');
+      if (bundleIndicator) {
+        bundleIndicator.remove();
+        console.log('Removed bundle indicator from cart item');
+      }
+      // Also remove the flex container if it was added by addBundleIndicatorBelowTitle
+      const titleContainer = cartItemElement.querySelector('.cart-item__title').parentNode;
+      if (titleContainer && titleContainer.classList.contains('flex-col')) {
+        const originalTitle = titleContainer.querySelector('.cart-item__title');
+        if (originalTitle) {
+          titleContainer.parentNode.replaceChild(originalTitle, titleContainer);
+        }
+      }
+    }
+    
+    // Function to toggle discount tag visibility based on bundle validity
+    function toggleDiscountTags(cartItemElement, isValidBundle) {
+      const discountsList = cartItemElement.querySelector('.cart-item__discounts');
+      if (discountsList) {
+        if (isValidBundle) {
+          // Valid bundle - hide discount tags
+          discountsList.style.display = 'none';
+          console.log('Hiding discount tags for valid bundle item');
+        } else {
+          // Invalid bundle - show discount tags
+          discountsList.style.display = '';
+          console.log('Showing discount tags for invalid bundle item');
+        }
+      }
+    }
+    
+    // Function to apply automatic discount display (for products with Shopify automatic discounts)
+    function applyAutomaticDiscountDisplay(cartItemElement, item) {
+      const priceElements = cartItemElement.querySelectorAll('.price');
+      
+      console.log(`Applying automatic discount display for item:`, {
+        originalPrice: item.original_price,
+        finalPrice: item.final_price
+      });
+
+      priceElements.forEach((priceElement) => {
+        // Clear existing content
+        priceElement.innerHTML = '';
+
+        // Format prices
+        const formattedOriginalPrice = new Intl.NumberFormat('no-NO', {
+          style: 'currency',
+          currency: 'NOK'
+        }).format(item.original_price / 100);
+
+        const formattedFinalPrice = new Intl.NumberFormat('no-NO', {
+          style: 'currency',
+          currency: 'NOK'
+        }).format(item.final_price / 100);
+
+        console.log(`Formatted automatic discount prices:`, {
+          original: formattedOriginalPrice,
+          final: formattedFinalPrice
+        });
+
+        // Create final price (current price) - this is the main price
+        const regularPriceSpan = document.createElement('span');
+        regularPriceSpan.className = 'price__regular font-body-bolder';
+        regularPriceSpan.textContent = formattedFinalPrice;
+        priceElement.appendChild(regularPriceSpan);
+
+        // Create original price (crossed out)
+        const salePriceSpan = document.createElement('s');
+        salePriceSpan.className = 'price__sale font-body text-subtext';
+        salePriceSpan.textContent = formattedOriginalPrice;
+        priceElement.appendChild(salePriceSpan);
+
+        // Add sale styling to show both prices
+        priceElement.classList.add('price--on-sale');
+
+        console.log(`Automatic discount price element updated:`, priceElement.innerHTML);
+      });
+    }
+    
+    // Function to update line total price with discount
+    function updateLineTotalPrice(cartItemElement, originalLinePrice, discountedLinePrice, discountPercent) {
+      // Only target line total elements, not unit price elements
+      const lineTotalElements = cartItemElement.querySelectorAll('.cart-item__total span');
+      
+      lineTotalElements.forEach(element => {
+        // Check if this is a line total element (contains total price)
+        if (element.classList.contains('font-body-bolder')) {
+          // Format discounted line price
+          const formattedDiscountedLinePrice = new Intl.NumberFormat('no-NO', {
+            style: 'currency',
+            currency: 'NOK'
+          }).format(discountedLinePrice / 100);
+          
+          // Format original line price
+          const formattedOriginalLinePrice = new Intl.NumberFormat('no-NO', {
+            style: 'currency',
+            currency: 'NOK'
+          }).format(originalLinePrice / 100);
+          
+          // Update the line total display
+          element.innerHTML = `
+            <span class="price__regular">${formattedDiscountedLinePrice}</span>
+            <s class="price__sale font-body text-subtext">${formattedOriginalLinePrice}</s>
+          `;
+          element.classList.add('price--on-sale');
+        }
+      });
+    }
+    
+    // Function to update price display with discount
+    function updatePriceDisplay(cartItemElement, originalPrice, discountedPrice, discountPercent) {
+      // Find price elements in both desktop and mobile views
+      const priceElements = cartItemElement.querySelectorAll('.price');
+      
+      priceElements.forEach(priceElement => {
+        // Clear existing content
+        priceElement.innerHTML = '';
+        
+        // Format prices
+        const formattedOriginalPrice = new Intl.NumberFormat('no-NO', {
+          style: 'currency',
+          currency: 'NOK'
+        }).format(originalPrice / 100);
+        
+        const formattedDiscountedPrice = new Intl.NumberFormat('no-NO', {
+          style: 'currency',
+          currency: 'NOK'
+        }).format(discountedPrice / 100);
+        
+        // Create discounted price (current price)
+        const regularPriceSpan = document.createElement('span');
+        regularPriceSpan.className = 'price__regular font-body-bolder';
+        regularPriceSpan.textContent = formattedDiscountedPrice;
+        priceElement.appendChild(regularPriceSpan);
+        
+        // Create original price (crossed out)
+        const salePriceSpan = document.createElement('s');
+        salePriceSpan.className = 'price__sale font-body text-subtext';
+        salePriceSpan.textContent = formattedOriginalPrice;
+        priceElement.appendChild(salePriceSpan);
+        
+        // Add sale styling
+        priceElement.classList.add('price--on-sale');
+      });
+    }
+    
+    // Function to update bundle price display (shows both original and discounted prices)
+    function updateBundlePriceDisplay(cartItemElement, originalPrice, discountedPrice, discountPercent) {
+      // Find price elements in both desktop and mobile views
+      const priceElements = cartItemElement.querySelectorAll('.price');
+      
+      console.log(`Updating bundle price display:`, {
+        originalPrice: originalPrice,
+        discountedPrice: discountedPrice,
+        discountPercent: discountPercent,
+        priceElementsFound: priceElements.length
+      });
+      
+      priceElements.forEach((priceElement, index) => {
+        console.log(`Updating price element ${index}:`, priceElement);
+        
+        // Clear existing content
+        priceElement.innerHTML = '';
+        
+        // Format prices
+        const formattedOriginalPrice = new Intl.NumberFormat('no-NO', {
+          style: 'currency',
+          currency: 'NOK'
+        }).format(originalPrice / 100);
+        
+        const formattedDiscountedPrice = new Intl.NumberFormat('no-NO', {
+          style: 'currency',
+          currency: 'NOK'
+        }).format(discountedPrice / 100);
+        
+        console.log(`Formatted prices:`, {
+          original: formattedOriginalPrice,
+          discounted: formattedDiscountedPrice
+        });
+        
+        // Create discounted price (current price) - this is the main price
+        const regularPriceSpan = document.createElement('span');
+        regularPriceSpan.className = 'price__regular font-body-bolder';
+        regularPriceSpan.textContent = formattedDiscountedPrice;
+        priceElement.appendChild(regularPriceSpan);
+        
+        // Create original price (crossed out) - this shows the original price
+        const salePriceSpan = document.createElement('s');
+        salePriceSpan.className = 'price__sale font-body text-subtext';
+        salePriceSpan.textContent = formattedOriginalPrice;
+        priceElement.appendChild(salePriceSpan);
+        
+        // Add sale styling to show both prices
+        priceElement.classList.add('price--on-sale');
+        
+        console.log(`Price element ${index} updated:`, priceElement.innerHTML);
+      });
+    }
+    
+    // Function to update bundle line total price (shows both original and discounted prices)
+    function updateBundleLineTotalPrice(cartItemElement, originalLinePrice, discountedLinePrice, discountPercent) {
+      // Only target line total elements, not unit price elements
+      const lineTotalElements = cartItemElement.querySelectorAll('.cart-item__total span');
+      
+      lineTotalElements.forEach(element => {
+        // Check if this is a line total element (contains total price)
+        if (element.classList.contains('font-body-bolder')) {
+          // Format discounted line price
+          const formattedDiscountedLinePrice = new Intl.NumberFormat('no-NO', {
+            style: 'currency',
+            currency: 'NOK'
+          }).format(discountedLinePrice / 100);
+          
+          // Format original line price
+          const formattedOriginalLinePrice = new Intl.NumberFormat('no-NO', {
+            style: 'currency',
+            currency: 'NOK'
+          }).format(originalLinePrice / 100);
+          
+          // Update the line total display
+          element.innerHTML = `
+            <span class="price__regular">${formattedDiscountedLinePrice}</span>
+            <s class="price__sale font-body text-subtext">${formattedOriginalLinePrice}</s>
+          `;
+          element.classList.add('price--on-sale');
+        }
+      });
+    }
+    
+    // Function to add bundle indicator below product title
+    function addBundleIndicatorBelowTitle(cartItemElement, discountPercent) {
+      const titleElement = cartItemElement.querySelector('.cart-item__title');
+      if (titleElement && !titleElement.querySelector('.bundle-indicator')) {
+        // Check if there's already a bundle indicator in the cart item
+        const existingIndicator = cartItemElement.querySelector('.bundle-indicator');
+        if (existingIndicator) {
+          console.log('Bundle indicator already exists in DOM, skipping JavaScript addition');
+          return;
+        }
+        
+        // Check if we already have a container
+        let titleContainer = titleElement.parentNode;
+        
+        // If the parent is not already a flex container, create one
+        if (!titleContainer.classList.contains('flex') || !titleContainer.classList.contains('flex-col')) {
+          titleContainer = document.createElement('div');
+          titleContainer.className = 'flex flex-col gap-1';
+          
+          // Move the title to the new container
+          titleContainer.appendChild(titleElement.cloneNode(true));
+          
+          // Replace the original title with the container
+          titleElement.parentNode.replaceChild(titleContainer, titleElement);
+        }
+        
+        // Create bundle indicator below the title
+        const bundleIndicator = document.createElement('span');
+        bundleIndicator.className = 'bundle-indicator text-xs bg-green-100 text-green-800 px-2 py-1 rounded w-fit';
+        bundleIndicator.textContent = `BUNDLE (-${discountPercent}%)`;
+        
+        // Add the indicator to the container
+        titleContainer.appendChild(bundleIndicator);
+      }
+    }
+    
+    // Function to add bundle indicator (old function for compatibility)
+    function addBundleIndicator(cartItemElement, discountPercent) {
+      const titleElement = cartItemElement.querySelector('.cart-item__title');
+      if (titleElement && !titleElement.querySelector('.bundle-indicator')) {
+        const bundleIndicator = document.createElement('span');
+        bundleIndicator.className = 'bundle-indicator text-xs bg-green-100 text-green-800 px-2 py-1 rounded ml-2';
+        bundleIndicator.textContent = `BUNDLE (-${discountPercent}%)`;
+        titleElement.appendChild(bundleIndicator);
+      }
+    }
+    
+    // Function to update bundle product display
+    function updateBundleProductDisplay() {
+      console.log('Updating bundle product display...');
+      applyBundleDiscounts();
+      updateCartSubtotal();
+      updateQuantityControls();
+    }
+    
+    // Function to update quantity controls based on bundle validity
+    function updateQuantityControls() {
+      console.log('Updating quantity controls based on bundle validity...');
+      
+      const cartItems = window.currentCartItems || {{ cart.items | json }};
+      const bundleGroups = groupProductsByBundleVariant();
+      
+      cartItems.forEach((item, index) => {
+        const cartItemElement = document.querySelector(`#CartItem-${index + 1}`);
+        if (!cartItemElement) return;
+        
+        const quantityInput = cartItemElement.querySelector('input[name="updates[]"]');
+        const minusButton = cartItemElement.querySelector('button[name="minus"]');
+        const plusButton = cartItemElement.querySelector('button[name="plus"]');
+        const quantityWrapper = cartItemElement.querySelector('.quantity');
+        
+        if (!quantityInput || !quantityWrapper) return;
+        
+        // Check if this is a bundle product
+        if (item.properties && item.properties._is_bundle && item.properties._bundle_id) {
+          const bundleId = item.properties._bundle_id;
+          const bundleGroup = bundleGroups[bundleId];
+          const isValidBundle = bundleGroup && validateBundleGroup(bundleGroup);
+          
+          console.log(`Item ${index}: Bundle ID ${bundleId}, Valid: ${isValidBundle}`);
+          
+          if (isValidBundle) {
+            // Valid bundle - disable controls
+            quantityInput.disabled = true;
+            quantityInput.readOnly = true;
+            minusButton.disabled = true;
+            plusButton.disabled = true;
+            quantityWrapper.classList.add('quantity--disabled');
+            minusButton.classList.add('disabled');
+            plusButton.classList.add('disabled');
+            quantityInput.classList.add('disabled');
+            console.log(`Disabled quantity controls for valid bundle item ${index}`);
+          } else {
+            // Invalid bundle - enable controls
+            quantityInput.disabled = false;
+            quantityInput.readOnly = false;
+            minusButton.disabled = false;
+            plusButton.disabled = false;
+            quantityWrapper.classList.remove('quantity--disabled');
+            minusButton.classList.remove('disabled');
+            plusButton.classList.remove('disabled');
+            quantityInput.classList.remove('disabled');
+            console.log(`Enabled quantity controls for invalid bundle item ${index}`);
+          }
+        } else {
+          // Regular product - ensure controls are enabled
+          quantityInput.disabled = false;
+          quantityInput.readOnly = false;
+          minusButton.disabled = false;
+          plusButton.disabled = false;
+          quantityWrapper.classList.remove('quantity--disabled');
+          minusButton.classList.remove('disabled');
+          plusButton.classList.remove('disabled');
+          quantityInput.classList.remove('disabled');
+        }
+      });
+    }
+    
+    // Function to reinitialize bundle display after cart changes
+    async function reinitializeBundleDisplay() {
+      console.log('Reinitializing bundle display after cart changes...');
+      
+      // Get current cart data dynamically
+      const currentCartData = await getCurrentCartData();
+      if (currentCartData && currentCartData.items) {
+        console.log('Using dynamic cart data for bundle display update');
+        console.log('Updated cart items:', currentCartData.items);
+        // Update the cart items in the global scope for the bundle functions
+        window.currentCartItems = currentCartData.items;
+      }
+      
+      // Small delay to ensure DOM is updated
+      setTimeout(() => {
+        console.log('Calling updateBundleProductDisplay after cart data refresh...');
+        updateBundleProductDisplay();
+      }, 100);
+    }
+    
+    // Function to update cart subtotal based on actual prices
+    function updateCartSubtotal() {
+      console.log('=== UPDATING CART SUBTOTAL ===');
+      
+      // Always get fresh cart data
+      const cartItems = window.currentCartItems || {{ cart.items | json }};
+      console.log('Cart items for subtotal calculation:', cartItems);
+      
+      let calculatedTotal = 0;
+      
+      // Get bundle groups to check which items should have discounts
+      const bundleGroups = groupProductsByBundleVariant();
+      console.log('Bundle groups for subtotal:', bundleGroups);
+      
+      cartItems.forEach((item, index) => {
+        console.log(`Processing item ${index}:`, {
+          id: item.variant_id,
+          title: item.product_title,
+          isBundle: item.properties?._is_bundle,
+          bundleId: item.properties?._bundle_id,
+          discountValue: item.properties?._discount_value,
+          originalLinePrice: item.original_line_price
+        });
+        
+        // Check if this is a bundle product and if it's part of a valid bundle group
+        if (item.properties && item.properties._is_bundle && item.properties._bundle_id) {
+          const bundleId = item.properties._bundle_id;
+          const bundleGroup = bundleGroups[bundleId];
+          const isValidBundle = bundleGroup && validateBundleGroup(bundleGroup);
+          
+          console.log(`Bundle validation for item ${index}:`, {
+            bundleId: bundleId,
+            bundleGroup: bundleGroup,
+            isValidBundle: isValidBundle
+          });
+          
+          if (isValidBundle && item.properties._discount_value) {
+            // This is a valid bundle product with discount - get true original price and calculate discount
+            const discountPercent = parseFloat(item.properties._discount_value) || 0;
+            
+            // Get bundle data to find true original price
+            const bundleData = getBundleDataFromItem(item);
+            let trueOriginalPrice = item.original_price; // Use original_price from cart item
+            
+            if (bundleData && bundleData.productsData && Array.isArray(bundleData.productsData)) {
+              const productData = bundleData.productsData.find(p => p.id == item.variant_id);
+              if (productData && productData.price) {
+                trueOriginalPrice = productData.price;
+              }
+            }
+            
+            // Calculate true original line price and then apply discount
+            const trueOriginalLinePrice = trueOriginalPrice * item.quantity;
+            const discountAmount = (trueOriginalLinePrice * discountPercent) / 100;
+            const discountedLinePrice = trueOriginalLinePrice - discountAmount;
+            calculatedTotal += discountedLinePrice;
+            
+            console.log(`✅ Valid bundle item ${index}: True Original ${trueOriginalLinePrice}, Discounted ${discountedLinePrice}`);
+          } else {
+            // This is an invalid bundle - check if it has automatic discount
+            if (item.original_price !== item.final_price) {
+              // Invalid bundle item with automatic discount - use final_line_price
+              calculatedTotal += item.final_line_price;
+              console.log(`❌ Invalid bundle item ${index} with automatic discount: ${item.final_line_price} (original: ${item.original_line_price})`);
+            } else {
+              // Invalid bundle item without automatic discount - use true original price
+              const bundleData = getBundleDataFromItem(item);
+              let trueOriginalPrice = item.original_price; // Use original_price from cart item
+              
+              if (bundleData && bundleData.productsData && Array.isArray(bundleData.productsData)) {
+                const productData = bundleData.productsData.find(p => p.id == item.variant_id);
+                if (productData && productData.price) {
+                  trueOriginalPrice = productData.price;
+                }
+              }
+              
+              const trueOriginalLinePrice = trueOriginalPrice * item.quantity;
+              calculatedTotal += trueOriginalLinePrice;
+              
+              console.log(`❌ Invalid bundle item ${index}: True Original ${trueOriginalLinePrice} (no automatic discount)`);
+            }
+          }
+        } else {
+          // This is a regular product - check if it has automatic discount
+          if (item.original_price !== item.final_price) {
+            // Has automatic discount - use final_line_price
+            calculatedTotal += item.final_line_price;
+            console.log(`💰 Regular item ${index} with automatic discount: ${item.final_line_price} (original: ${item.original_line_price})`);
+          } else {
+            // No discount - use original_line_price
+            calculatedTotal += item.original_line_price;
+            console.log(`📦 Regular item ${index}: ${item.original_line_price}`);
+          }
+        }
+      });
+      
+      console.log(`Final calculated total: ${calculatedTotal}`);
+      
+      // Update the subtotal display
+      const subtotalElement = document.getElementById('cart-subtotal-value');
+      const jsSubtotalElement = document.getElementById('js-subtotal');
+      
+      const targetElement = jsSubtotalElement || subtotalElement;
+      
+      if (targetElement) {
+        const formattedTotal = new Intl.NumberFormat('no-NO', {
+          style: 'currency',
+          currency: 'NOK'
+        }).format(calculatedTotal / 100);
+        
+        console.log(`Updating subtotal display to: ${formattedTotal}`);
+        console.log(`Previous subtotal was: ${targetElement.textContent}`);
+        targetElement.textContent = formattedTotal;
+        console.log(`New subtotal is: ${targetElement.textContent}`);
+        
+        // Also update the main subtotal element if it exists
+        if (subtotalElement && jsSubtotalElement) {
+          subtotalElement.textContent = formattedTotal;
+        }
+      } else {
+        console.error('Subtotal element not found!');
+        console.log('Available elements with cart-subtotal:', document.querySelectorAll('[id*="cart-subtotal"]'));
+        console.log('Available elements with js-subtotal:', document.querySelectorAll('[id*="js-subtotal"]'));
+      }
+
+      const freeShippingGoalLeftToSpend = document.getElementById('free-shipping-goal-left-to-spend');
+      if (freeShippingGoalLeftToSpend) {
+        freeShippingGoalLeftToSpend.textContent = new Intl.NumberFormat('no-NO', {
+          style: 'currency',
+          currency: 'NOK'
+        }).format(calculatedTotal / 100);
+      }
+      
+      console.log('=== END SUBTOTAL UPDATE ===');
+    }
+    
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', async function() {
+        // Get fresh cart data on initial load
+        const currentCartData = await getCurrentCartData();
+        if (currentCartData && currentCartData.items) {
+          window.currentCartItems = currentCartData.items;
+          console.log('Initial cart data loaded:', currentCartData.items);
+        }
+        updateBundleProductDisplay();
+      });
+    } else {
+      // DOM is already loaded, get fresh cart data
+      getCurrentCartData().then(currentCartData => {
+        if (currentCartData && currentCartData.items) {
+          window.currentCartItems = currentCartData.items;
+          console.log('Initial cart data loaded (DOM ready):', currentCartData.items);
+        }
+        updateBundleProductDisplay();
+      });
+    }
+    
+    // Listen for cart updates and reinitialize bundle display
+    document.addEventListener('cart:updated', reinitializeBundleDisplay);
+    document.addEventListener('cart:refresh', reinitializeBundleDisplay);
+    document.addEventListener('cart:change', reinitializeBundleDisplay);
+    
+    // Listen for quantity changes
+    document.addEventListener('change', function(event) {
+      if (event.target.matches('input[name="updates[]"]')) {
+        // Check if this is a bundle product
+        const cartItem = event.target.closest('[id^="CartItem-"]');
+        if (cartItem) {
+          const cartItemIndex = cartItem.id.replace('CartItem-', '');
+          const cartItems = window.currentCartItems || {{ cart.items | json }};
+          const item = cartItems[parseInt(cartItemIndex) - 1];
+          
+          if (item && item.properties && item.properties._is_bundle && item.properties._bundle_id) {
+            // Check if this bundle group is still valid
+            const bundleGroups = groupProductsByBundleVariant();
+            const bundleId = item.properties._bundle_id;
+            const bundleGroup = bundleGroups[bundleId];
+            const isValidBundle = bundleGroup && validateBundleGroup(bundleGroup);
+            
+            if (isValidBundle) {
+              console.log('Valid bundle product quantity change detected - preventing change');
+              // Reset to original quantity
+              event.target.value = item.quantity;
+              event.preventDefault();
+              return false;
+            } else {
+              console.log('Invalid bundle product - allowing quantity change');
+            }
+          }
+        }
+        
+        console.log('Quantity changed, reinitializing bundle display...');
+        reinitializeBundleDisplay();
+      }
+    });
+    
+    // Listen for item removals and quantity button clicks
+    document.addEventListener('click', function(event) {
+      if (event.target.closest('[is="cart-remove-item"]') || event.target.closest('[is="gift-wrap-remove-item"]')) {
+        console.log('Item removal detected, reinitializing bundle display...');
+        // Immediate update first
+        setTimeout(() => {
+          updateCartSubtotal();
+        }, 100);
+        // Then full reinitialize
+        setTimeout(() => {
+          reinitializeBundleDisplay();
+        }, 500); // Longer delay for removal
+      }
+      
+      // Prevent quantity button clicks for bundle products
+      if (event.target.matches('.quantity__button')) {
+        const cartItem = event.target.closest('[id^="CartItem-"]');
+        if (cartItem) {
+          const cartItemIndex = cartItem.id.replace('CartItem-', '');
+          const cartItems = window.currentCartItems || {{ cart.items | json }};
+          const item = cartItems[parseInt(cartItemIndex) - 1];
+          
+          if (item && item.properties && item.properties._is_bundle && item.properties._bundle_id) {
+            // Check if this bundle group is still valid
+            const bundleGroups = groupProductsByBundleVariant();
+            const bundleId = item.properties._bundle_id;
+            const bundleGroup = bundleGroups[bundleId];
+            const isValidBundle = bundleGroup && validateBundleGroup(bundleGroup);
+            
+            if (isValidBundle) {
+              console.log('Valid bundle product quantity button clicked - preventing action');
+              event.preventDefault();
+              event.stopPropagation();
+              return false;
+            } else {
+              console.log('Invalid bundle product - allowing quantity button action');
+            }
+          }
+        }
+      }
+    });
+    
+    // Add MutationObserver to detect DOM changes in cart items
+    const cartObserver = new MutationObserver(function(mutations) {
+      let shouldReinitialize = false;
+      mutations.forEach(function(mutation) {
+        if (mutation.type === 'childList') {
+          // Check if cart items were added or removed
+          const cartItems = document.querySelectorAll('[id^="CartItem-"]');
+          const expectedCount = window.currentCartItems ? window.currentCartItems.length : {{ cart.items.size }};
+          if (cartItems.length !== expectedCount) {
+            console.log(`Cart items count changed from ${expectedCount} to ${cartItems.length}, reinitializing bundle display...`);
+            shouldReinitialize = true;
+          }
+        }
+      });
+      
+      if (shouldReinitialize) {
+        setTimeout(() => {
+          reinitializeBundleDisplay();
+        }, 100);
+      }
+    });
+    
+    // Start observing the cart items container
+    const cartItemsContainer = document.querySelector('cart-items');
+    if (cartItemsContainer) {
+      cartObserver.observe(cartItemsContainer, {
+        childList: true,
+        subtree: true
+      });
+    }
+    
+    // Also observe the subtotal element to force updates
+    const subtotalElement = document.getElementById('cart-subtotal-value');
+    if (subtotalElement) {
+      const subtotalObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'childList' || mutation.type === 'characterData') {
+            console.log('Subtotal element changed, forcing update...');
+            setTimeout(() => {
+              updateCartSubtotal();
+            }, 100);
+          }
+        });
+      });
+      
+      subtotalObserver.observe(subtotalElement, {
+        childList: true,
+        characterData: true,
+        subtree: true
+      });
+    }
+    
+    // Also listen for any AJAX cart updates
+    document.addEventListener('DOMContentLoaded', function() {
+      // Override any existing cart update functions
+      const originalFetch = window.fetch;
+      window.fetch = function(...args) {
+        const url = args[0];
+        if (typeof url === 'string' && (url.includes('/cart/') || url.includes('cart.js'))) {
+          console.log('Cart API call detected:', url);
+          return originalFetch.apply(this, args).then(response => {
+            if (response.ok) {
+              setTimeout(() => {
+                console.log('Cart API call completed, reinitializing bundle display...');
+                reinitializeBundleDisplay();
+              }, 200);
+            }
+            return response;
+          });
+        }
+        return originalFetch.apply(this, args);
+      };
+    });
+    
+    // Add periodic check as a fallback
+    let lastCartItemCount = {{ cart.items.size }};
+    setInterval(async function() {
+      const currentCartItemCount = document.querySelectorAll('[id^="CartItem-"]').length;
+      const expectedCount = window.currentCartItems ? window.currentCartItems.length : {{ cart.items.size }};
+      
+      if (currentCartItemCount !== expectedCount) {
+        console.log(`Periodic check: Cart item count mismatch - DOM: ${currentCartItemCount}, Expected: ${expectedCount} - reinitializing bundle display...`);
+        lastCartItemCount = currentCartItemCount;
+        reinitializeBundleDisplay();
+      }
+    }, 1000); // Check every second
+    
+    // Function to get current cart data dynamically
+    async function getCurrentCartData() {
+      try {
+        const response = await fetch('/cart.js');
+        const cartData = await response.json();
+        console.log('Current cart data from API:', cartData);
+        return cartData;
+      } catch (error) {
+        console.error('Error fetching cart data:', error);
+        return null;
+      }
+    }
+    
+    // Function to get original product price from product data
+    function getOriginalProductPrice(item, bundleData) {
+      // If we have the original product data in bundleData.productsData, use that
+      if (bundleData.productsData && Array.isArray(bundleData.productsData)) {
+        const productData = bundleData.productsData.find(p => p.id == item.variant_id);
+        if (productData && productData.price) {
+          console.log(`Found original price from bundle data: ${productData.price} for variant ${item.variant_id}`);
+          return productData.price;
+        }
+      }
+      
+      // Fallback: calculate original price by reversing the discount
+      const discountPercent = parseFloat(bundleData.discountValue) || 0;
+      if (discountPercent > 0) {
+        // If current price is already discounted, calculate original price
+        const currentPrice = item.original_price;
+        const originalPrice = Math.round(currentPrice / (1 - discountPercent / 100));
+        console.log(`Calculated original price: ${originalPrice} from current price: ${currentPrice} with discount: ${discountPercent}%`);
+        return originalPrice;
+      }
+      
+      // If no discount, return current price
+      return item.original_price;
+    }
+    
+    // Listen for Shopify-specific cart events
+    document.addEventListener('cart:item:removed', reinitializeBundleDisplay);
+    document.addEventListener('cart:item:updated', reinitializeBundleDisplay);
+    document.addEventListener('cart:item:added', reinitializeBundleDisplay);
+    
+    // Also listen for any custom cart events that might be fired
+    window.addEventListener('cartUpdated', reinitializeBundleDisplay);
+    window.addEventListener('cartChanged', reinitializeBundleDisplay);
+    
+    // Make functions globally available for debugging
+    window.getBundleDataFromItem = getBundleDataFromItem;
+    window.processBundleProducts = processBundleProducts;
+    window.updateBundleProductDisplay = updateBundleProductDisplay;
+    window.groupProductsByBundleVariant = groupProductsByBundleVariant;
+    window.validateBundleGroup = validateBundleGroup;
+    window.applyBundleDiscounts = applyBundleDiscounts;
+    window.updateCartSubtotal = updateCartSubtotal;
+    window.reinitializeBundleDisplay = reinitializeBundleDisplay;
+    window.updateQuantityControls = updateQuantityControls;
+    window.toggleDiscountTags = toggleDiscountTags;
+    window.applyAutomaticDiscountDisplay = applyAutomaticDiscountDisplay;
+    
+    // Add manual trigger for testing
+    window.forceBundleUpdate = function() {
+      console.log('Manually triggering bundle display update...');
+      reinitializeBundleDisplay();
+    };
+    
+    // Add manual trigger for subtotal update
+    window.forceSubtotalUpdate = function() {
+      console.log('Manually triggering subtotal update...');
+      updateCartSubtotal();
+    };
+    
+    // Add function to refresh cart data and update subtotal
+    window.refreshCartAndUpdate = async function() {
+      console.log('Refreshing cart data and updating subtotal...');
+      const currentCartData = await getCurrentCartData();
+      if (currentCartData && currentCartData.items) {
+        window.currentCartItems = currentCartData.items;
+        console.log('Cart data refreshed:', currentCartData.items);
+        updateCartSubtotal();
+      }
+    };
+    
+    // Force initial subtotal update after a delay to ensure everything is loaded
+    setTimeout(() => {
+      console.log('Force updating subtotal on page load...');
+      updateCartSubtotal();
+    }, 1000);
+    
+    // Additional attempts to ensure subtotal is updated
+    setTimeout(() => {
+      console.log('Second attempt to update subtotal...');
+      updateCartSubtotal();
+    }, 2000);
+    
+    setTimeout(() => {
+      console.log('Third attempt to update subtotal...');
+      updateCartSubtotal();
+    }, 3000);
+    
+    // Override any Liquid calculation with JavaScript calculation
+    setTimeout(() => {
+      console.log('Final override of Liquid calculation...');
+      updateCartSubtotal();
+    }, 5000);
+    
+  })();
+</script>
+
+<div class="cart section--padding{% if cart == empty %} is-empty{% endif %}">
+  <div class="section__container page-width page-width--{{ section.settings.container }}">
+    <div class="cart__header">
+      <h1 class="cart__title h1">
+        <motion-element data-motion="fade-up" class="inline-flex gap-2">
+          {{- 'sections.cart.title' | t }}
+          <cart-count
+            class="cart-count cart-count--blank"
+            aria-label="{{ 'general.cart.cart_count' | t: count: cart.item_count | escape }}"
+            {% if cart == empty %}
+              hidden
+            {% endif %}
+            data-type="blank"
+          >
+            (
+            {%- if cart.item_count < 100 -%}
+              {{- cart.item_count -}}
+            {%- else -%}
+              99+
+            {%- endif -%}
+            )</cart-count
+          ></motion-element
+        >
+      </h1>
+    </div>
+    <div class="cart__empty text-center flex flex-col gap-10">
+      <div class="grid gap-5 cart__empty-header">
+        <h2 class="h1">{{ 'sections.cart.empty' | t }}</h2>
+        {%- if settings.cart_empty_message != blank -%}
+          <div class="rte text-subtext">{{ settings.cart_empty_message }}</div>
+        {%- endif -%}
+      </div>
+      {%- if settings.collection_list != blank -%}
+        {% liquid
+          assign card_has_bg = false
+          assign color_scheme_first = settings.color_schemes | first
+          if settings.collection_card_color_scheme != color_scheme_first
+            assign card_has_bg = true
+          endif
+        %}
+        <div class="swipe-mobile">
+          <div class="f-grid recommendation-collection swipe-mobile__inner">
+            {%- for collection in settings.collection_list -%}
+              {%- liquid
+                if collection.image
+                  assign featured_image = collection.image
+                elsif collection.metafields.foxtheme.collection_in_cart.value != blank
+                  assign featured_image = collection.metafields.foxtheme.collection_in_cart.value
+                else
+                  assign featured_image = collection.products.first.featured_media.preview_image
+                endif
+              -%}
+              <div class="f-column">
+                {% render 'card-collection',
+                  collection: collection,
+                  has_bg: card_has_bg,
+                  featured_image: featured_image,
+                  card_style: 'card',
+                  color_scheme: settings.collection_card_color_scheme,
+                  image_ratio: settings.collection_image_ratio,
+                  image_width: 'full',
+                  heading_size: 'h5',
+                  classes: 'text-left',
+                  button_icon_classes: 'hidden lg:flex'
+                %}
+              </div>
+            {%- endfor -%}
+          </div>
+        </div>
+      {%- endif -%}
+      <a class="btn btn--primary self-center cart__empty-header" href="{{ routes.all_products_collection_url }}">
+        <span class="btn__text">{{- 'general.cart.continue_shopping' | t -}}</span>
+      </a>
+    </div>
+    {% comment %} {%- if cart.item_count > 0 -%} {% endcomment %}
+    {%- liquid
+      if linklists['gift-wrapping'].links != blank and linklists['gift-wrapping'].links.first.type == 'product_link'
+        assign gift_wrapping = linklists['gift-wrapping'].links.first
+        assign gift_wrap_id = gift_wrapping.object.variants.first.id
+        assign gift_wraps_in_cart = 0
+        for item in cart.items
+          if item.id == gift_wrap_id
+            assign gift_wraps_in_cart = item.quantity
+            break
+          endif
+        endfor
+        assign items_in_cart = cart.item_count | minus: gift_wraps_in_cart
+      endif
+    -%}
+    <main-cart
+      id="MainCart-{{ section.id }}"
+      class="block md:flex items-stretch"
+    >
+      <div class="cart__inner flex-1">
+        <form
+          class="cart__form{% unless cart.item_count > 0 %} hidden{% endunless %}"
+          action="{{ routes.cart_url }}"
+          method="POST"
+          id="cart"
+        >
+          <cart-items class="block sticky-element">
+            <table role="table" class="w-full">
+              <caption class="visually-hidden">
+                {{ 'general.cart.title' | t }}
+              </caption>
+              <thead>
+                <tr class="text-left hidden">
+                  <th class="h6" colspan="1" scope="col">{{ 'sections.cart.headings.product' | t }}</th>
+                  <th class="h6" colspan="1" scope="col" class="hidden lg:table-cell">
+                    {{ 'sections.cart.headings.quantity' | t }}
+                  </th>
+                  <th class="h6" colspan="1" scope="col" class="hidden lg:table-cell">
+                    {{ 'sections.cart.headings.total' | t }}
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {%- for item in cart.items -%}
+                  {%- liquid
+                    assign is_gift_wrap_item = false
+                    if gift_wrap_id != null and item.id == gift_wrap_id
+                      assign is_gift_wrap_item = true
+                    endif
+
+                    assign has_qty_rules = false
+                    if item.variant.quantity_rule.increment > 1 or item.variant.quantity_rule.min > 1 or item.variant.quantity_rule.max != null
+                      assign has_qty_rules = true
+                    endif
+
+                    assign has_vol_pricing = false
+                    if item.variant.quantity_price_breaks.size > 0
+                      assign has_vol_pricing = true
+                    endif
+                  -%}
+
+                  {%- if has_qty_rules or has_vol_pricing -%}
+                    {%- capture qty_rules_vol_pricing -%}
+                        {%- if has_qty_rules -%}
+                          <div
+                            class="quantity__rules text-sm"
+                          >
+                            {%- if item.variant.quantity_rule.increment > 1 -%}
+                              <span class="divider">
+                                {{-
+                                  'products.product.quantity.multiples_of'
+                                  | t: quantity: item.variant.quantity_rule.increment
+                                -}}
+                              </span>
+                            {%- endif -%}
+                            {%- if item.variant.quantity_rule.min > 1 -%}
+                              <span class="divider">
+                                {{-
+                                  'products.product.quantity.minimum_of'
+                                  | t: quantity: item.variant.quantity_rule.min
+                                -}}
+                              </span>
+                            {%- endif -%}
+                            {%- if item.variant.quantity_rule.max != null -%}
+                              <span class="divider font-body-bold">
+                                {{-
+                                  'products.product.quantity.maximum_of'
+                                  | t: quantity: item.variant.quantity_rule.max
+                                -}}
+                              </span>
+                            {%- endif -%}
+                          </div>
+                        {%- endif -%}
+                        {%- if has_vol_pricing -%}
+                          {{ 'component-volume-pricing.css' | asset_url | stylesheet_tag }}
+                          <volume-pricing class="block parent-display blocks-radius-md" id="Volume-{{ section.id }}">
+                            <span class="caption block">{{ 'products.product.volume_pricing.title' | t }}</span>
+                            <ul class="list-unstyled">
+                              <li class="blocks-radius-md">
+                                <span>{{ item.variant.quantity_rule.min }}+</span>
+                                {%- liquid 
+                                  if settings.currency_code_enabled
+                                    assign price = item.variant.price | money_with_currency
+                                  else
+                                    assign price = item.variant.price | money
+                                  endif
+                                -%}
+                                <span> {{ 'sections.quick_order_list.each' | t: money: price }}</span>
+                              </li>
+                              {%- for price_break in item.variant.quantity_price_breaks -%}
+                                <li class="blocks-radius-md">
+                                  <span>
+                                    {{- price_break.minimum_quantity -}}
+                                    <span aria-hidden="true">+</span>
+                                  </span>
+                                  {%- liquid 
+                                    if settings.currency_code_enabled
+                                      assign price_break_price = price_break.price | money_with_currency
+                                    else
+                                      assign price_break_price = price_break.price | money
+                                    endif
+                                  -%}
+                                  <span>{{ 'sections.quick_order_list.each' | t: money: price_break_price }}</span>
+                                </li>
+                              {%- endfor -%}
+                            </ul>
+                          </volume-pricing>
+                        {%- endif -%}
+                      {%- endcapture -%}
+                  {%- endif -%}
+
+                  {%- capture cart_item -%}
+                      <tr class="cart-item" id="CartItem-{{ item.index | plus: 1 }}">
+                        <td class="cart-item__product">
+                          <div class="flex items-start md:items-center gap-3 md:gap-6">
+                            <a id="Loader-{{ section.id }}-{{ item.index | plus: 1 }}"{% unless is_gift_wrap_item %} is="cart-remove-item"{% else %} is="gift-wrap-remove-item"{% endunless %} class="items-center justify-center relative hidden md:flex btn-remove" href="{{ item.url_to_remove }}" data-index="{{ item.index | plus: 1 }}">
+                              <span class="visually-hidden">{{ 'general.cart.remove' | t }}</span>
+                              {% render 'icon-close', size: 'small' %}
+                              {% render 'loading-spinner' %}
+                            </a>
+                            {%- if item.image -%}
+                              <a class="cart-item__media blocks-radius media-wrapper" href="{{ item.url }}" tabindex="-1" aria-label="{{ item.title | escape }}">
+                                {{- item.image | image_url: width: item.image.width | image_tag: loading: 'lazy', widths: '180,360,540', is: 'image-lazy' -}}
+                              </a>
+                            {%- endif -%}
+                            <div class="cart-item__product--info flex flex-col items-start gap-3 flex-grow">
+                              <div class="flex justify-between w-full md:grid gap-3">
+                                <div class="grid gap-1 w-full">
+                                  <div class="flex items-center justify-between gap-1 flex-wrap">
+                                    <div class="block">
+                                      <div class="flex flex-col gap-1">
+                                        <a href="{{ item.url }}" class="cart-item__title text-pcard-title reversed-link">{{- item.product.title | escape -}}</a>
+                                        {%- if item.properties._is_bundle and item.properties._discount_value -%}
+                                          <span class="bundle-indicator text-xs bg-green-100 text-green-800 px-2 py-1 rounded w-fit">
+                                            BUNDLE (-{{ item.properties._discount_value }}%)
+                                          </span>
+                                        {%- endif -%}
+                                      </div>
+                                    </div>
+                                  </div>
+                                  {%- if item.product.has_only_default_variant == false or item.properties.size != 0 or item.selling_plan_allocation != null -%}
+                                    <div class="cart-item__options">
+                                      {%- if item.product.has_only_default_variant == false -%}
+                                        {%- assign last_index = item.options_with_values.size | minus: 1 -%}
+                                        {%- for option in item.options_with_values -%}
+                                          <span class="cart-item__option-value text-sm text-subtext">
+                                            {{ option.value }}{% unless forloop.index0 == last_index %}, {% endunless %}
+                                          </span>
+                                        {%- endfor -%}
+                                      {%- endif -%}
+                                      {%- for property in item.properties -%}
+                                        {%- assign property_first_char = property.first | slice: 0 -%}
+                                        {%- if property.last != blank and property_first_char != '_' -%}
+                                          <div class="flex gap-1 text-sm text-subtext">
+                                            <dt>{{ property.first }}:&nbsp;</dt>
+                                            <dd>
+                                              {%- if property.last contains '/uploads/' -%}
+                                                <a href="{{ property.last }}" class="link" target="_blank" aria-describedby="a11y-new-window-message">
+                                                  {{- property.last | split: '/' | last -}}
+                                                </a>
+                                              {%- else -%}
+                                                {{- property.last -}}
+                                              {%- endif -%}
+                                            </dd>
+                                          </div>
+                                        {%- endif -%}
+                                      {%- endfor -%}
+                                      {%- if item.selling_plan_allocation != null -%}
+                                        <p class="text-sm text-subtext">{{ item.selling_plan_allocation.selling_plan.name }}</p>
+                                      {%- endif -%}
+                                    </div>
+                                  {%- endif -%}
+                                </div>
+                                <div class="grid gap-2 hidden lg:grid">
+                                  {%- liquid
+                                    # Check if this is a valid bundle item to hide discount tags
+                                    assign show_discount_tag = true
+                                    assign is_bundle_check = false
+                                    assign is_valid_bundle_check = false
+
+                                    if item.properties._is_bundle and item.properties._bundle_id
+                                      assign is_bundle_check = true
+                                      assign bundle_id_check = item.properties._bundle_id
+                                      assign bundle_count_check = 0
+                                      assign expected_components_check = 0
+
+                                      # Count items in this bundle group
+                                      for other_item in cart.items
+                                        if other_item.properties._bundle_id == bundle_id_check
+                                          assign bundle_count_check = bundle_count_check | plus: 1
+                                        endif
+                                      endfor
+
+                                      # Get expected number of components
+                                      if item.properties._bundle_products_data
+                                        assign bundle_products_data_check = item.properties._bundle_products_data | parse_json
+                                        assign expected_components_check = bundle_products_data_check.size
+                                      endif
+
+                                      # Bundle is valid if we have ALL expected components
+                                      if bundle_count_check == expected_components_check and expected_components_check >= 2
+                                        assign is_valid_bundle_check = true
+                                        # Hide discount tags for valid bundle items
+                                        assign show_discount_tag = false
+                                      endif
+                                    endif
+                                  -%}
+                                  {%- if item.line_level_discount_allocations != blank and show_discount_tag -%}
+                                    <ul class="cart-item__discounts discounts list-unstyled flex gap-1" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                                      {%- for discount_allocation in item.line_level_discount_allocations -%}
+                                        <li class="discount text-sm-extra font-body-bold flex items-center gap-2">
+                                          {% render 'icon-discount' %}
+                                          <span>{{ discount_allocation.discount_application.title }}</span>
+                                        </li>
+                                      {%- endfor -%}
+                                    </ul>
+                                  {%- endif -%}
+                                  <div class="cart-item__prices">
+                                    <div class="price text-right flex flex-wrap items-center gap-x-2 font-body-bolder{% if item.original_price != item.final_price or item.properties._is_bundle %} price--on-sale{% endif %}">
+                                      {%- liquid
+                                        assign money_price = item.original_price | money
+                                        if settings.currency_code_enabled
+                                          assign money_price = item.original_price | money_with_currency
+                                        endif
+                                        
+                                        # Check if this is a bundle product and calculate discounted price
+                                        assign is_bundle_item = false
+                                        assign bundle_discount_percent = 0
+                                        assign discounted_price = item.original_price
+                                        assign discounted_line_price = item.original_line_price
+                                        
+                                        if item.properties._is_bundle and item.properties._discount_value
+                                          assign is_bundle_item = true
+                                          assign bundle_discount_percent = item.properties._discount_value | times: 1.0
+                                          assign discount_amount = item.original_price | times: bundle_discount_percent | divided_by: 100
+                                          assign discounted_price = item.original_price | minus: discount_amount
+                                          assign line_discount_amount = item.original_line_price | times: bundle_discount_percent | divided_by: 100
+                                          assign discounted_line_price = item.original_line_price | minus: line_discount_amount
+                                        endif
+
+                                        # Check if regular product has automatic discount
+                                        assign has_automatic_discount = false
+                                        if item.original_price != item.final_price and is_bundle_item == false
+                                          assign has_automatic_discount = true
+                                        endif
+                                      -%}
+                                      
+                                      {%- if is_bundle_item -%}
+                                        {%- comment -%} Bundle product - show discounted price with original crossed out {%- endcomment -%}
+                                        <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                                        <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+                                        <span class="price__regular">
+                                          {%- liquid 
+                                            if settings.currency_code_enabled
+                                              echo discounted_price | money_with_currency
+                                            else
+                                              echo discounted_price | money
+                                            endif
+                                          -%}
+                                        </span>
+                                        <s class="price__sale font-body text-subtext">{{ money_price }}</s>
+                                        
+                                      {%- elsif has_automatic_discount -%}
+                                        {%- comment -%} Regular product with automatic discount - show final price with original crossed out {%- endcomment -%}
+                                        <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                                        <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+                                        <span class="price__regular">
+                                          {%- liquid 
+                                            if settings.currency_code_enabled
+                                              echo item.final_price | money_with_currency
+                                            else
+                                              echo item.final_price | money
+                                            endif
+                                          -%}
+                                        </span>
+                                        <s class="price__sale font-body text-subtext">{{ money_price }}</s>
+                                        
+                                      {%- else -%}
+                                        {%- comment -%} Regular product without discount - show regular price only {%- endcomment -%}
+                                        {{- money_price -}}
+                                      {%- endif -%}
+            
+                                      {%- if item.variant.available and item.unit_price_measurement -%}
+                                        <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+                                        <span class="unit-price flex items-center font-body text-sm text-subtext">
+                                          {%- liquid
+                                            capture unit_price_base_unit
+                                              if item.variant.unit_price_measurement
+                                                if item.variant.unit_price_measurement.reference_value != 1
+                                                  echo item.variant.unit_price_measurement.reference_value
+                                                endif
+                                                echo item.variant.unit_price_measurement.reference_unit
+                                              endif
+                                            endcapture
+                                          -%}
+                                          ({{ item.variant.unit_price | money }}
+                                          <span aria-hidden="true">/</span>
+                                          <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+                                          {{ unit_price_base_unit }})
+                                          </span>
+                                      {%- endif -%}
+                                    </div>
+                                  </div>
+                                </div>
+                                <a id="Loader-{{ section.id }}-{{ item.index | plus: 1 }}"{% unless is_gift_wrap_item %} is="cart-remove-item"{% else %} is="gift-wrap-remove-item"{% endunless %} class="items-start justify-center relative flex md:hidden btn-remove" href="{{ item.url_to_remove }}" data-index="{{ item.index | plus: 1 }}">
+                                  <span class="visually-hidden">{{ 'general.cart.remove' | t }}</span>
+                                  {% render 'icon-close', size: 'small' %}
+                                  {% render 'loading-spinner' %}
+                                </a>
+                              </div>
+                              
+                              <template>
+                                <div class="cart-item__action flex items-end justify-between gap-3 lg:hidden w-full">
+                                  <div class="flex items-center gap-2">
+                                    {%- unless is_gift_wrap_item -%}
+                                      {%- liquid
+                                        assign is_bundle_item = false
+                                        assign is_valid_bundle = false
+                                        
+                                        if item.properties._is_bundle and item.properties._bundle_id
+                                          assign is_bundle_item = true
+                                          
+                                          # Check if this bundle group is still valid (has ALL required components)
+                                          assign bundle_id = item.properties._bundle_id
+                                          assign bundle_count = 0
+                                          assign expected_components = 0
+                                          
+                                          # Count items in this bundle group
+                                          for other_item in cart.items
+                                            if other_item.properties._bundle_id == bundle_id
+                                              assign bundle_count = bundle_count | plus: 1
+                                            endif
+                                          endfor
+                                          
+                                          # Get expected number of components from bundle products data
+                                          if item.properties._bundle_products_data
+                                            assign bundle_products_data = item.properties._bundle_products_data | parse_json
+                                            assign expected_components = bundle_products_data.size
+                                          endif
+                                          
+                                          # Bundle is valid only if we have ALL expected components
+                                          if bundle_count == expected_components and expected_components >= 2
+                                            assign is_valid_bundle = true
+                                          endif
+                                          
+                                          # Debug logging
+                                          echo '<!-- Bundle Debug: Item ' | append: item.index | append: ', Bundle ID: ' | append: bundle_id | append: ', Count: ' | append: bundle_count | append: ', Expected: ' | append: expected_components | append: ', Valid: ' | append: is_valid_bundle | append: ' -->'
+                                        endif
+                                      -%}
+                                      <quantity-input class="cart-quantity quantity{% if is_bundle_item and is_valid_bundle %} quantity--disabled{% endif %}">
+                                        <label class="visually-hidden" for="Quantity-{{ section.id }}-{{ item.index | plus: 1 }}">{{ 'products.product.quantity.label' | t }}</label>
+                                        <button type="button" name="minus" class="quantity__button{% if is_bundle_item and is_valid_bundle %} disabled{% endif %}" 
+                                          {% if is_bundle_item and is_valid_bundle %}disabled{% endif %}
+                                          aria-label="{{ 'products.product.quantity.decrease' | t: product: item.product.title | escape }}">
+                                          <svg width="16" height="16" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2.6875 7H12.3125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                          </svg>
+                                        </button>
+                                        <input class="quantity__input{% if is_bundle_item and is_valid_bundle %} disabled{% endif %}"
+                                          type="number"
+                                          name="updates[]"
+                                          value="{{ item.quantity }}"
+                                          aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                                          id="Quantity-{{ section.id }}-{{ item.index | plus: 1 }}"
+                                          data-index="{{ item.index | plus: 1 }}"
+                                          size="2"
+                                          inputmode="numeric"
+                                          autocomplete="off"
+                                          data-quantity-variant-id="{{ item.variant.id }}"
+                                          data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
+                                          min="0"
+                                          data-min="{{ item.variant.quantity_rule.min }}"
+                                          {% if item.variant.quantity_rule.max != null %}
+                                            max="{{ item.variant.quantity_rule.max }}"
+                                          {% endif %}
+                                          step="{{ item.variant.quantity_rule.increment }}"
+                                          {% if is_bundle_item and is_valid_bundle %}disabled readonly{% endif %}
+                                        />
+                                        <button type="button" name="plus" class="quantity__button{% if is_bundle_item and is_valid_bundle %} disabled{% endif %}" 
+                                          {% if is_bundle_item and is_valid_bundle %}disabled{% endif %}
+                                          aria-label="{{ 'products.product.quantity.increase' | t: product: item.product.title | escape }}">
+                                          <svg width="16" height="16" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2.6875 7H12.3125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M7.5 2.1875V11.8125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                          </svg>
+                                        </button>
+                                      </quantity-input>
+                                    {%- else -%}
+                                      <div class="cart-quantity quantity cart-quantity-gift-wrap">
+                                        <label class="visually-hidden" for="Quantity-{{ section.id }}-{{ item.index | plus: 1 }}">{{ 'products.product.quantity.label' | t }}</label>
+                                        <button type="button" name="minus" class="quantity__button hidden" disabled aria-label="{{ 'products.product.quantity.decrease' | t: product: item.product.title | escape }}">
+                                          <svg width="16" height="16" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2.6875 7H12.3125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                          </svg>
+                                        </button>
+                                        <input 
+                                          class="quantity__input"
+                                          disabled
+                                          type="number"
+                                          name="updates[]"
+                                          value="{{ item.quantity }}"
+                                          aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                                          id="Quantity-{{ section.id }}-{{ item.index | plus: 1 }}"
+                                          data-index="{{ item.index | plus: 1 }}"
+                                          size="2"
+                                          inputmode="numeric"
+                                          autocomplete="off"
+                                          data-quantity-variant-id="{{ item.variant.id }}"
+                                          data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
+                                          min="0"
+                                          data-min="{{ item.variant.quantity_rule.min }}"
+                                          {% if item.variant.quantity_rule.max != null %}
+                                            max="{{ item.variant.quantity_rule.max }}"
+                                          {% endif %}
+                                          step="{{ item.variant.quantity_rule.increment }}"
+                                        />
+                                        <button type="button" name="plus" disabled class="quantity__button hidden" aria-label="{{ 'products.product.quantity.increase' | t: product: item.product.title | escape }}">
+                                          <svg width="16" height="16" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M2.6875 7H12.3125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M7.5 2.1875V11.8125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                          </svg>
+                                        </button>
+                                      </div>
+                                    {%- endunless -%}
+                                    {%- if has_qty_rules or has_vol_pricing -%}
+                                      <button class="btn btn--plain volume-pricing-toggle" aria-controls="VolumnPricing-{{ section.id }}-{{ item.key }}">
+                                        <svg class="icon icon-info icon--medium" viewBox="0 0 25 24" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                          <path stroke-linecap="round" stroke-linejoin="round" d="M12.5 16V11M13 8C13 8.27614 12.7761 8.5 12.5 8.5C12.2239 8.5 12 8.27614 12 8M13 8C13 7.72386 12.7761 7.5 12.5 7.5C12.2239 7.5 12 7.72386 12 8M13 8H12M22.5 12C22.5 17.5228 18.0228 22 12.5 22C6.97715 22 2.5 17.5228 2.5 12C2.5 6.47715 6.97715 2 12.5 2C18.0228 2 22.5 6.47715 22.5 12Z"></path>
+                                        </svg>
+                                      </button>
+                                      <basic-modal class="drawer drawer--right" id="VolumnPricing-{{ section.id }}-{{ item.key }}" hidden>
+                                        <div
+                                          class="fixed-overlay absolute"
+                                          aria-controls="VolumnPricing-{{ section.id }}-{{ item.key }}"
+                                        ></div>
+                                        <div class="drawer__inner v-scrollable color-{{ settings.overlay_color_scheme }}">
+                                          <button
+                                            aria-controls="VolumnPricing-{{ section.id }}-{{ item.key }}"
+                                            class="drawer__close-btn z-1"
+                                          >
+                                            {%- render 'icon-close' -%}
+                                          </button>
+                                          <div class="drawer__content cart-addons-drawer__content grid gap-5">
+                                            <div>
+                                              <h4>{{ item.product.title | escape }}</h4>
+                                              {% if item.product.has_only_default_variant == false %}
+                                                {%- assign last_index = item.options_with_values.size | minus: 1 -%}
+                                                <div class="flex gap-1">
+                                                  {% for option in item.options_with_values %}
+                                                    <span class="text-sm text-subtext">
+                                                      {{- option.value -}}
+                                                      {%- unless forloop.index0 == last_index %},{% endunless -%}
+                                                    </span>
+                                                  {% endfor %}
+                                                </div>
+                                              {% endif %}
+                                            </div>
+                                            <div class="grid gap-3">
+                                              {{ qty_rules_vol_pricing }}
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </basic-modal>
+                                    {%- endif -%}
+                                  </div>
+                                  <div class="grid gap-2 lg:hidden">
+                                    {%- liquid
+                                      # Check if this is a valid bundle item to hide discount tags (mobile)
+                                      assign show_discount_tag_mobile = true
+                                      assign is_bundle_check_mobile = false
+                                      assign is_valid_bundle_check_mobile = false
+
+                                      if item.properties._is_bundle and item.properties._bundle_id
+                                        assign is_bundle_check_mobile = true
+                                        assign bundle_id_check_mobile = item.properties._bundle_id
+                                        assign bundle_count_check_mobile = 0
+                                        assign expected_components_check_mobile = 0
+
+                                        # Count items in this bundle group
+                                        for other_item in cart.items
+                                          if other_item.properties._bundle_id == bundle_id_check_mobile
+                                            assign bundle_count_check_mobile = bundle_count_check_mobile | plus: 1
+                                          endif
+                                        endfor
+
+                                        # Get expected number of components
+                                        if item.properties._bundle_products_data
+                                          assign bundle_products_data_check_mobile = item.properties._bundle_products_data | parse_json
+                                          assign expected_components_check_mobile = bundle_products_data_check_mobile.size
+                                        endif
+
+                                        # Bundle is valid if we have ALL expected components
+                                        if bundle_count_check_mobile == expected_components_check_mobile and expected_components_check_mobile >= 2
+                                          assign is_valid_bundle_check_mobile = true
+                                          # Hide discount tags for valid bundle items
+                                          assign show_discount_tag_mobile = false
+                                        endif
+                                      endif
+                                    -%}
+                                    {%- if item.line_level_discount_allocations != blank and show_discount_tag_mobile -%}
+                                      <ul class="cart-item__discounts discounts list-unstyled flex justify-end gap-1" role="list" aria-label="{{ 'customer.order.discount' | t }}">
+                                        {%- for discount_allocation in item.line_level_discount_allocations -%}
+                                          <li class="discount text-sm-extra font-body-bold flex items-center gap-2">
+                                            {% render 'icon-discount' %}
+                                            <span>{{ discount_allocation.discount_application.title }}</span>
+                                          </li>
+                                        {%- endfor -%}
+                                      </ul>
+                                    {%- endif -%}
+                                    <div class="cart-item__prices">
+                                      <div class="price text-right flex flex-wrap items-center gap-x-2 font-body-bolder{% if item.original_price != item.final_price or item.properties._is_bundle %} price--on-sale{% endif %}">
+                                        {%- liquid
+                                          assign money_price = item.original_price | money
+                                          if settings.currency_code_enabled
+                                            assign money_price = item.original_price | money_with_currency
+                                          endif
+
+                                          # Check if this is a bundle product and calculate discounted price
+                                          assign is_bundle_item_mobile = false
+                                          assign bundle_discount_percent_mobile = 0
+                                          assign discounted_price_mobile = item.original_price
+                                          
+                                          if item.properties._is_bundle and item.properties._discount_value
+                                            assign is_bundle_item_mobile = true
+                                            assign bundle_discount_percent_mobile = item.properties._discount_value | times: 1.0
+                                            assign discount_amount_mobile = item.original_price | times: bundle_discount_percent_mobile | divided_by: 100
+                                            assign discounted_price_mobile = item.original_price | minus: discount_amount_mobile
+                                          endif
+
+                                          # Check if regular product has automatic discount
+                                          assign has_automatic_discount_mobile = false
+                                          if item.original_price != item.final_price and is_bundle_item_mobile == false
+                                            assign has_automatic_discount_mobile = true
+                                          endif
+                                        -%}
+                                        
+                                        {%- if is_bundle_item_mobile -%}
+                                          {%- comment -%} Bundle product - show discounted price with original crossed out {%- endcomment -%}
+                                          <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                                          <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+                                          <span class="price__regular">
+                                            {%- liquid 
+                                              if settings.currency_code_enabled
+                                                echo discounted_price_mobile | money_with_currency
+                                              else
+                                                echo discounted_price_mobile | money
+                                              endif
+                                            -%}
+                                          </span>
+                                          <s class="price__sale font-body text-subtext">{{ money_price }}</s>
+                                          
+                                        {%- elsif has_automatic_discount_mobile -%}
+                                          {%- comment -%} Regular product with automatic discount - show final price with original crossed out {%- endcomment -%}
+                                          <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                                          <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+                                          <span class="price__regular">
+                                            {%- liquid 
+                                              if settings.currency_code_enabled
+                                                echo item.final_price | money_with_currency
+                                              else
+                                                echo item.final_price | money
+                                              endif  
+                                            -%}
+                                          </span>
+                                          <s class="price__sale font-body text-subtext">{{ money_price }}</s>
+                                          
+                                        {%- else -%}
+                                          {%- comment -%} Regular product without discount - show regular price only {%- endcomment -%}
+                                          {{- money_price -}}
+                                        {%- endif -%}
+              
+                                        {%- if item.variant.available and item.unit_price_measurement -%}
+                                          <span class="visually-hidden">{{ 'products.product.price.unit_price' | t }}</span>
+                                          <span class="unit-price flex items-center font-body text-sm text-subtext">
+                                            {%- liquid
+                                              capture unit_price_base_unit
+                                                if item.variant.unit_price_measurement
+                                                  if item.variant.unit_price_measurement.reference_value != 1
+                                                    echo item.variant.unit_price_measurement.reference_value
+                                                  endif
+                                                  echo item.variant.unit_price_measurement.reference_unit
+                                                endif
+                                              endcapture
+                                            -%}
+                                            ({{ item.variant.unit_price | money }}
+                                            <span aria-hidden="true">/</span>
+                                            <span class="visually-hidden">&nbsp;{{ 'accessibility.unit_price_separator' | t }}&nbsp;</span>
+                                            {{ unit_price_base_unit }})
+                                            </span>
+                                        {%- endif -%}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                              </template>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td class="cart-item__quantity hidden lg:table-cell">
+                          <div class="cart-item__action flex items-center justify-between cart-item__quantity-wrapper">
+                            <template>
+                              <div class="flex items-center gap-2">
+                                {%- unless is_gift_wrap_item -%}
+                                  {%- liquid
+                                    assign is_bundle_item = false
+                                    assign is_valid_bundle = false
+                                    
+                                    if item.properties._is_bundle and item.properties._bundle_id
+                                      assign is_bundle_item = true
+                                      
+                                      # Check if this bundle group is still valid (has ALL required components)
+                                      assign bundle_id = item.properties._bundle_id
+                                      assign bundle_count = 0
+                                      assign expected_components = 0
+                                      
+                                      # Count items in this bundle group
+                                      for other_item in cart.items
+                                        if other_item.properties._bundle_id == bundle_id
+                                          assign bundle_count = bundle_count | plus: 1
+                                        endif
+                                      endfor
+                                      
+                                      # Get expected number of components from bundle products data
+                                      if item.properties._bundle_products_data
+                                        assign bundle_products_data = item.properties._bundle_products_data | parse_json
+                                        assign expected_components = bundle_products_data.size
+                                      endif
+                                      
+                                      # Bundle is valid only if we have ALL expected components
+                                      if bundle_count == expected_components and expected_components >= 2
+                                        assign is_valid_bundle = true
+                                      endif
+                                      
+                                      # Debug logging
+                                      echo '<!-- Desktop Bundle Debug: Item ' | append: item.index | append: ', Bundle ID: ' | append: bundle_id | append: ', Count: ' | append: bundle_count | append: ', Expected: ' | append: expected_components | append: ', Valid: ' | append: is_valid_bundle | append: ' -->'
+                                    endif
+                                  -%}
+                                  <quantity-input class="cart-quantity quantity{% if is_bundle_item and is_valid_bundle %} quantity--disabled{% endif %}">
+                                    <label class="visually-hidden" for="Quantity-{{ section.id }}-{{ item.index | plus: 1 }}">{{ 'products.product.quantity.label' | t }}</label>
+                                    <button type="button" name="minus" class="quantity__button{% if is_bundle_item and is_valid_bundle %} disabled{% endif %}" 
+                                      {% if is_bundle_item and is_valid_bundle %}disabled{% endif %}
+                                      aria-label="{{ 'products.product.quantity.decrease' | t: product: item.product.title | escape }}">
+                                      <svg width="16" height="16" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.6875 7H12.3125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                      </svg>
+                                    </button>
+                                    <input class="quantity__input{% if is_bundle_item and is_valid_bundle %} disabled{% endif %}"
+                                      type="number"
+                                      name="updates[]"
+                                      value="{{ item.quantity }}"
+                                      aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                                      id="Quantity-{{ section.id }}-{{ item.index | plus: 1 }}"
+                                      data-index="{{ item.index | plus: 1 }}"
+                                      size="2"
+                                      inputmode="numeric"
+                                      autocomplete="off"
+                                      data-quantity-variant-id="{{ item.variant.id }}"
+                                      data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
+                                      min="0"
+                                      data-min="{{ item.variant.quantity_rule.min }}"
+                                      {% if item.variant.quantity_rule.max != null %}
+                                        max="{{ item.variant.quantity_rule.max }}"
+                                      {% endif %}
+                                      step="{{ item.variant.quantity_rule.increment }}"
+                                      {% if is_bundle_item and is_valid_bundle %}disabled readonly{% endif %}
+                                    />
+                                    <button type="button" name="plus" class="quantity__button{% if is_bundle_item and is_valid_bundle %} disabled{% endif %}" 
+                                      {% if is_bundle_item and is_valid_bundle %}disabled{% endif %}
+                                      aria-label="{{ 'products.product.quantity.increase' | t: product: item.product.title | escape }}">
+                                      <svg width="16" height="16" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.6875 7H12.3125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.5 2.1875V11.8125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                      </svg>
+                                    </button>
+                                  </quantity-input>
+                                {%- else -%}
+                                  <div class="cart-quantity quantity cart-quantity-gift-wrap">
+                                    <label class="visually-hidden" for="Quantity-{{ section.id }}-{{ item.index | plus: 1 }}">{{ 'products.product.quantity.label' | t }}</label>
+                                    <button type="button" name="minus" class="quantity__button hidden" disabled aria-label="{{ 'products.product.quantity.decrease' | t: product: item.product.title | escape }}">
+                                      <svg width="16" height="16" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.6875 7H12.3125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                      </svg>
+                                    </button>
+                                    <input 
+                                      class="quantity__input"
+                                      disabled
+                                      type="number"
+                                      name="updates[]"
+                                      value="{{ item.quantity }}"
+                                      aria-label="{{ 'products.product.quantity.input_label' | t: product: item.product.title | escape }}"
+                                      id="Quantity-{{ section.id }}-{{ item.index | plus: 1 }}"
+                                      data-index="{{ item.index | plus: 1 }}"
+                                      size="2"
+                                      inputmode="numeric"
+                                      autocomplete="off"
+                                      data-quantity-variant-id="{{ item.variant.id }}"
+                                      data-cart-quantity="{{ cart | item_count_for_variant: item.variant.id }}"
+                                      min="0"
+                                      data-min="{{ item.variant.quantity_rule.min }}"
+                                      {% if item.variant.quantity_rule.max != null %}
+                                        max="{{ item.variant.quantity_rule.max }}"
+                                      {% endif %}
+                                      step="{{ item.variant.quantity_rule.increment }}"
+                                    />
+                                    <button type="button" name="plus" disabled class="quantity__button hidden" aria-label="{{ 'products.product.quantity.increase' | t: product: item.product.title | escape }}">
+                                      <svg width="16" height="16" viewBox="0 0 15 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                        <path d="M2.6875 7H12.3125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                        <path d="M7.5 2.1875V11.8125" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                      </svg>
+                                    </button>
+                                  </div>
+                                {%- endunless -%}
+                                {%- if has_qty_rules or has_vol_pricing -%}
+                                  <button class="btn btn--plain volume-pricing-toggle" aria-controls="VolumnPricing-{{ section.id }}-{{ item.key }}">
+                                    <svg class="icon icon-info icon--medium" viewBox="0 0 25 24" stroke="currentColor" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                      <path stroke-linecap="round" stroke-linejoin="round" d="M12.5 16V11M13 8C13 8.27614 12.7761 8.5 12.5 8.5C12.2239 8.5 12 8.27614 12 8M13 8C13 7.72386 12.7761 7.5 12.5 7.5C12.2239 7.5 12 7.72386 12 8M13 8H12M22.5 12C22.5 17.5228 18.0228 22 12.5 22C6.97715 22 2.5 17.5228 2.5 12C2.5 6.47715 6.97715 2 12.5 2C18.0228 2 22.5 6.47715 22.5 12Z"></path>
+                                    </svg>
+                                  </button>
+                                  <basic-modal class="drawer drawer--right" id="VolumnPricing-{{ section.id }}-{{ item.key }}" hidden>
+                                    <div
+                                      class="fixed-overlay absolute"
+                                      aria-controls="VolumnPricing-{{ section.id }}-{{ item.key }}"
+                                    ></div>
+                                    <div class="drawer__inner v-scrollable color-{{ settings.overlay_color_scheme }}">
+                                      <button
+                                        aria-controls="VolumnPricing-{{ section.id }}-{{ item.key }}"
+                                        class="drawer__close-btn z-1"
+                                      >
+                                        {%- render 'icon-close' -%}
+                                      </button>
+                                      <div class="drawer__content cart-addons-drawer__content grid gap-5">
+                                        <div>
+                                          <h4>{{ item.product.title | escape }}</h4>
+                                          {% if item.product.has_only_default_variant == false %}
+                                            {%- assign last_index = item.options_with_values.size | minus: 1 -%}
+                                            <div class="flex gap-1">
+                                              {% for option in item.options_with_values %}
+                                                <span class="text-sm text-subtext">
+                                                  {{- option.value -}}
+                                                  {%- unless forloop.index0 == last_index %},{% endunless -%}
+                                                </span>
+                                              {% endfor %}
+                                            </div>
+                                          {% endif %}
+                                        </div>
+                                        <div class="grid gap-3">
+                                          {{ qty_rules_vol_pricing }}
+                                        </div>
+                                      </div>
+                                    </div>
+                                  </basic-modal>
+                                {%- endif -%}
+                              </div>
+                            </template>
+                          </div>
+                        </td>
+    
+                        <td class="cart-item__total hidden lg:table-cell">
+                          <span class="font-body-bolder">
+                            {%- liquid
+                              assign line_price = item.final_line_price
+                              
+                              # Check if this is a bundle product and calculate discounted line price
+                              if item.properties._is_bundle and item.properties._discount_value
+                                # Check if this bundle group is still valid
+                                assign bundle_id_line = item.properties._bundle_id
+                                assign bundle_count_line = 0
+                                assign expected_components_line = 0
+                                
+                                # Count items in this bundle group
+                                for other_item in cart.items
+                                  if other_item.properties._bundle_id == bundle_id_line
+                                    assign bundle_count_line = bundle_count_line | plus: 1
+                                  endif
+                                endfor
+                                
+                                # Get expected number of components
+                                if item.properties._bundle_products_data
+                                  assign bundle_products_data_line = item.properties._bundle_products_data | parse_json
+                                  assign expected_components_line = bundle_products_data_line.size
+                                endif
+                                
+                                # Bundle is valid only if we have ALL expected components
+                                assign is_valid_bundle_line = false
+                                if bundle_count_line == expected_components_line and expected_components_line >= 2
+                                  assign is_valid_bundle_line = true
+                                endif
+                                
+                                # Only apply bundle discount if bundle is valid
+                                if is_valid_bundle_line
+                                  assign discount_percent = item.properties._discount_value | times: 1.0
+                                  assign original_line_price = item.original_line_price
+                                  assign discount_amount = original_line_price | times: discount_percent | divided_by: 100
+                                  assign line_price = original_line_price | minus: discount_amount
+                                else
+                                  # Invalid bundle - use final_line_price (includes automatic discount if present)
+                                  assign line_price = item.final_line_price
+                                endif
+                              endif
+                              
+                              if settings.currency_code_enabled
+                                echo line_price | money_with_currency
+                              else
+                                echo line_price | money
+                              endif
+                            -%}
+                          </span>
+                        </td>
+                      </tr>
+                    {%- endcapture -%}
+
+                  {%- liquid
+                    unless is_gift_wrap_item
+                      echo cart_item
+                    else
+                      assign cart_gift_wrap_item = cart_item
+                    endunless
+                  -%}
+                {%- endfor -%}
+                {%- liquid
+                  if cart_gift_wrap_item
+                    echo cart_gift_wrap_item
+                  endif
+                -%}
+              </tbody>
+            </table>
+          </cart-items>
+        </form>
+      </div>
+      <div class="cart__footer flex flex-col{% unless cart.item_count > 0 %} hidden{% endunless %}">
+        <div class="sticky-element">
+          <div class="foxkit-cart-countdown-hook"></div>
+          <div class="foxkit-cart-goal-hook"></div>
+          {%- liquid
+            for block in section.blocks
+              if block.type == 'free_shipping_goal'
+                if settings.free_shipping_minimum_amount != blank
+                  assign minimum_amount = settings.free_shipping_minimum_amount | remove: ' '
+                  render 'free-shipping-goal', minimum_amount: minimum_amount
+                endif
+              endif
+            endfor
+          -%}
+          <div class="cart__footer-wrapper grid gap-6">
+            {%- render 'gift-wrapping',
+              section_id: section.id,
+              gift_wrapping: gift_wrapping,
+              gift_wrap_id: gift_wrap_id,
+              gift_wraps_in_cart: gift_wraps_in_cart,
+              items_in_cart: items_in_cart
+            -%}
+            {%- for block in section.blocks -%}
+              {%- case block.type -%}
+                {%- when '@app' -%}
+                  {%- render block -%}
+                {%- when 'subtotal' -%}
+                  <div class="cart__footer--subtotal" data-cart-subtotal {{ block.shopify_attributes }}>
+                    <div class="grid gap-1">
+                      {%- liquid
+                        assign discount_codes = cart.cart_level_discount_applications | where: 'type', 'discount_code' | map: 'title'
+                        assign cart_items_has_discount = false
+                        for item in cart.items
+                          for allocation in item.line_level_discount_allocations
+                            if allocation.discount_application.type == 'discount_code'
+                              assign cart_items_has_discount = true
+                            endif
+                          endfor
+                        endfor
+                      -%}
+                      {%- if cart.cart_level_discount_applications.size > 0 or cart_items_has_discount -%}
+                        <ul
+                          class="cart__discounts discounts list-unstyled flex flex-wrap gap-1"
+                          role="list"
+                          aria-label="{{ 'customer.order.discount' | t }}"
+                        >
+                          {%- for discount in cart.cart_level_discount_applications -%}
+                            <li
+                              class="discount text-sm-extra font-body-bold flex items-center"
+                              data-discount-code="{{ discount.title }}"
+                            >
+                              {% render 'icon-discount' %}
+                              <span>{{- discount.title -}}</span>
+                              <span class="font-body-bold">(-{{ discount.total_allocated_amount | money }})</span>
+                              <button
+                                is="cart-discount-remove"
+                                type="button"
+                                aria-label="{{ 'general.cart.coupon.remove' | t: code: discount.title }}"
+                                class="btn btn--inherit btn-remove"
+                              >
+                                {% render 'icon-close', size: 'extra-small' %}
+                                {%- render 'loading-spinner' -%}
+                              </button>
+                            </li>
+                          {%- endfor -%}
+                          {%- if cart_items_has_discount -%}
+                            {%- for item in cart.items -%}
+                              {%- for allocation in item.line_level_discount_allocations -%}
+                                {%- liquid
+                                  unless allocation.discount_application.type == 'discount_code'
+                                    continue
+                                  endunless
+
+                                  assign discount = allocation.discount_application
+
+                                  assign is_displayed = discount_codes | has: discount.title
+                                  if is_displayed
+                                    continue
+                                  endif
+
+                                  assign discount_codes = item.line_level_discount_allocations | slice: forloop.index0 | map: 'discount_application' | map: 'title' | concat: discount_codes
+                                -%}
+                                <li
+                                  class="discount text-sm-extra font-body-bold flex items-center"
+                                  data-discount-code="{{ discount.title }}"
+                                >
+                                  {% render 'icon-discount' %}
+                                  <span>{{- discount.title -}}</span>
+                                  <span class="font-body-bold">(-{{ discount.total_allocated_amount | money }})</span>
+                                  <button
+                                    is="cart-discount-remove"
+                                    type="button"
+                                    aria-label="{{ 'general.cart.coupon.remove' | t: code: discount.title }}"
+                                    class="btn btn--inherit btn-remove"
+                                  >
+                                    {% render 'icon-close', size: 'extra-small' %}
+                                    {%- render 'loading-spinner' -%}
+                                  </button>
+                                </li>
+                              {%- endfor -%}
+                            {%- endfor -%}
+                          {%- endif -%}
+                        </ul>
+                      {%- endif -%}
+                      <div class="totals flex justify-between items-center h5">
+                        <span class="totals__subtotal">
+                          {{- 'sections.cart.estimated_total' | t -}}
+                        </span>
+                        <span class="totals__subtotal-value" id="cart-subtotal-value">
+                          {%- liquid
+                            assign calculated_total = 0
+
+                            # Group bundle products to check validity
+                            assign bundle_groups = ''
+                            for item in cart.items
+                              if item.properties._is_bundle and item.properties._bundle_id
+                                assign bundle_id = item.properties._bundle_id
+                                unless bundle_groups contains bundle_id
+                                  assign bundle_groups = bundle_groups | append: bundle_id | append: ','
+                                endunless
+                              endif
+                            endfor
+
+                            # Calculate total based on bundle validity
+                            for item in cart.items
+                              if item.properties._is_bundle and item.properties._bundle_id
+                                # Check if this bundle group is still valid (has ALL required components)
+                                assign bundle_id = item.properties._bundle_id
+                                assign bundle_count = 0
+                                assign expected_components = 0
+                                
+                                # Count items in this bundle group
+                                for other_item in cart.items
+                                  if other_item.properties._bundle_id == bundle_id
+                                    assign bundle_count = bundle_count | plus: 1
+                                  endif
+                                endfor
+                                
+                                # Get expected number of components from bundle products data
+                                if item.properties._bundle_products_data
+                                  assign bundle_products_data = item.properties._bundle_products_data | parse_json
+                                  assign expected_components = bundle_products_data.size
+                                endif
+                                
+                                # Bundle is valid only if we have ALL expected components
+                                assign is_valid_bundle = false
+                                if bundle_count == expected_components and expected_components >= 2
+                                  assign is_valid_bundle = true
+                                endif
+                                
+                                if is_valid_bundle and item.properties._discount_value
+                                  # Valid bundle - apply discount
+                                  assign discount_percent = item.properties._discount_value | times: 1.0
+                                  
+                                  # Try to get original price from bundle products data
+                                  assign true_original_price = item.variant.price
+                                  if item.properties._bundle_products_data
+                                    assign bundle_products_data = item.properties._bundle_products_data | parse_json
+                                    for bundle_product in bundle_products_data
+                                      if bundle_product.id == item.variant_id
+                                        assign true_original_price = bundle_product.price
+                                        break
+                                      endif
+                                    endfor
+                                  endif
+                                  
+                                  # Calculate true original line price and then apply discount
+                                  assign true_original_line_price = true_original_price | times: item.quantity
+                                  assign discount_amount = true_original_line_price | times: discount_percent | divided_by: 100
+                                  assign discounted_line_price = true_original_line_price | minus: discount_amount
+                                  assign calculated_total = calculated_total | plus: discounted_line_price
+                                else
+                                  # Invalid bundle - check if it has automatic discount
+                                  if item.original_price != item.final_price
+                                    # Invalid bundle with automatic discount - use final_line_price
+                                    assign calculated_total = calculated_total | plus: item.final_line_price
+                                  else
+                                    # Invalid bundle without automatic discount - use true original price
+                                    assign true_original_price = item.variant.price
+                                    if item.properties._bundle_products_data
+                                      assign bundle_products_data = item.properties._bundle_products_data | parse_json
+                                      for bundle_product in bundle_products_data
+                                        if bundle_product.id == item.variant_id
+                                          assign true_original_price = bundle_product.price
+                                          break
+                                        endif
+                                      endfor
+                                    endif
+                                    
+                                    assign true_original_line_price = true_original_price | times: item.quantity
+                                    assign calculated_total = calculated_total | plus: true_original_line_price
+                                  endif
+                                endif
+                              else
+                                # This is a regular product - check if it has automatic discount
+                                if item.original_price != item.final_price
+                                  # Has automatic discount - use final_line_price
+                                  assign calculated_total = calculated_total | plus: item.final_line_price
+                                else
+                                  # No discount - use original_line_price
+                                  assign calculated_total = calculated_total | plus: item.original_line_price
+                                endif
+                              endif
+                            endfor
+
+                            if settings.currency_code_enabled
+                              echo calculated_total | money_with_currency
+                            else
+                              echo calculated_total | money
+                            endif
+                          -%}
+                          
+                          <script>
+                            console.log('=== LIQUID TEMPLATE CALCULATION ===');
+                            console.log('Liquid calculated total:', {{ calculated_total }});
+                            console.log('Expected discounted total should be around: 81175 (811.75 kr)');
+                            console.log('Current total shows: 95500 (955.00 kr) - this is ORIGINAL price');
+                            console.log('=== END LIQUID CALCULATION ===');
+                          </script>
+                        </span>
+                      </div>
+                      <div class="tax-note text-sm-extra">
+                        {%- liquid
+                          if cart.taxes_included and shop.shipping_policy.body != blank
+                            echo 'sections.cart.taxes_included_and_shipping_policy_html' | t: link: shop.shipping_policy.url
+                          elsif cart.taxes_included
+                            echo 'sections.cart.taxes_included_but_shipping_at_checkout' | t
+                          elsif shop.shipping_policy.body != blank
+                            echo 'sections.cart.taxes_and_shipping_policy_at_checkout_html' | t: link: shop.shipping_policy.url
+                          else
+                            echo 'sections.cart.taxes_and_shipping_at_checkout' | t
+                          endif
+                        -%}
+                      </div>
+                    </div>
+                  </div>
+                {%- when 'buttons' -%}
+                  <div class="cart__footer--buttons grid gap-3" {{ block.shopify_attributes }}>
+                    {% comment %}
+                      <noscript>
+                        <button class="btn btn--primary w-full" type="submit" name="update" form="cart">
+                          <span class="btn__text">{{- 'sections.cart.update' | t -}}</span>
+                        </button>
+                      </noscript>
+                    {% endcomment %}
+
+                    <button class="btn btn--primary w-full" type="submit" form="cart" name="checkout">
+                      <span class="btn__text">{{ 'sections.cart.checkout' | t }}</span>
+                    </button>
+
+                    {% if additional_checkout_buttons %}
+                      <div class="additional-checkout-buttons no-js-hidden">
+                        {{ content_for_additional_checkout_buttons }}
+                      </div>
+                    {% endif %}
+                  </div>
+                {%- when 'cart_note' -%}
+                  <div class="cart__addon cart__footer--cart-note no-js-hidden" {{ block.shopify_attributes }}>
+                    <details is="accordion-details" class="accordion-details cart-accordion-details">
+                      <summary class="accordion-details__summary flex items-center justify-between h6">
+                        <div class="flex gap-2 items-center">
+                          {{ 'general.cart.note.title' | t }}
+                        </div>
+                        {%- render 'icon-caret-down', size: 'small' -%}
+                      </summary>
+                      <cart-note class="flex flex-col items-start gap-5 accordion-details__content">
+                        <div class="form-field w-full">
+                          <textarea
+                            name="note"
+                            class="form-control form-control--textarea"
+                            rows="5"
+                            form="cart"
+                            placeholder="{{ 'general.cart.note.caption' | t }}"
+                            id="CartNoteForm-{{ section.id }}"
+                          >{{ cart.note }}</textarea>
+                          <label class="visually-hidden" for="CartNoteForm-{{ section.id }}">
+                            {{- 'general.cart.note.title' | t -}}
+                          </label>
+                        </div>
+                        <button
+                          class="btn btn--primary"
+                          type="button"
+                        >
+                          <span class="btn__text">{{ 'general.cart.note.button' | t }}</span>
+                        </button>
+                      </cart-note>
+                    </details>
+                  </div>
+                {%- when 'cart_coupon' -%}
+                  <div class="cart__addon cart__footer--cart-coupon no-js-hidden" {{ block.shopify_attributes }}>
+                    <details is="accordion-details" class="accordion-details cart-accordion-details">
+                      <summary class="accordion-details__summary flex items-center justify-between h6">
+                        <div class="flex gap-2 items-center">
+                          {{ 'general.cart.coupon.title' | t }}
+                        </div>
+                        {%- render 'icon-caret-down', size: 'small' -%}
+                      </summary>
+                      <form
+                        is="cart-discount"
+                        class="cart-discount__form flex flex-col items-start gap-5 accordion-details__content"
+                        action="{{ routes.cart_url }}"
+                        method="POST"
+                      >
+                        <div class="form-field w-full">
+                          <label class="visually-hidden" for="CartCouponForm-{{ section.id }}">
+                            {{- 'general.cart.coupon.title' | t -}}
+                          </label>
+                          <input
+                            id="CartCouponForm-{{ section.id }}"
+                            class="form-control"
+                            name="discount"
+                            placeholder="{{ 'general.cart.coupon.caption' | t }}"
+                            required
+                            aria-required="true"
+                          >
+                        </div>
+                        <div class="form-submit">
+                          <button class="btn btn--primary" type="submit">
+                            <span class="btn__text">{{ 'general.cart.coupon.button' | t }}</span>
+                            {%- render 'loading-spinner' -%}
+                          </button>
+                        </div>
+                        <div class="form__message w-full alert alert--error blocks-radius grid gap-2"></div>
+                      </form>
+                    </details>
+                  </div>
+                {%- when 'cart_shipping_rate' -%}
+                  <div
+                    class="cart__addon cart__footer--shipping-rate no-js-hidden"
+                    class="{{ block.shopify_attributes }}"
+                  >
+                    <details is="accordion-details" class="accordion-details cart-accordion-details">
+                      <summary class="accordion-details__summary flex items-center justify-between h6">
+                        <div class="flex gap-2 items-center">
+                          {{ 'general.cart.shipping_calculator.title' | t }}
+                        </div>
+                        {%- render 'icon-caret-down', size: 'small' -%}
+                      </summary>
+                      <form
+                        class="grid gap-4 accordion-details__content"
+                        action="{{ routes.cart_url }}"
+                        method="POST"
+                        novalidate
+                        is="shipping-calculator"
+                      >
+                        <country-province
+                          class="grid gap-4"
+                          {% if shop.customer_accounts_enabled and customer %}
+                            data-country="{{ customer.default_address.country }}"
+                            {%- if customer.default_address.province != '' %}
+                              data-province="{{ customer.default_address.province }}"
+                            {%- endif -%}
+                          {% endif %}
+                          data-template="{{ template }}"
+                        >
+                          <div class="form-field reset-spacing">
+                            <label class="form-label" for="ShippingCalculatorCountry-{{ section.id }}">
+                              {{- 'customer.addresses.country' | t -}}
+                            </label>
+                            <div class="select">
+                              <select
+                                name="address[country]"
+                                class="form-control form-control--select"
+                                autocomplete="country"
+                                id="ShippingCalculatorCountry-{{ section.id }}"
+                              >
+                                {{- all_country_option_tags -}}
+                              </select>
+                              {%- render 'icon-caret-down', size: 'small' -%}
+                            </div>
+                          </div>
+                          <div class="form-field reset-spacing" hidden>
+                            <label class="form-label" for="ShippingCalculatorProvince-{{ section.id }}">
+                              {{- 'customer.addresses.province' | t -}}
+                            </label>
+                            <div class="select">
+                              <select
+                                name="address[province]"
+                                class="form-control form-control--select"
+                                autocomplete="address-level1"
+                                id="ShippingCalculatorProvince-{{ section.id }}"
+                              ></select>
+                              {%- render 'icon-caret-down', size: 'small' -%}
+                            </div>
+                          </div>
+                        </country-province>
+                        <div class="form-field">
+                          <label class="form-label" for="ShippingCalculatorZip-{{ section.id }}">
+                            {{- 'customer.addresses.zip' | t -}}
+                          </label>
+                          <input
+                            name="address[zip]"
+                            class="form-control form-control--input"
+                            type="text"
+                            autocapitalize="characters"
+                            autocomplete="postal-code"
+                            placeholder=" "
+                            id="ShippingCalculatorZip-{{ section.id }}"
+                            {% if shop.customer_accounts_enabled and customer %}
+                              value="{{ customer.default_address.zip }}"
+                            {% endif %}
+                          >
+                        </div>
+                        <div class="">
+                          <button class="btn btn--primary" type="submit">
+                            <span class="btn__text">{{ 'general.cart.shipping_calculator.button' | t }}</span>
+                            {%- render 'loading-spinner' -%}
+                          </button>
+                        </div>
+                        <div class="grid gap-3"></div>
+                      </form>
+                    </details>
+                  </div>
+              {%- endcase -%}
+            {%- endfor -%}
+          </div>
+        </div>
+      </div>
+    </main-cart>
+    {% comment %} {%- endif -%} {% endcomment %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "t:sections.main-cart.name",
+  "settings": [
+    {
+      "type": "header",
+      "content": "t:general.general.name"
+    },
+    {
+      "type": "select",
+      "id": "container",
+      "options": [
+        {
+          "value": "full",
+          "label": "t:general.container.options__full.label"
+        },
+        {
+          "value": "fixed",
+          "label": "t:general.container.options__fixed.label"
+        }
+      ],
+      "default": "fixed",
+      "label": "t:general.container.label"
+    },
+    {
+      "type": "header",
+      "content": "t:general.padding.section_heading.content"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "t:general.padding.top.label",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "label": "t:general.padding.bottom.label",
+      "default": 60
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    },
+    {
+      "type": "free_shipping_goal",
+      "name": "t:sections.main-cart.blocks.free_shipping_goal.name",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "paragraph",
+          "content": "t:settings_schema.cart.settings.free_shipping_minimum_amount.info"
+        }
+      ]
+    },
+    {
+      "type": "subtotal",
+      "name": "t:sections.main-cart.blocks.subtotal.name",
+      "limit": 1
+    },
+    {
+      "type": "buttons",
+      "name": "t:sections.main-cart.blocks.buttons.name",
+      "limit": 1
+    },
+    {
+      "type": "cart_note",
+      "name": "t:sections.main-cart.blocks.cart_note.name",
+      "limit": 1
+    },
+    {
+      "type": "cart_coupon",
+      "name": "t:sections.main-cart.blocks.cart_coupon.name",
+      "limit": 1
+    },
+    {
+      "type": "cart_shipping_rate",
+      "name": "t:sections.main-cart.blocks.cart_shipping_rate.name",
+      "limit": 1
+    }
+  ]
+}
+{% endschema %}

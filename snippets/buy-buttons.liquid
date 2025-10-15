@@ -1,0 +1,1066 @@
+{% comment %}
+  Renders product buy-buttons.
+  Accepts:
+  - product: {Object} product object.
+  - block: {Object} passing the block information.
+  - product_form_id: {String} product form id.
+  - section_id: {String} id of section to which this snippet belongs.
+
+  Usage:
+  {% render 'buy-buttons', block: block, product: product, product_form_id: product_form_id, section_id: section.id %}
+{% endcomment %}
+
+{%- comment -%}
+  Bundle Product Detection and Management
+  This section handles bundle products by checking metafields and managing inventory
+{%- endcomment -%}
+
+{%- liquid
+  assign is_bundle_product = false
+  assign bundle_products = null
+  assign bundle_quantities = null
+  assign bundle_discount = null
+
+  if product.variants.first.metafields.custom.is_bundle == true
+    assign is_bundle_product = true
+    assign bundle_products = product.variants.first.metafields.custom.bundle_products.value
+    assign bundle_quantities = product.variants.first.metafields.custom.bundle_quantities.value
+    assign bundle_discount = product.variants.first.metafields.custom.bundle_discount.value
+  endif
+-%}
+
+{%- comment -%}
+  Bundle Product Inventory Check Function
+  This function calculates the effective inventory for bundle products by finding
+  the smallest inventory among all bundled product variants.
+{%- endcomment -%}
+
+{%- liquid
+  assign bundle_inventory = 0
+  assign bundle_available = false
+
+  if is_bundle_product and bundle_products and bundle_quantities
+    assign min_inventory = 999999
+    for bundle_product in bundle_products
+      for variant in bundle_product.variants
+        if variant.inventory_quantity < min_inventory
+          assign min_inventory = variant.inventory_quantity
+        endif
+      endfor
+    endfor
+    assign bundle_inventory = min_inventory
+    if bundle_inventory > 0
+      assign bundle_available = true
+    endif
+  endif
+-%}
+
+<script>
+  const bundle_products_inventory_quantities = [];
+</script>
+
+<script>
+  console.log("bundle_variant_id", {{product.variants.first.id}});
+</script>
+
+{% for variant in product.variants %}
+  <script>
+    {% if variant.metafields.custom.bundle_products.value %}
+      {% for bundle_product in variant.metafields.custom.bundle_products.value %}
+        bundle_products_inventory_quantities.push({{ bundle_product.inventory_quantity | json }});
+      {% endfor %}
+    {% endif %}
+  </script>
+{% endfor %}
+
+{%- if product != blank -%}
+  {%- liquid
+    assign gift_card_recipient_feature_active = false
+    if block.settings.show_gift_card_recipient and product.gift_card?
+      assign gift_card_recipient_feature_active = true
+    endif
+
+    assign show_dynamic_checkout = false
+    if block.settings.show_dynamic_checkout and gift_card_recipient_feature_active == false
+      assign show_dynamic_checkout = true
+    endif
+  -%}
+  <div
+    class="product-form"
+    data-hide-errors="{{ gift_card_recipient_feature_active }}"
+    data-section-id="{{ section.id }}">
+    <div
+      class="product-form__error-message-wrapper"
+      role="alert"
+      hidden>
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        class="icon icon-error"
+        viewBox="0 0 13 13">
+        <circle
+          cx="6.5"
+          cy="6.50049"
+          r="5.5"
+          stroke="white"
+          stroke-width="2" />
+        <circle
+          cx="6.5"
+          cy="6.5"
+          r="5.5"
+          fill="#EB001B"
+          stroke="#EB001B"
+          stroke-width="0.7" />
+        <path d="M5.87413 3.52832L5.97439 7.57216H7.02713L7.12739 3.52832H5.87413ZM6.50076 9.66091C6.88091 9.66091 7.18169 9.37267 7.18169 9.00504C7.18169 8.63742 6.88091 8.34917 6.50076 8.34917C6.12061 8.34917 5.81982 8.63742 5.81982 9.00504C5.81982 9.37267 6.12061 9.66091 6.50076 9.66091Z" fill="white" />
+        <path
+          d="M5.87413 3.17832H5.51535L5.52424 3.537L5.6245 7.58083L5.63296 7.92216H5.97439H7.02713H7.36856L7.37702 7.58083L7.47728 3.537L7.48617 3.17832H7.12739H5.87413ZM6.50076 10.0109C7.06121 10.0109 7.5317 9.57872 7.5317 9.00504C7.5317 8.43137 7.06121 7.99918 6.50076 7.99918C5.94031 7.99918 5.46982 8.43137 5.46982 9.00504C5.46982 9.57872 5.94031 10.0109 6.50076 10.0109Z"
+          fill="white"
+          stroke="#EB001B"
+          stroke-width="0.7">
+      </svg>
+      <div
+        class="product-form__error-message blocks-radius-md alert alert--error"
+        role="alert"
+        hidden></div>
+    </div>
+    {%- form 'product'
+      , product
+      , id: product_form_id
+      , class: 'main-product-form grid gap-4'
+      , data-type: 'add-to-cart-form'
+      , is: 'product-form'
+      , data-hide-errors: gift_card_recipient_feature_active
+    -%}
+      <input
+        type="hidden"
+        name="id"
+        value="{{ product.selected_or_first_available_variant.id }}"
+        {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout %}
+        disabled
+        {% endif %}
+        class="product-variant-id">
+      {%- liquid
+        assign check_against_inventory = true
+        if product.selected_or_first_available_variant.inventory_management != 'shopify' or product.selected_or_first_available_variant.inventory_policy == 'continue'
+          assign check_against_inventory = false
+        endif
+        if product.selected_or_first_available_variant.quantity_rule.min > product.selected_or_first_available_variant.inventory_quantity and check_against_inventory
+          assign quantity_rule_soldout = true
+        endif
+      -%}
+      {%- if gift_card_recipient_feature_active -%}
+        {%- render 'gift-card-recipient-form'
+          , product: product
+          , form: form
+          , section: section -%}
+      {%- endif -%}
+
+      {%- if product.quantity_price_breaks_configured? -%}
+        <div id="QuantityForm-{{ section_id }}" class="{% if block.settings.show_quantity_selector %} grid gap-4{% else %} hidden{% endif %}">
+          {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
+
+          <div class="grid gap-2">
+            <div class="grid gap-3">
+              <label class="quantity__label form__label" for="Quantity-{{ section.id }}">
+                <span class="font-body-bold">{{ 'products.product.quantity.label' | t }}</span>
+
+                <span id="QuantityRulesCart-{{ section_id }}" class="quantity__rules-cart{% if cart_qty == 0 %} hidden{% endif %} relative inline-flex items-center">
+                  {%- render 'loading-spinner' -%}
+                  <span class="quantity-cart font-body-bold">({{ 'products.product.quantity.in_cart_html' | t: quantity: cart_qty }})</span>
+                </span>
+              </label>
+              <div class="flex items-center gap-4">
+                <quantity-input
+                  class="quantity"
+                  data-section-id="{{ section_id }}"
+                  data-product-id="{{ product_id }}">
+                  <button
+                    class="quantity__button"
+                    name="minus"
+                    type="button">
+                    <span class="visually-hidden">
+                      {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
+                    </span>
+                    {% render 'icon-minus' %}
+                  </button>
+                  <input
+                    class="quantity__input"
+                    type="number"
+                    name="quantity"
+                    id="Quantity-{{ section.id }}"
+                    data-cart-quantity="{{ cart_qty }}"
+                    step="{{ product.selected_or_first_available_variant.quantity_rule.increment }}"
+                    value="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+                    data-quantity-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                    data-min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+                    min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+                    {% if product.selected_or_first_available_variant.quantity_rule.max != null %}
+                    data-max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
+                    max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
+                    {% endif %}
+                    inputmode="numeric"
+                    autocomplete="off"
+                    form="{{ product_form_id }}">
+                  <button
+                    class="quantity__button"
+                    name="plus"
+                    type="button">
+                    <span class="visually-hidden">
+                      {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}
+                    </span>
+                    {% render 'icon-plus' %}
+                  </button>
+                </quantity-input>
+
+                {%- if product.quantity_price_breaks_configured? -%}
+                  {%- liquid
+                    assign volume_pricing_array = product.selected_or_first_available_variant.quantity_price_breaks | sort: 'quantity' | reverse
+                    assign current_qty_for_volume_pricing = cart_qty | plus: product.selected_or_first_available_variant.quantity_rule.min
+                    if cart_qty > 0
+                      assign current_qty_for_volume_pricing = cart_qty | plus: product.selected_or_first_available_variant.quantity_rule.increment
+                    endif
+                    assign variant_price_compare = product.selected_or_first_available_variant.compare_at_price
+                  -%}
+                  <price-per-item
+                    id="PricePerItem-{{ section_id }}"
+                    class="flex flex-wrap items-center gap-2"
+                    data-section-id="{{ section_id }}"
+                    data-product-id="{{ product_id }}"
+                    data-variant-id="{{ product.selected_or_first_available_variant.id }}">
+                    {%- if variant_price_compare -%}
+                      <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
+                      <span class="inline-flex items-center h-auto relative">
+                        {%- liquid
+                          if settings.currency_code_enabled
+                            echo variant_price_compare | money_with_currency
+                          else
+                            echo variant_price_compare | money
+                          endif
+                        -%}
+                      </span>
+                      <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
+                    {%- endif -%}
+
+                    {%- if product.selected_or_first_available_variant.quantity_price_breaks.size > 0 -%}
+                      {%- if current_qty_for_volume_pricing < volume_pricing_array.last.minimum_quantity -%}
+                        {%- liquid
+                          if settings.currency_code_enabled
+                            assign variant_price = product.selected_or_first_available_variant.price | money_with_currency
+                          else
+                            assign variant_price = product.selected_or_first_available_variant.price | money
+                          endif
+                        -%}
+                        <span class="price-per-item--current price__regular whitespace-nowrap">
+                          {{- 'products.product.volume_pricing.price_at_each' | t: price: variant_price -}}
+                        </span>
+                      {%- else -%}
+                        {%- for price_break in volume_pricing_array -%}
+                          {%- if current_qty_for_volume_pricing >= price_break.minimum_quantity -%}
+                            {%- liquid
+                              if settings.currency_code_enabled
+                                assign price_break_price = price_break.price | money_with_currency
+                              else
+                                assign price_break_price = price_break.price | money
+                              endif
+                            -%}
+                            <span class="price-per-item--current price__regular whitespace-nowrap">
+                              {{- 'products.product.volume_pricing.price_at_each' | t: price: price_break_price -}}
+                            </span>
+                            {%- break -%}
+                          {%- endif -%}
+                        {%- endfor -%}
+                      {%- endif -%}
+                    {%- else -%}
+                      <span class="price-per-item--current price__regular whitespace-nowrap">
+                        {%- liquid
+                          if settings.currency_code_enabled
+                            assign variant_price = product.selected_or_first_available_variant.price | money_with_currency
+                          else
+                            assign variant_price = product.selected_or_first_available_variant.price | money
+                          endif
+                        -%}
+                        {{- 'products.product.volume_pricing.price_at_each' | t: price: variant_price -}}
+                      </span>
+                    {%- endif -%}
+                  </price-per-item>
+                {%- endif -%}
+              </div>
+            </div>
+
+            <div class="quantity__rules" id="QuantityRules-{{ section_id }}">
+              {%- if product.selected_or_first_available_variant.quantity_rule.increment > 1 -%}
+                <span class="divider">
+                  {{-
+                    'products.product.quantity.multiples_of' | t: quantity: product.selected_or_first_available_variant.quantity_rule.increment
+                  -}}
+                </span>
+              {%- endif -%}
+              {%- if product.selected_or_first_available_variant.quantity_rule.min > 1 -%}
+                <span class="divider">
+                  {{-
+                    'products.product.quantity.minimum_of' | t: quantity: product.selected_or_first_available_variant.quantity_rule.min
+                  -}}
+                </span>
+              {%- endif -%}
+              {%- if product.selected_or_first_available_variant.quantity_rule.max != null -%}
+                <span class="divider font-body-bold">
+                  {{-
+                    'products.product.quantity.maximum_of' | t: quantity: product.selected_or_first_available_variant.quantity_rule.max
+                  -}}
+                </span>
+              {%- endif -%}
+            </div>
+          </div>
+
+          {%- if product.quantity_price_breaks_configured? -%}
+            <volume-pricing class="block parent-display blocks-radius-md" id="Volume-{{ section.id }}">
+              {%- if product.selected_or_first_available_variant.quantity_price_breaks.size > 0 -%}
+                <span class="caption block">{{ 'products.product.volume_pricing.title' | t }}</span>
+                <ul class="list-unstyled">
+                  <li class="blocks-radius-md">
+                    <span>{{ product.selected_or_first_available_variant.quantity_rule.min }}+</span>
+                    {%- liquid
+                      if settings.currency_code_enabled
+                        assign price = product.selected_or_first_available_variant.price | money_with_currency
+                      else
+                        assign price = product.selected_or_first_available_variant.price | money
+                      endif
+                    -%}
+                    <span data-text="{{ 'products.product.volume_pricing.price_at_each' | t: price: price }}">
+                      {{- 'products.product.volume_pricing.each' | t: money: price -}}
+                    </span>
+                  </li>
+                  {%- for price_break in product.selected_or_first_available_variant.quantity_price_breaks -%}
+                    {%- liquid
+                      if settings.currency_code_enabled
+                        assign price_break_price = price_break.price | money_with_currency
+                      else
+                        assign price_break_price = price_break.price | money
+                      endif
+                    -%}
+                    <li class="blocks-radius-md{% if forloop.index >= 3 %} show-more-item hidden{% endif %}">
+                      <span>
+                        {{- price_break.minimum_quantity -}}
+                        <span aria-hidden="true">+</span>
+                      </span>
+                      <span data-text="{{ 'products.product.volume_pricing.price_at_each' | t: price: price_break_price }}">
+                        {{- 'products.product.volume_pricing.each' | t: money: price_break_price -}}
+                      </span>
+                    </li>
+                  {%- endfor -%}
+                </ul>
+                {%- if product.selected_or_first_available_variant.quantity_price_breaks.size >= 3 -%}
+                  <show-more-button>
+                    <button
+                      class="button-show-more btn--link"
+                      id="Show-More-{{ section.id }}"
+                      type="button">
+                      <span class="label-show-more label-text">
+                        <span aria-hidden="true">+
+                        </span>
+                        {{ 'products.facets.show_more' | t }}</span>
+                    </button>
+                  </show-more-button>
+                {%- endif -%}
+              {%- endif -%}
+            </volume-pricing>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <div class="product-form__buttons flex flex-wrap items-end gap-x-2 gap-y-4" id="QuantityForm-{{ section_id }}">
+        {%- if product.quantity_price_breaks_configured? != true -%}
+          {%- assign cart_qty = cart | item_count_for_variant: product.selected_or_first_available_variant.id -%}
+          <div class="product-form__quantity{% unless block.settings.show_quantity_selector %} hidden{% endunless %}">
+            <label class="quantity__label form__label visually-hidden" for="Quantity-{{ section.id }}">
+              <span class="font-body-bolder">{{ 'products.product.quantity.label' | t }}</span>
+            </label>
+            <quantity-input
+              class="quantity"
+              data-section-id="{{ section_id }}"
+              data-product-id="{{ product_id }}">
+              <button
+                class="quantity__button"
+                name="minus"
+                type="button">
+                <span class="visually-hidden">
+                  {{- 'products.product.quantity.decrease' | t: product: product.title | escape -}}
+                </span>
+                {% render 'icon-minus' %}
+              </button>
+              <input
+                class="quantity__input"
+                type="number"
+                name="quantity"
+                id="Quantity-{{ section.id }}"
+                data-cart-quantity="{{ cart_qty }}"
+                step="{{ product.selected_or_first_available_variant.quantity_rule.increment }}"
+                value="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+                data-quantity-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                data-min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+                min="{{ product.selected_or_first_available_variant.quantity_rule.min }}"
+                {% if product.selected_or_first_available_variant.quantity_rule.max != null %}
+                data-max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
+                max="{{ product.selected_or_first_available_variant.quantity_rule.max }}"
+                {% endif %}
+                inputmode="numeric"
+                autocomplete="off"
+                form="{{ product_form_id }}">
+              <button
+                class="quantity__button"
+                name="plus"
+                type="button">
+                <span class="visually-hidden">
+                  {{- 'products.product.quantity.increase' | t: product: product.title | escape -}}
+                </span>
+                {% render 'icon-plus' %}
+              </button>
+            </quantity-input>
+          </div>
+        {%- endif -%}
+        <button
+          id="ProductSubmitButton-{{ section_id }}"
+          type="submit"
+          name="add"
+          class="product-form__submit btn{% if show_dynamic_checkout %} btn--secondary{% else %} btn--primary{% endif %}"
+          {% if product.selected_or_first_available_variant.available == false or quantity_rule_soldout or product.selected_or_first_available_variant == nil %}
+          disabled
+          {% endif %}>
+          <span class="btn__text">
+            {%- if product.selected_or_first_available_variant == nil -%}
+              {{ 'products.product.unavailable' | t }}
+            {%- elsif product.selected_or_first_available_variant.available == false or quantity_rule_soldout
+            -%}
+              {{ 'products.product.sold_out' | t }}
+            {%- else -%}
+              {{ 'products.product.add_to_cart' | t }}
+            {%- endif -%}
+          </span>
+          {%- render 'loading-spinner' -%}
+        </button>
+        {%- if show_dynamic_checkout -%}
+          {{ form | payment_button }}
+        {%- endif -%}
+      </div>
+      <div
+        class="product-form__error-message blocks-radius-md alert alert--error"
+        role="alert"
+        hidden></div>
+    {%- endform -%}
+  </div>
+{%- else -%}
+  <div class="product-form">
+    <div class="form product-form__buttons flex flex-wrap items-end gap-x-2 gap-y-4">
+      <button
+        type="submit"
+        name="add"
+        class="product-form__submit button button--full-width button--primary"
+        disabled>
+        {{ 'products.product.sold_out' | t }}
+      </button>
+    </div>
+  </div>
+{%- endif -%}
+
+{%- comment -%}
+  Bundle Product JavaScript Implementation
+  Handles custom add to cart functionality for bundle products
+{%- endcomment -%}
+
+<script>
+  (function() {
+    // Bundle product data from Liquid
+    const isBundleProduct = {{ is_bundle_product | json }};
+    const bundleProducts = {{ bundle_products | json }};
+    const bundleQuantities = {{ bundle_quantities | json }};
+    const bundleDiscount = {{ bundle_discount | json }};
+    const variantId = {{ product.variants.first.id | json }};
+    const sectionId = '{{ section_id }}';
+
+    console.log('Bundle product detection:', {
+      isBundleProduct,
+      bundleProducts,
+      bundleQuantities,
+      bundleDiscount,
+      variantId
+    });
+
+    console.log({{ product.title | json }});
+
+    console.log({{product.variants.first.metafields.custom.bundle_products.value | json}})
+
+    // Function to check bundle inventory availability
+    function checkBundleInventory(userQuantity) {
+      console.log("bundle products list data", bundleProducts);
+      console.log("bundle_products_inventory_quantities", bundle_products_inventory_quantities);
+
+      if (!bundleProducts || !bundleQuantities) return { valid: false, message: 'Bundle data not available' };
+
+      for (let i = 0; i < bundleProducts.length; i++) {
+        const variant = bundleProducts[i]; // This is a variant, not a product
+        const bundleQuantity = bundleQuantities[i] || 1;
+        const requiredQuantity = bundleQuantity * userQuantity;
+
+        // Get inventory quantity from the pre-populated array
+        const inventoryQuantity = bundle_products_inventory_quantities[i] || 0;
+
+        console.log(`Checking ${variant.title}: Required ${requiredQuantity}, Available ${inventoryQuantity}`);
+
+        if (requiredQuantity > inventoryQuantity) {
+          return {
+            valid: false,
+            message: `Insufficient inventory for ${variant.title}. Required: ${requiredQuantity}, Available: ${inventoryQuantity}`
+          };
+        }
+      }
+
+      return { valid: true };
+    }
+
+    // Function to get maximum allowed quantity for bundle
+    function getMaxBundleQuantity() {
+      if (!bundleProducts || !bundleQuantities || bundleProducts.length === 0) return 0;
+
+      let maxQuantity = Infinity;
+
+      console.log(bundleProducts, "bundle product list part")
+      console.log("bundle_products_inventory_quantities", bundle_products_inventory_quantities);
+
+      for (let i = 0; i < bundleProducts.length; i++) {
+        const variant = bundleProducts[i]; // This is a variant, not a product
+        const bundleQuantity = bundleQuantities[i] || 1;
+
+        // Get inventory quantity from the pre-populated array
+        const inventoryQuantity = bundle_products_inventory_quantities[i] || 0;
+
+        const maxForThisProduct = Math.floor(inventoryQuantity / bundleQuantity);
+
+        console.log(`Variant ${i}: ${variant.title || 'Unknown'}`);
+        console.log(`  - inventory=${inventoryQuantity}, bundle_qty=${bundleQuantity}, max_for_this=${maxForThisProduct}`);
+        console.log(`  - variant structure:`, variant);
+
+        if (maxForThisProduct < maxQuantity) {
+          maxQuantity = maxForThisProduct;
+        }
+      }
+
+      console.log(`Final max quantity: ${maxQuantity}`);
+      return maxQuantity === Infinity ? 0 : maxQuantity;
+    }
+
+    // Function to update quantity controls based on inventory
+    function updateQuantityControls() {
+      if (!isBundleProduct) return;
+
+      const quantityInput = document.querySelector('#Quantity-' + sectionId);
+      const plusButton = document.querySelector('.quantity__button[name="plus"]');
+      const minusButton = document.querySelector('.quantity__button[name="minus"]');
+      const submitButton = document.getElementById('ProductSubmitButton-' + sectionId);
+
+      if (!quantityInput || !plusButton || !minusButton || !submitButton) return;
+
+      const maxQuantity = getMaxBundleQuantity();
+      const currentValue = parseInt(quantityInput.value) || 1;
+      const minValue = parseInt(quantityInput.getAttribute('min')) || 1;
+
+      console.log(`Max bundle quantity: ${maxQuantity}, Current: ${currentValue}`);
+      console.log(`Bundle products:`, bundleProducts);
+      console.log(`Bundle quantities:`, bundleQuantities);
+
+      // Update max attribute
+      quantityInput.setAttribute('data-max', maxQuantity);
+      quantityInput.setAttribute('max', maxQuantity);
+
+      // Disable/enable plus button
+      if (currentValue >= maxQuantity) {
+        plusButton.disabled = true;
+        plusButton.style.opacity = '0.5';
+        console.log('Plus button disabled - at max quantity');
+      } else {
+        plusButton.disabled = false;
+        plusButton.style.opacity = '1';
+        console.log('Plus button enabled');
+      }
+
+      // Disable/enable minus button
+      if (currentValue <= minValue) {
+        minusButton.disabled = true;
+        minusButton.style.opacity = '0.5';
+        console.log('Minus button disabled - at min quantity');
+      } else {
+        minusButton.disabled = false;
+        minusButton.style.opacity = '1';
+        console.log('Minus button enabled');
+      }
+
+      // Disable/enable submit button
+      if (maxQuantity === 0) {
+        submitButton.disabled = true;
+        const btnText = submitButton.querySelector('.btn__text');
+        if (btnText) {
+          btnText.textContent = '{{ "products.product.sold_out" | t }}';
+        }
+        console.log('Submit button disabled - no inventory');
+      } else {
+        submitButton.disabled = false;
+        const btnText = submitButton.querySelector('.btn__text');
+        if (btnText) {
+          btnText.textContent = '{{ "products.product.add_to_cart" | t }}';
+        }
+        console.log('Submit button enabled');
+      }
+    }
+
+    // Custom Add to Cart Function for Bundle Products
+    function handleBundleAddToCart(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      console.log('Bundle add to cart triggered');
+      console.log('Event prevented and stopped propagation');
+
+      if (!isBundleProduct || !bundleProducts || bundleProducts.length === 0) {
+        console.log('Not a bundle product, proceeding with normal form submission');
+        // Not a bundle product, proceed with normal form submission
+        const form = event.target.closest('form');
+        if (form) {
+          form.submit();
+        }
+        return;
+      }
+
+      // Get user selected quantity
+      const quantityInput = document.querySelector('#Quantity-' + sectionId) ||
+                           document.querySelector('input[name="quantity"]') ||
+                           { value: 1 };
+      const userQuantity = parseInt(quantityInput.value) || 1;
+
+      console.log('User quantity:', userQuantity);
+
+      // Check inventory before proceeding
+      const inventoryCheck = checkBundleInventory(userQuantity);
+      if (!inventoryCheck.valid) {
+        showMessage(inventoryCheck.message, 'error');
+        return;
+      }
+
+      // Generate a unique bundle ID for this bundle purchase
+      const bundleId = `bundle-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+      // Prepare cart items with bundle metafields as properties
+      const items = bundleProducts.map((variant, index) => {
+        const bundleQuantity = bundleQuantities && bundleQuantities[index] ? bundleQuantities[index] : 1;
+        const finalQuantity = bundleQuantity * userQuantity;
+
+        console.log(`Variant ${index + 1}: ${variant.title || 'Unknown Variant'}`);
+        console.log(`Bundle quantity: ${bundleQuantity}, User quantity: ${userQuantity}, Final quantity: ${finalQuantity}`);
+
+        // Create properties object with all metafields
+        const properties = {
+          '_bundle_id': bundleId,
+          '_is_bundle': true,
+          '_variant_id': variantId,
+          '_bundle_quantity': bundleQuantity,
+          '_user_quantity': userQuantity,
+          '_product_title': variant.title || 'Bundle Variant',
+          '_product_id': variant.id,
+        };
+
+        // Add bundle discount if available
+        if (bundleDiscount) {
+          properties['_bundle_discount'] = bundleDiscount;
+          properties['_discount_value'] = bundleDiscount;
+        }
+
+        // Add all bundle products data as a property
+        properties['_bundle_products_data'] = JSON.stringify(bundleProducts);
+        properties["_bundle_name"] = {{ product.title | json }}
+
+        return {
+          id: variant.id,
+          quantity: finalQuantity,
+          properties: properties
+        };
+      });
+
+      console.log('Cart items to add:', items);
+
+      // Add items to cart via AJAX
+      addBundleToCart(items);
+    }
+
+    // Function to add bundle items to cart
+    async function addBundleToCart(items) {
+      try {
+        // Show loading state
+        const submitButton = document.getElementById('ProductSubmitButton-' + sectionId);
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.classList.add('btn--loading');
+          const buttonText = submitButton.querySelector('span') || submitButton.querySelector('.btn__text');
+          const originalText = buttonText ? buttonText.textContent : '';
+          if (buttonText) {
+            buttonText.textContent = 'Adding...';
+          }
+        }
+
+        // Add items one by one to avoid inventory conflicts
+        const results = [];
+        let successCount = 0;
+        let errorCount = 0;
+
+        for (const item of items) {
+          try {
+            console.log('Adding individual item:', item);
+
+            const response = await fetch('/cart/add.js', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                id: item.id,
+                quantity: item.quantity,
+                properties: item.properties
+              })
+            });
+
+            if (response.ok) {
+              const result = await response.json();
+              console.log('Item added successfully:', result);
+              results.push({ success: true, item: item, result: result });
+              successCount++;
+            } else {
+              const errorData = await response.json();
+              console.error('Error adding item:', errorData);
+              results.push({ success: false, item: item, error: errorData });
+              errorCount++;
+            }
+          } catch (itemError) {
+            console.error('Error adding item:', itemError);
+            results.push({ success: false, item: item, error: itemError });
+            errorCount++;
+          }
+        }
+
+        console.log('Bundle add results:', results);
+
+        if (successCount > 0) {
+          // Update cart state and show cart drawer like normal products
+          await updateCartStateAndShowDrawerSimple();
+          console.log('Bundle products added successfully - cart drawer opened');
+        } else {
+          showMessage('{{ "products.product.error_adding_to_cart" | t | default: "Error adding to cart" }}', 'error');
+        }
+
+      } catch (error) {
+        console.error('Error adding bundle products to cart:', error);
+        showMessage('{{ "products.product.error_adding_to_cart" | t | default: "Error adding to cart" }}', 'error');
+      } finally {
+        // Reset button state
+        const submitButton = document.getElementById('ProductSubmitButton-' + sectionId);
+        if (submitButton) {
+          submitButton.disabled = false;
+          submitButton.classList.remove('btn--loading');
+          const buttonText = submitButton.querySelector('span') || submitButton.querySelector('.btn__text');
+          if (buttonText) {
+            buttonText.textContent = '{{ "products.product.add_to_cart" | t }}';
+          }
+        }
+      }
+    }
+
+    // Simple function to update cart state and show cart drawer
+    async function updateCartStateAndShowDrawerSimple() {
+      try {
+        console.log('Updating cart state and showing cart drawer');
+
+        // Get cart drawer section ID
+        const cartDrawer = document.querySelector('cart-drawer');
+        const cartDrawerSectionId = cartDrawer ? cartDrawer.getAttribute('data-section-id') : null;
+
+        console.log(cartDrawerSectionId, 'cartDrawerSectionId');
+        
+        if (!cartDrawerSectionId) {
+          console.error('Cart drawer section ID not found');
+          return;
+        }
+
+        // Fetch both cart data and cart drawer section (like ProductForm does)
+        const [cartResponse, sectionResponse] = await Promise.all([
+          fetch('/cart.js'),
+          fetch(`/?section_id=${cartDrawerSectionId}`)
+        ]);
+        
+        const cartData = await cartResponse.json();
+        const sectionHtml = await sectionResponse.text();
+        
+        // Parse the section HTML to get the cart drawer content
+        const parser = new DOMParser();
+        const parsedSection = parser.parseFromString(sectionHtml, 'text/html');
+        const cartDrawerSection = parsedSection.querySelector(`#shopify-section-${cartDrawerSectionId}`);
+        
+        // Create the sections object that the theme expects
+        const sections = {};
+        if (cartDrawerSection) {
+          sections[`sections--${cartDrawerSectionId}__cart-drawer`] = cartDrawerSection.outerHTML;
+        }
+        
+        // Combine cart data with sections (like ProductForm does)
+        const cartJson = {
+          ...cartData,
+          sections: sections
+        };
+        
+        // Show cart drawer first, then update cart state
+        if (cartDrawer && cartDrawer.show) {
+          // Wait a bit for DOM to be ready, then show cart drawer
+          setTimeout(() => {
+            const submitButton = document.getElementById('ProductSubmitButton-' + sectionId);
+            if (submitButton) {
+              cartDrawer.show(submitButton);
+            } else {
+              // Fallback: show cart drawer without specific focus element
+              cartDrawer.show();
+            }
+            
+            // Update cart drawer content directly first
+            setTimeout(() => {
+              // Update cart drawer content directly
+              updateCartDrawerContent(cartJson, cartDrawerSectionId);
+              
+              // Then trigger cart update events (with delay to avoid focus issues)
+              setTimeout(() => {
+                // Update cart badge manually to avoid focus trap issues
+                updateCartBadge(cartJson);
+                
+                // Dispatch product added event (same as ProductForm)
+                document.dispatchEvent(new CustomEvent('product-ajax:added', {
+                  detail: {
+                    product: { status: 'success' },
+                    cart: cartJson
+                  }
+                }));
+                
+                console.log('Cart drawer content and badge updated successfully');
+              }, 300); // Longer delay to ensure content is updated
+              
+            }, 200); // Wait for cart drawer to be fully open
+            
+          }, 100);
+        }
+        
+        console.log('Cart state updated and drawer shown successfully');
+        
+      } catch (error) {
+        console.error('Error updating cart state:', error);
+      }
+    }
+
+    // Function to update cart drawer content directly
+    function updateCartDrawerContent(cartJson, cartDrawerSectionId) {
+      try {
+        console.log('Updating cart drawer content directly...');
+        
+        // Get the cart drawer body and footer elements
+        const cartDrawerBody = document.querySelector(`#CartDrawerBody-${cartDrawerSectionId}`);
+        const cartDrawerFooter = document.querySelector(`#CartDrawerFooter-${cartDrawerSectionId}`);
+        const cartDrawerEmpty = document.querySelector(`#CartDrawerEmpty-${cartDrawerSectionId}`);
+        
+        // Update cart drawer body with new content
+        if (cartDrawerBody && cartJson.sections) {
+          const sectionKey = `sections--${cartDrawerSectionId}__cart-drawer`;
+          const sectionContent = cartJson.sections[sectionKey];
+          
+          if (sectionContent) {
+            // Parse the section content
+            const parser = new DOMParser();
+            const parsedSection = parser.parseFromString(sectionContent, 'text/html');
+            
+            // Update cart drawer body
+            const newCartDrawerBody = parsedSection.querySelector(`#CartDrawerBody-${cartDrawerSectionId}`);
+            if (newCartDrawerBody && cartDrawerBody) {
+              cartDrawerBody.innerHTML = newCartDrawerBody.innerHTML;
+              console.log('Cart drawer body updated');
+            }
+            
+            // Update cart drawer footer
+            const newCartDrawerFooter = parsedSection.querySelector(`#CartDrawerFooter-${cartDrawerSectionId}`);
+            if (newCartDrawerFooter && cartDrawerFooter) {
+              cartDrawerFooter.innerHTML = newCartDrawerFooter.innerHTML;
+              console.log('Cart drawer footer updated');
+            }
+            
+            // Update cart drawer empty state
+            const newCartDrawerEmpty = parsedSection.querySelector(`#CartDrawerEmpty-${cartDrawerSectionId}`);
+            if (newCartDrawerEmpty && cartDrawerEmpty) {
+              cartDrawerEmpty.innerHTML = newCartDrawerEmpty.innerHTML;
+              console.log('Cart drawer empty state updated');
+            }
+          }
+        }
+        
+        // Show/hide cart drawer sections based on cart state
+        if (cartJson.item_count > 0) {
+          if (cartDrawerBody) cartDrawerBody.classList.remove('hidden');
+          if (cartDrawerFooter) cartDrawerFooter.classList.remove('hidden');
+          if (cartDrawerEmpty) cartDrawerEmpty.classList.add('hidden');
+        } else {
+          if (cartDrawerBody) cartDrawerBody.classList.add('hidden');
+          if (cartDrawerFooter) cartDrawerFooter.classList.add('hidden');
+          if (cartDrawerEmpty) cartDrawerEmpty.classList.remove('hidden');
+        }
+        
+        console.log('Cart drawer content updated successfully');
+        
+      } catch (error) {
+        console.error('Error updating cart drawer content:', error);
+      }
+    }
+
+    // Function to update cart badge in header
+    function updateCartBadge(cartData) {
+      console.log('Updating cart badge with cart data:', cartData);
+
+      // Update cart count elements
+      const cartCountElements = document.querySelectorAll('cart-count');
+
+      cartCountElements.forEach(element => {
+        const itemCount = cartData.item_count || 0;
+        let count = itemCount > 99 ? '99+' : itemCount.toString();
+
+        if (element.dataset.type === 'blank') {
+          count = `(${count})`;
+        }
+
+        if (element.classList.contains('cart-count--absolute')) {
+          if (itemCount > 99) {
+            element.innerHTML = `<span class="text-sm-extra">${count}</span>`;
+            element.classList.add('cart-count--small-medium');
+          } else {
+            element.innerText = count;
+            element.classList.remove('cart-count--small-medium');
+          }
+        } else {
+          element.innerText = count;
+        }
+
+        element.hidden = itemCount === 0;
+
+        const method = itemCount === 0 ? 'remove' : 'add';
+        document.documentElement.classList[method]('cart-has-items');
+
+        console.log('Updated cart count element:', element, 'with count:', itemCount);
+      });
+
+      // Also trigger the cart update event for other components
+      // Note: We don't publish FoxTheme cart update here to avoid sections error
+      // The cart drawer refresh already handles the proper FoxTheme events
+      console.log('Cart badge updated - skipping FoxTheme cart update to avoid sections error');
+
+      console.log('Cart badge update completed');
+    }
+
+    // Function to show messages
+    function showMessage(message, type = 'info') {
+      // Try to find existing error message wrapper
+      const errorWrapper = document.querySelector('.product-form__error-message-wrapper');
+      const errorMessage = document.querySelector('.product-form__error-message');
+
+      if (errorWrapper && errorMessage) {
+        errorMessage.textContent = message;
+        errorWrapper.hidden = false;
+
+        // Add styling for different message types
+        if (type === 'success') {
+          errorMessage.style.color = 'green';
+        } else if (type === 'warning') {
+          errorMessage.style.color = 'orange';
+        } else if (type === 'error') {
+          errorMessage.style.color = 'red';
+        } else {
+          errorMessage.style.color = '';
+        }
+
+        // Hide after 5 seconds
+        setTimeout(() => {
+          errorWrapper.hidden = true;
+        }, 5000);
+      } else {
+        // Fallback to alert
+        alert(message);
+      }
+    }
+
+    // Initialize bundle product functionality
+    function initializeBundleProduct() {
+      const submitButton = document.getElementById('ProductSubmitButton-' + sectionId);
+      if (submitButton && isBundleProduct) {
+        console.log('Attaching bundle product event listener to button:', submitButton);
+        console.log('Bundle product detected:', isBundleProduct);
+        submitButton.addEventListener('click', handleBundleAddToCart);
+
+        // Initialize quantity controls
+        updateQuantityControls();
+
+        // Add event listeners for quantity changes
+        const quantityInput = document.querySelector('#Quantity-' + sectionId);
+        const plusButton = document.querySelector('.quantity__button[name="plus"]');
+        const minusButton = document.querySelector('.quantity__button[name="minus"]');
+
+        if (quantityInput) {
+          quantityInput.addEventListener('input', function() {
+            const newValue = parseInt(this.value) || 1;
+            const maxQuantity = getMaxBundleQuantity();
+
+            if (newValue > maxQuantity) {
+              this.value = maxQuantity;
+              showMessage(`Maximum quantity available: ${maxQuantity}`, 'error');
+            }
+
+            updateQuantityControls();
+          });
+        }
+
+        if (plusButton) {
+          plusButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const currentValue = parseInt(quantityInput.value) || 1;
+            const maxQuantity = getMaxBundleQuantity();
+
+            if (currentValue < maxQuantity) {
+              quantityInput.value = currentValue + 1;
+              updateQuantityControls();
+            } else {
+              showMessage(`Maximum quantity available: ${maxQuantity}`, 'error');
+            }
+          });
+        }
+
+        if (minusButton) {
+          minusButton.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const currentValue = parseInt(quantityInput.value) || 1;
+            const minValue = parseInt(quantityInput.getAttribute('min')) || 1;
+
+            if (currentValue > minValue) {
+              quantityInput.value = currentValue - 1;
+              updateQuantityControls();
+            }
+          });
+        }
+      }
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeBundleProduct);
+    } else {
+      initializeBundleProduct();
+    }
+
+    // Also try after a delay to ensure all elements are rendered
+    setTimeout(initializeBundleProduct, 100);
+  })();
+</script>

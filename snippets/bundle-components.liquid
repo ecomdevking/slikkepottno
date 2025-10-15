@@ -1,0 +1,184 @@
+{%- comment -%}
+  Bundle Components Block
+  Displays bundle product components and their details
+{%- endcomment -%}
+
+{%- liquid
+  assign is_bundle_product = false
+  assign bundle_products = null
+  assign bundle_quantities = null
+  assign bundle_discount = null
+  
+  if product.variants.first.metafields.custom.is_bundle.value == true
+    assign is_bundle_product = true
+    assign bundle_products = product.variants.first.metafields.custom.bundle_products.value
+    assign bundle_quantities = product.variants.first.metafields.custom.bundle_quantities.value
+    assign bundle_discount = product.variants.first.metafields.custom.bundle_discount.value
+  endif
+-%}
+
+{%- if is_bundle_product and bundle_products and bundle_products.size > 0 -%}
+  <div class="bundle-components" {{ block.shopify_attributes }}>
+    {%- if block.settings.heading != blank -%}
+      <h3 class="bundle-components__heading">{{ block.settings.heading }}</h3>
+    {%- endif -%}
+    
+    {%- if block.settings.description != blank -%}
+      <div class="bundle-components__description rte">
+        {{ block.settings.description }}
+      </div>
+    {%- endif -%}
+    
+    <div class="bundle-components__list">
+      {%- for bundle_product in bundle_products -%}
+        {%- assign bundle_quantity = bundle_quantities[forloop.index0] | default: 1 -%}
+        <div class="bundle-component">
+          <div class="bundle-component__image">
+            {%- if bundle_product.featured_image -%}
+              {{ bundle_product.featured_image | image_url: width: 100 | image_tag: loading: 'lazy' }}
+            {%- endif -%}
+          </div>
+          <div class="bundle-component__details">
+            <h4 class="bundle-component__title">{{ bundle_product.title }}</h4>
+            <div class="bundle-component__quantity">
+              Quantity: {{ bundle_quantity }}
+            </div>
+            <div class="bundle-component__price">
+              {%- if bundle_discount and bundle_discount > 0 -%}
+                {%- assign original_price = bundle_product.price -%}
+                {%- assign discount_amount = original_price | times: bundle_discount | divided_by: 100 -%}
+                {%- assign discounted_price = original_price | minus: discount_amount -%}
+                <span class="bundle-component__price--original">{{ original_price | money }}</span>
+                <span class="bundle-component__price--discounted">{{ discounted_price | money }}</span>
+                <span class="bundle-component__savings">Save {{ bundle_discount }}%</span>
+              {%- else -%}
+                {{ bundle_product.price | money }}
+              {%- endif -%}
+            </div>
+          </div>
+        </div>
+      {%- endfor -%}
+    </div>
+    
+    {%- if bundle_discount and bundle_discount > 0 -%}
+      <div class="bundle-components__discount">
+        <strong>Bundle Discount: {{ bundle_discount }}% off</strong>
+      </div>
+    {%- endif -%}
+  </div>
+  
+  <style>
+    .bundle-components {
+      margin: 20px 0;
+      padding: 20px;
+      background-color: #f9f9f9;
+      border-radius: 8px;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .bundle-components__heading {
+      margin: 0 0 15px 0;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #333;
+    }
+    
+    .bundle-components__description {
+      margin-bottom: 20px;
+      color: #666;
+    }
+    
+    .bundle-components__list {
+      display: grid;
+      gap: 15px;
+    }
+    
+    .bundle-component {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      padding: 15px;
+      background-color: white;
+      border-radius: 6px;
+      border: 1px solid #e0e0e0;
+    }
+    
+    .bundle-component__image {
+      flex-shrink: 0;
+      width: 60px;
+      height: 60px;
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    
+    .bundle-component__image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    
+    .bundle-component__details {
+      flex: 1;
+    }
+    
+    .bundle-component__title {
+      margin: 0 0 5px 0;
+      font-size: 1em;
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .bundle-component__quantity {
+      font-size: 0.9em;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    
+    .bundle-component__price {
+      font-weight: 600;
+      color: #333;
+    }
+    
+    .bundle-component__price--original {
+      text-decoration: line-through;
+      color: #999;
+      margin-right: 8px;
+    }
+    
+    .bundle-component__price--discounted {
+      color: #e74c3c;
+      font-weight: bold;
+    }
+    
+    .bundle-component__savings {
+      display: inline-block;
+      background-color: #e74c3c;
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.8em;
+      margin-left: 8px;
+    }
+    
+    .bundle-components__discount {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #e8f5e8;
+      border-radius: 4px;
+      text-align: center;
+      color: #2d5a2d;
+    }
+    
+    @media (max-width: 768px) {
+      .bundle-component {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .bundle-component__image {
+        width: 80px;
+        height: 80px;
+      }
+    }
+  </style>
+{%- endif -%}

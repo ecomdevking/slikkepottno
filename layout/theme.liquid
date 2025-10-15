@@ -1,0 +1,203 @@
+{% liquid
+  assign enable_rtl = settings.enable_rtl
+  assign language_support_rtl = settings.language_support_rtl
+  if enable_rtl and language_support_rtl != blank
+    assign shop_locale = localization.language.iso_code
+    assign language_support_rtl_list = language_support_rtl | split: ','
+    assign is_rtl = language_support_rtl_list | where: shop_locale
+    if is_rtl.size > 0
+      assign enable_rtl = true
+    else
+      assign enable_rtl = false
+    endif 
+  endif
+%}
+<!doctype html>
+<html
+  class="no-js{% if cart != empty %} cart-has-items{% endif %}"
+  lang="{{ request.locale.iso_code }}"
+  {% if enable_rtl %}
+    dir="rtl"
+  {% endif %}
+>
+  <head>
+
+    
+    
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="theme-color" content="">
+    <link rel="canonical" href="{{ canonical_url }}">
+    <link rel="preconnect" href="https://cdn.shopify.com" crossorigin>
+
+    {%- if settings.favicon != blank -%}
+      <link rel="icon" type="image/png" href="{{ settings.favicon | image_url: width: 32, height: 32 }}">
+    {%- endif -%}
+
+    {%- unless settings.type_header_font.system? and settings.type_body_font.system? -%}
+      <link rel="preconnect" href="https://fonts.shopifycdn.com" crossorigin>
+    {%- endunless -%}
+
+    <title>
+      {{- page_title -}}
+      {%- if current_tags -%}
+        {%- assign meta_tags = current_tags | join: ', ' %} &ndash; {{ 'general.meta.tags' | t: tags: meta_tags -}}
+      {%- endif -%}
+      {%- if current_page != 1 %} &ndash; {{ 'general.meta.page' | t: page: current_page }}{% endif -%}
+      {%- if template == 'password' -%}
+        {{- shop.name -}}
+      {%- else -%}
+        {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+      {%- endif -%}
+    </title>
+
+    {% if page_description %}
+      <meta name="description" content="{{ page_description | escape }}">
+    {% endif %}
+
+    {%- liquid
+      render 'meta-tags'
+      render 'css-variables'
+
+      echo 'vendor.css' | asset_url | stylesheet_tag: preload: true
+      echo 'theme.css' | asset_url | stylesheet_tag: preload: true
+
+      if settings.enable_product_compare
+        echo 'compare.css' | asset_url | stylesheet_tag: preload: true
+      endif
+
+      if enable_rtl 
+        echo 'rtl.css' | asset_url | stylesheet_tag: preload: true
+      endif
+    -%}
+
+    {{ content_for_header }}
+    <script src="{{ 'vendor.js' | asset_url }}" defer="defer"></script>
+    <script src="{{ 'theme.js' | asset_url }}" defer="defer"></script>
+
+    {%- if request.page_type contains 'customers/' -%}
+      <script src="{{ 'shopify_common.js' | shopify_asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    <script>
+      if (Shopify.designMode) {
+        document.documentElement.classList.add('shopify-design-mode');
+      }
+    </script>
+
+    {%- if request.design_mode -%}
+      <script src="{{ 'theme-editor.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    {%- render 'js-variables' -%}
+    {%- render 'microdata-schema' -%}
+
+
+
+
+
+    {% comment %} Custom metafield for head tag like GTag tracking {% endcomment %}
+    {{ shop.metafields.foxtheme.code_head.value }}
+    {% comment %} End custom metafield for head tag like GTag tracking {% endcomment %}
+  </head>
+
+  <body
+    class="{{ request.page_type }}-template {{ template.suffix }} blocks-corner--{{ settings.blocks_corner_radius }}{% if request.design_mode %} shopify-design-mode{% endif %}"
+    data-initializing
+  >
+
+    {% comment %} Custom metafield for body tag like GTag tracking {% endcomment %}
+    {{ shop.metafields.foxtheme.code_body.value }}
+    {% comment %} End custom metafield for body tab like GTag tracking {% endcomment %}
+
+    <a class="skip-to-content-link button visually-hidden" href="#MainContent">
+      {{ 'accessibility.skip_to_text' | t }}
+    </a>
+
+    {%- liquid
+      if settings.enable_page_transition
+        render 'page-transition'
+      endif
+    -%}
+
+    <div class="site-wrapper min-height-screen">
+      {% sections 'header-group' %}
+
+      <main id="MainContent" class="main-content content-for-layout focus-none" role="main" tabindex="-1">
+        {{ content_for_layout }}
+      </main>
+
+      {% sections 'footer-group' %}
+    </div>
+
+    {% sections 'overlay-group' %}
+    {%- liquid
+      if settings.enable_back_to_top
+        render 'back-to-top'
+      endif
+    -%}
+
+    <ul hidden>
+      <li id="a11y-refresh-page-message">{{ 'accessibility.refresh_page' | t }}</li>
+      <li id="a11y-new-window-message">{{ 'accessibility.link_messages.new_window' | t }}</li>
+    </ul>
+
+    {% if settings.pcard_show_quickview_button or settings.pcard_choose_options_actions == 'open_popup' %}
+      <script src="{{ 'quick-view.js' | asset_url }}" defer="defer"></script>
+    {% endif %}
+
+    {%- if settings.enable_product_compare -%}
+      <script src="{{ 'compare.js' | asset_url }}" defer="defer"></script>
+    {%- endif -%}
+
+    <script async src="https://helloretailcdn.com/helloretail.js"></script>
+<script>
+    let helloRetailInitParams = {};
+    if (Shopify.country) {
+        switch (Shopify.country) {
+            case "US":
+                helloRetailInitParams.websiteUuid = "YOUR_US_WEBSITE_UUID";
+                break;
+            case "DK":
+                helloRetailInitParams.websiteUuid = "YOUR_DK_WEBSITE_UUID";
+                break;
+        }
+        // ignore if the snippet was inserted without updating the websiteUuid.
+        if (helloRetailInitParams.websiteUuid && helloRetailInitParams.websiteUuid.startsWith("YOUR_")) {
+            delete helloRetailInitParams.websiteUuid;
+        }
+    }
+    if (Shopify.customerPrivacy) {
+        let hr_trackingIsAllowed = Shopify.customerPrivacy.analyticsProcessingAllowed() && Shopify.customerPrivacy.marketingAllowed();
+        if (!hr_trackingIsAllowed) {
+            helloRetailInitParams.trackingOptOut = true;
+        }
+    }
+    if (Shopify.currency && Shopify.currency.active && Shopify.currency.rate) {
+      let date = new Date();
+      date.setTime(date.getTime() + (60 * 24 * 365 * 60 * 1000));
+      let domain = window.location.host;
+      if (domain.indexOf("www.") === 0) {
+          domain = domain.substring(4);
+      }
+      document.cookie = "hello_retail_currency" + "=" + encodeURIComponent(JSON.stringify(Shopify.currency))
+        + "; expires=" + date.toGMTString()
+        + ";domain=." + domain
+        + ";path=/;samesite=lax";
+    }
+
+    window.hrq = window.hrq || [];
+    hrq.push(["init", helloRetailInitParams]);
+
+    document.addEventListener("visitorConsentCollected", (event) => {
+        let hr_trackingIsAllowed = Shopify.customerPrivacy.analyticsProcessingAllowed() && Shopify.customerPrivacy.marketingAllowed();
+        hrq = window.hrq || [];
+        hrq.push(function(sdk) {
+            sdk.setTrackingOptOut(!hr_trackingIsAllowed);
+        });
+    });
+</script>
+
+  </body>
+</html>

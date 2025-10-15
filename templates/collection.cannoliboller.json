@@ -1,0 +1,711 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "breadcrumbs_Gxg9wp": {
+      "type": "breadcrumbs",
+      "settings": {
+        "container": "fixed",
+        "text_alignment": "start",
+        "padding_top": 16,
+        "padding_bottom": 20
+      }
+    },
+    "rich_text_CBMYkj": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_PKyWWA": {
+          "type": "heading",
+          "settings": {
+            "heading": "{{ collection.title }}",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "hd2"
+          }
+        },
+        "text_HbpfQG": {
+          "type": "text",
+          "settings": {
+            "text": "<p>{{ collection.description }}</p>",
+            "text_size": "text-base",
+            "text_line_limit": "5-lines",
+            "button_style": "btn--plain",
+            "button_icon": "caret-right"
+          }
+        }
+      },
+      "block_order": [
+        "heading_PKyWWA",
+        "text_HbpfQG"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "use_color_scheme_in_container": false,
+        "content_spacing": "standard",
+        "content_alignment": "center",
+        "padding_top": 20,
+        "padding_bottom": 20,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "banner": {
+      "type": "main-collection-banner",
+      "blocks": {
+        "collection_info_zUNyKV": {
+          "type": "collection_info",
+          "settings": {
+            "heading_size": "h1",
+            "heading_tag": "h1",
+            "show_description": true,
+            "padding_top": 40,
+            "padding_bottom": 40
+          }
+        }
+      },
+      "block_order": [
+        "collection_info_zUNyKV"
+      ],
+      "disabled": true,
+      "custom_css": [],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "text_alignment": "left",
+        "show_collection_image": true,
+        "image_overlay_opacity": 0,
+        "image_position": "right",
+        "image_height": "extra-small",
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "image_height_mobile": "auto",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "slideshow_with_product_MCkiBh": {
+      "type": "slideshow-with-product",
+      "blocks": {
+        "slide_3ra7wC": {
+          "type": "slide",
+          "settings": {
+            "color_scheme": "",
+            "background": "shopify://shop_images/4_52e01b92-7f72-4d98-8323-75a1a215e348.jpg",
+            "image_overlay_opacity": 20,
+            "product": "produktpakke-til-fastelavnsstenger-med-bringebaer",
+            "subheading": "",
+            "title": "Cannoliboller med bringebær",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "hd1",
+            "description": "<p>Cannoliboller med vaniljekrem og bringebærstrø</p>",
+            "description_size": "text-base",
+            "button_label": "SE OPPSKRIFT",
+            "button_link": "shopify://blogs/oppskrifter/fastelavns-cannelloni-med-bringebaer",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "bottom_heading": "",
+            "enable_preload_image": false
+          }
+        }
+      },
+      "block_order": [
+        "slide_3ra7wC"
+      ],
+      "custom_css": [
+        ".f-price-item {display: none;}"
+      ],
+      "name": "t:sections.slideshow-with-product.name",
+      "settings": {
+        "container": "full",
+        "slide_height": "large",
+        "show_controls": true,
+        "autoplay": false,
+        "autoplay_delay": 3,
+        "accessibility_info": "Slideshow about our brand"
+      }
+    },
+    "featured_collection_BjYA6F": {
+      "type": "featured-collection",
+      "blocks": {
+        "collection_QVJBHU": {
+          "type": "collection",
+          "settings": {
+            "collection": "cannoliboller-med-bringebaer",
+            "title": "",
+            "show_banner": false,
+            "color_scheme": "",
+            "card_link": "",
+            "image_overlay_opacity": 0,
+            "content_position": "top-left",
+            "content_alignment": "left",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "Collections",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "text_size": "text-base",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "collection_QVJBHU"
+      ],
+      "name": "t:sections.featured-collection.presets__1.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--secondary",
+        "button_icon": "none",
+        "limit": 8,
+        "columns": 4,
+        "column_gap": "medium",
+        "row_gap": "inherit",
+        "enable_slider": true,
+        "content_overflow": true,
+        "navigation_position": "bottom",
+        "pcard_image_ratio": "",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "show_progress_bar": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "slideshow_with_product_tTtUGe": {
+      "type": "slideshow-with-product",
+      "blocks": {
+        "slide_4NE6qY": {
+          "type": "slide",
+          "settings": {
+            "color_scheme": "",
+            "background": "shopify://shop_images/1_8288edde-403a-47fa-b09f-0e2bbc10a6ee.jpg",
+            "image_overlay_opacity": 20,
+            "product": "cannoli-skoleboller-produktpakke-alt-du-trenger-for-herlige-hjemmelagde-skoleboller-med-vaniljekrem-1",
+            "subheading": "",
+            "title": "Cannoli skoleboller",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "hd1",
+            "description": "<p>Vaniljekrem, melisglasur og kokos i hver eneste bit!</p>",
+            "description_size": "text-base",
+            "button_label": "SE OPPSKRIFT",
+            "button_link": "shopify://blogs/oppskrifter/oppskrift-pa-cannoli-skoleboller",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "bottom_heading": "",
+            "enable_preload_image": false
+          }
+        }
+      },
+      "block_order": [
+        "slide_4NE6qY"
+      ],
+      "custom_css": [
+        ".f-price-item {display: none;}"
+      ],
+      "name": "t:sections.slideshow-with-product.name",
+      "settings": {
+        "container": "full",
+        "slide_height": "large",
+        "show_controls": true,
+        "autoplay": false,
+        "autoplay_delay": 3,
+        "accessibility_info": "Slideshow about our brand"
+      }
+    },
+    "featured_collection_xgmhKc": {
+      "type": "featured-collection",
+      "blocks": {
+        "collection_88AN8J": {
+          "type": "collection",
+          "settings": {
+            "collection": "cannoli-skoleboller",
+            "title": "",
+            "show_banner": false,
+            "color_scheme": "",
+            "card_link": "",
+            "image_overlay_opacity": 0,
+            "content_position": "top-left",
+            "content_alignment": "left",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "Collections",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "text_size": "text-base",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "collection_88AN8J"
+      ],
+      "name": "t:sections.featured-collection.presets__1.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--underline",
+        "button_icon": "none",
+        "limit": 8,
+        "columns": 4,
+        "column_gap": "medium",
+        "row_gap": "inherit",
+        "enable_slider": true,
+        "content_overflow": true,
+        "navigation_position": "bottom",
+        "pcard_image_ratio": "",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "show_progress_bar": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "slideshow_6nM7Wa": {
+      "type": "slideshow",
+      "blocks": {
+        "slide_EEiHAT": {
+          "type": "slide",
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "background": "shopify://shop_images/5_733319e9-0feb-4230-b950-de4789e7c8c5.jpg",
+            "image_overlay_opacity": 20,
+            "content_position": "middle-center",
+            "text_alignment": "center",
+            "subheading": "",
+            "title": "Fastelavnsstenger",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "hd2",
+            "description": "<p>Boller fylt med vaniljekrem. Garantert en ny favoritt!</p>",
+            "description_size": "text-base",
+            "button_label": "SE OPPSKRIFT",
+            "button_link": "shopify://blogs/oppskrifter/fastelavns-cannelloni-fylt-med-vaniljekrem",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "enable_preload_image": false
+          }
+        }
+      },
+      "block_order": [
+        "slide_EEiHAT"
+      ],
+      "name": "t:sections.slideshow.name",
+      "settings": {
+        "container": "full",
+        "slide_height": "large",
+        "show_controls": true,
+        "autoplay": false,
+        "autoplay_delay": 3,
+        "show_text_below": false,
+        "text_alignment_mobile": "center",
+        "accessibility_info": "Slideshow about our brand"
+      }
+    },
+    "featured_collection_8nhjic": {
+      "type": "featured-collection",
+      "blocks": {
+        "collection_3886EG": {
+          "type": "collection",
+          "settings": {
+            "collection": "cannoliboller",
+            "title": "",
+            "show_banner": false,
+            "color_scheme": "",
+            "card_link": "",
+            "image_overlay_opacity": 0,
+            "content_position": "top-left",
+            "content_alignment": "left",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "Collections",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "text_size": "text-base",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "collection_3886EG"
+      ],
+      "name": "t:sections.featured-collection.presets__1.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--underline",
+        "button_icon": "none",
+        "limit": 8,
+        "columns": 4,
+        "column_gap": "medium",
+        "row_gap": "inherit",
+        "enable_slider": true,
+        "content_overflow": true,
+        "navigation_position": "bottom",
+        "pcard_image_ratio": "",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "show_progress_bar": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "slideshow_with_product_MJYpQ4": {
+      "type": "slideshow-with-product",
+      "blocks": {
+        "slide_GJGLgh": {
+          "type": "slide",
+          "settings": {
+            "color_scheme": "",
+            "background": "shopify://shop_images/3_5b2c4551-f473-4949-82f9-e99ed452d07e.jpg",
+            "image_overlay_opacity": 20,
+            "product": "produktpakke-til-cannoli-mummies",
+            "subheading": "",
+            "title": "Cannoli mummies",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "hd1",
+            "description": "<p>Cannoliboller med ostekakekrem og flytende jordbærgele. Perfekt til Halloween!</p>",
+            "description_size": "text-base",
+            "button_label": "SE OPPSKRIFT",
+            "button_link": "",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "bottom_heading": "",
+            "enable_preload_image": false
+          }
+        }
+      },
+      "block_order": [
+        "slide_GJGLgh"
+      ],
+      "custom_css": [
+        ".f-price-item {display: none;}"
+      ],
+      "name": "t:sections.slideshow-with-product.name",
+      "settings": {
+        "container": "full",
+        "slide_height": "large",
+        "show_controls": true,
+        "autoplay": false,
+        "autoplay_delay": 3,
+        "accessibility_info": "Slideshow about our brand"
+      }
+    },
+    "featured_collection_QWMrtJ": {
+      "type": "featured-collection",
+      "blocks": {
+        "collection_9nRmEA": {
+          "type": "collection",
+          "settings": {
+            "collection": "cannoliboller",
+            "title": "",
+            "show_banner": false,
+            "color_scheme": "",
+            "card_link": "",
+            "image_overlay_opacity": 0,
+            "content_position": "top-left",
+            "content_alignment": "left",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "Collections",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "text_size": "text-base",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "collection_9nRmEA"
+      ],
+      "name": "t:sections.featured-collection.presets__1.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--underline",
+        "button_icon": "none",
+        "limit": 8,
+        "columns": 4,
+        "column_gap": "medium",
+        "row_gap": "inherit",
+        "enable_slider": true,
+        "content_overflow": true,
+        "navigation_position": "bottom",
+        "pcard_image_ratio": "",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "show_progress_bar": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "slideshow_WTDNfE": {
+      "type": "slideshow",
+      "blocks": {
+        "slide_3yr7bx": {
+          "type": "slide",
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "background": "shopify://shop_images/2_ef4950cf-0c02-4a9c-b166-3b567f51af7a.jpg",
+            "image_overlay_opacity": 25,
+            "content_position": "middle-center",
+            "text_alignment": "center",
+            "subheading": "",
+            "title": "Butterdeigscannoli med bringebærkrem",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "hd2",
+            "description": "<p>Perfekt balanse mellom søtt og syrlig, myk krem, sprø butterdeig og knasende hasselnøttkrem.</p>",
+            "description_size": "text-base",
+            "button_label": "SE OPPSKRIFT",
+            "button_link": "shopify://blogs/oppskrifter/oppskrift-pa-butterdeigscannoli-med-bringebaerkrem",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "enable_preload_image": false
+          }
+        }
+      },
+      "block_order": [
+        "slide_3yr7bx"
+      ],
+      "name": "t:sections.slideshow.name",
+      "settings": {
+        "container": "full",
+        "slide_height": "large",
+        "show_controls": true,
+        "autoplay": false,
+        "autoplay_delay": 3,
+        "show_text_below": false,
+        "text_alignment_mobile": "center",
+        "accessibility_info": "Slideshow about our brand"
+      }
+    },
+    "featured_collection_CwpiDh": {
+      "type": "featured-collection",
+      "blocks": {
+        "collection_4Vkzeh": {
+          "type": "collection",
+          "settings": {
+            "collection": "butterdeigscannoli-med-bringebaerkrem",
+            "title": "",
+            "show_banner": false,
+            "color_scheme": "",
+            "card_link": "",
+            "image_overlay_opacity": 0,
+            "content_position": "top-left",
+            "content_alignment": "left",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "Collections",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "text_size": "text-base",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "collection_4Vkzeh"
+      ],
+      "name": "t:sections.featured-collection.presets__1.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--underline",
+        "button_icon": "none",
+        "limit": 8,
+        "columns": 4,
+        "column_gap": "medium",
+        "row_gap": "inherit",
+        "enable_slider": true,
+        "content_overflow": true,
+        "navigation_position": "bottom",
+        "pcard_image_ratio": "",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "show_progress_bar": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "custom_css": [],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "products_per_page": 20,
+        "columns_desktop": 5,
+        "column_gap": "large",
+        "row_gap": "large",
+        "pagination": "load_more",
+        "enable_filtering": true,
+        "enable_color_swatch": true,
+        "filter_type": "drawer",
+        "expand_filter_groups": "Availability, Price, Color, Size, Category",
+        "enable_sorting": true,
+        "enable_layout_switching": true,
+        "columns_mobile": "2",
+        "padding_top": 28,
+        "padding_bottom": 60,
+        "show_section_divider": true,
+        "divider_width": "fixed"
+      }
+    }
+  },
+  "order": [
+    "breadcrumbs_Gxg9wp",
+    "rich_text_CBMYkj",
+    "banner",
+    "slideshow_with_product_MCkiBh",
+    "featured_collection_BjYA6F",
+    "slideshow_with_product_tTtUGe",
+    "featured_collection_xgmhKc",
+    "slideshow_6nM7Wa",
+    "featured_collection_8nhjic",
+    "slideshow_with_product_MJYpQ4",
+    "featured_collection_QWMrtJ",
+    "slideshow_WTDNfE",
+    "featured_collection_CwpiDh",
+    "product-grid"
+  ]
+}

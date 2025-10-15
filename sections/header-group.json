@@ -1,0 +1,318 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "name": "t:sections.header.name",
+  "type": "header",
+  "sections": {
+    "announcement_bar_FixGhc": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement_bar_RRJB6V": {
+          "type": "announcement_bar",
+          "settings": {
+            "text": "🚚 Gratis frakt på ordre over 1000 kr",
+            "link": ""
+          }
+        },
+        "announcement_bar_gqPaXr": {
+          "type": "announcement_bar",
+          "settings": {
+            "text": "⚡ Rask levering",
+            "link": ""
+          }
+        },
+        "announcement_bar_zyyaFD": {
+          "type": "announcement_bar",
+          "settings": {
+            "text": "↩️ Åpent kjøp i 30 dager",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "announcement_bar_RRJB6V",
+        "announcement_bar_gqPaXr",
+        "announcement_bar_zyyaFD"
+      ],
+      "custom_css": [
+        ".swiper-button {display: none;}"
+      ],
+      "name": "t:sections.announcement-bar.name",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "content_width": 30,
+        "autoplay": true,
+        "autoplay_speed": 5,
+        "padding_top": 12,
+        "padding_bottom": 12
+      }
+    },
+    "header": {
+      "type": "header",
+      "blocks": {
+        "sidebar_hBPHUD": {
+          "type": "sidebar",
+          "settings": {
+            "menu_title": "Ingredienser og spiselig",
+            "enable_hl_link": false,
+            "hl_link_style": "text_color",
+            "hl_link_color": "",
+            "menu_columns": 4,
+            "show_collection_image": true,
+            "show_image_of_first_product": false,
+            "image_ratio": "adapt"
+          }
+        },
+        "sidebar_hVMnaE": {
+          "type": "sidebar",
+          "settings": {
+            "menu_title": "Servering og emballasje",
+            "enable_hl_link": false,
+            "hl_link_style": "text_color",
+            "hl_link_color": "",
+            "menu_columns": 4,
+            "show_collection_image": true,
+            "show_image_of_first_product": true,
+            "image_ratio": "adapt"
+          }
+        },
+        "product_list_QMAUAH": {
+          "type": "product_list",
+          "settings": {
+            "menu_title": "Utstyr",
+            "menu_columns": 3,
+            "show_menu_column_divider": true,
+            "enable_hl_link": false,
+            "hl_link_style": "text_color",
+            "hl_link_color": "",
+            "heading": "",
+            "promotions_width": 20,
+            "number_of_columns": 5,
+            "product_list": [],
+            "show_product_vendor": false,
+            "show_product_type": false,
+            "show_progress_bar": true
+          }
+        },
+        "product_list_A7XNWQ": {
+          "type": "product_list",
+          "settings": {
+            "menu_title": "Spiselig",
+            "menu_columns": 3,
+            "show_menu_column_divider": true,
+            "enable_hl_link": false,
+            "hl_link_style": "text_color",
+            "hl_link_color": "",
+            "heading": "",
+            "promotions_width": 20,
+            "number_of_columns": 5,
+            "product_list": [],
+            "show_product_vendor": false,
+            "show_product_type": false,
+            "show_progress_bar": true
+          }
+        },
+        "custom_card_6QAXXN": {
+          "type": "custom_card",
+          "settings": {
+            "menu_title": "",
+            "menu_columns": 3,
+            "enable_hl_link": false,
+            "hl_link_style": "text_color",
+            "hl_link_color": "",
+            "promotions_width": 38,
+            "promotion_columns": 1,
+            "promo_image_1": "shopify://shop_images/2-22_a89482b0-d2fd-43ef-be6d-b59053907825.jpg",
+            "heading_1": "Test",
+            "heading_size_1": "h5",
+            "description_1": "<p>test</p>",
+            "promotion_link_1": "",
+            "heading_2": "",
+            "heading_size_2": "h5",
+            "description_2": "",
+            "promotion_link_2": "",
+            "heading_3": "",
+            "heading_size_3": "h5",
+            "description_3": "",
+            "promotion_link_3": "",
+            "heading_4": "",
+            "heading_size_4": "h5",
+            "description_4": "",
+            "promotion_link_4": "",
+            "heading_5": "",
+            "heading_size_5": "h5",
+            "description_5": "",
+            "promotion_link_5": ""
+          }
+        },
+        "promotion_banner_tyTnNL": {
+          "type": "promotion_banner",
+          "settings": {
+            "menu_title": "",
+            "menu_columns": 3,
+            "enable_hl_link": false,
+            "hl_link_style": "text_color",
+            "hl_link_color": "",
+            "promotions_width": 38,
+            "promotion_columns": 1,
+            "promotion_position": "right",
+            "color_scheme_1": "",
+            "promo_image_1": "shopify://shop_images/2-22_a89482b0-d2fd-43ef-be6d-b59053907825.jpg",
+            "content_position_1": "middle-left",
+            "content_alignment_1": "left",
+            "content_gap_1": "standard",
+            "image_overlay_opacity_1": 0,
+            "promotion_link_1": "",
+            "subheading_1": "ds sdds",
+            "subheading_style_1": "border",
+            "heading_1": "",
+            "heading_size_1": "h5",
+            "description_1": "",
+            "button_label_1": "",
+            "button_style_1": "btn--primary",
+            "button_icon_1": "none",
+            "color_scheme_2": "",
+            "content_position_2": "top-left",
+            "content_alignment_2": "left",
+            "content_gap_2": "fitted",
+            "image_overlay_opacity_2": 0,
+            "promotion_link_2": "",
+            "subheading_2": "",
+            "subheading_style_2": "",
+            "heading_2": "",
+            "heading_size_2": "h5",
+            "description_2": "",
+            "button_label_2": "",
+            "button_style_2": "btn--primary",
+            "button_icon_2": "none",
+            "color_scheme_3": "",
+            "content_position_3": "top-left",
+            "content_alignment_3": "left",
+            "content_gap_3": "fitted",
+            "image_overlay_opacity_3": 0,
+            "promotion_link_3": "",
+            "subheading_3": "",
+            "subheading_style_3": "",
+            "heading_3": "",
+            "heading_size_3": "h5",
+            "description_3": "",
+            "button_label_3": "",
+            "button_style_3": "btn--primary",
+            "button_icon_3": "none",
+            "color_scheme_4": "",
+            "content_position_4": "top-left",
+            "content_alignment_4": "left",
+            "content_gap_4": "fitted",
+            "image_overlay_opacity_4": 0,
+            "promotion_link_4": "",
+            "subheading_4": "",
+            "subheading_style_4": "",
+            "heading_4": "",
+            "heading_size_4": "h5",
+            "description_4": "",
+            "button_label_4": "",
+            "button_style_4": "btn--primary",
+            "button_icon_4": "none",
+            "color_scheme_5": "",
+            "content_position_5": "top-left",
+            "content_alignment_5": "left",
+            "content_gap_5": "fitted",
+            "image_overlay_opacity_5": 0,
+            "promotion_link_5": "",
+            "subheading_5": "",
+            "subheading_style_5": "",
+            "heading_5": "",
+            "heading_size_5": "h5",
+            "description_5": "",
+            "button_label_5": "",
+            "button_style_5": "btn--primary",
+            "button_icon_5": "none"
+          }
+        },
+        "sidebar_htfqMY": {
+          "type": "sidebar",
+          "settings": {
+            "menu_title": "Velg anledning",
+            "enable_hl_link": false,
+            "hl_link_style": "text_color",
+            "hl_link_color": "",
+            "menu_columns": 4,
+            "show_collection_image": true,
+            "show_image_of_first_product": false,
+            "image_ratio": "adapt"
+          }
+        }
+      },
+      "block_order": [
+        "sidebar_hBPHUD",
+        "sidebar_hVMnaE",
+        "product_list_QMAUAH",
+        "product_list_A7XNWQ",
+        "custom_card_6QAXXN",
+        "promotion_banner_tyTnNL",
+        "sidebar_htfqMY"
+      ],
+      "custom_css": [
+        "@media (max-width: 768px) {.header__logo {position: absolute !important; left: 55% !important; transform: translateX(-50%) !important; margin: 0 !important; }}",
+        ".predictive-search [klaviyo-bis-trigger],.search__content [klaviyo-bis-trigger] {display: none !important;}"
+      ],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "menu": "knuts-menyforslag",
+        "menu_mobile": "",
+        "header_layout": "logo-left-search-center",
+        "menu_trigger": "hover",
+        "sticky_header": "always",
+        "enable_collapse_on_scroll": true,
+        "show_sperator_line": true,
+        "customer_account_style": "icon-only",
+        "show_social_media_icons": false,
+        "enable_language_selector": false,
+        "enable_country_selector": false,
+        "header_top_padding_top": 20,
+        "header_top_padding_bottom": 20,
+        "navigation_color_scheme": "",
+        "navigation_content_alignment": "center",
+        "navigation_padding_top": 0,
+        "navigation_padding_bottom": 12
+      }
+    },
+    "announcement_bar_gKg6cG": {
+      "type": "announcement-bar",
+      "blocks": {
+        "announcement_bar_GMhULc": {
+          "type": "announcement_bar",
+          "settings": {
+            "text": "🎃 Halloween Mystery Box er tilbake! - Kjøp her 👈",
+            "link": "shopify://products/halloween-mystery-box-forundringspakke-til-halloweenbaking"
+          }
+        }
+      },
+      "block_order": [
+        "announcement_bar_GMhULc"
+      ],
+      "name": "t:sections.announcement-bar.name",
+      "settings": {
+        "color_scheme": "",
+        "content_width": 45,
+        "autoplay": true,
+        "autoplay_speed": 5,
+        "padding_top": 12,
+        "padding_bottom": 12
+      }
+    }
+  },
+  "order": [
+    "announcement_bar_FixGhc",
+    "header",
+    "announcement_bar_gKg6cG"
+  ]
+}

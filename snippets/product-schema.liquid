@@ -1,0 +1,574 @@
+{%- comment -%}
+Universal Enhanced Product Schema Markup Template for Shopify with Judge.me Integration
+Automatically adapts to any store's currency, country, and shipping settings
+Includes comprehensive Judge.me review integration with @id linking
+LAST UPDATE: Judge.me integration, dynamic shipping, return policies, and universal compatibility
+{%- endcomment -%}
+
+{%- if request.page_type == 'product' -%}
+  {%- assign days_product_price_valid_until = 10 | times: 86400 -%}
+
+  {%- capture main_entity_microdata -%}
+    {%- assign is_valid_global_gtin_length = false -%}
+
+    {%- if product.selected_or_first_available_variant.barcode != blank -%}
+      {%- assign gtin_string_length = product.selected_or_first_available_variant.barcode | size -%}
+
+      {%- if gtin_string_length == 8 or gtin_string_length == 12 or gtin_string_length == 13 or gtin_string_length == 14 -%}
+        {%- assign is_valid_global_gtin_length = true -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    {%- comment -%} Universal shipping calculation with metaobject support {%- endcomment -%}
+{%- assign default_shipping_rate = 0 -%}
+{%- assign default_free_threshold = 0 -%}
+
+{%- comment -%} Primary: Try metaobject first {%- endcomment -%}
+{%- assign shipping_settings = shop.metaobjects.shipping-settings-bndmqudl.first -%}
+{%- if shipping_settings -%}
+  {%- assign default_shipping_rate = shipping_settings.default_rate.value -%}
+  {%- assign default_free_threshold = shipping_settings.free_threshold.value -%}
+{%- endif -%}
+
+{%- comment -%} Secondary: Try metafields (for backward compatibility) {%- endcomment -%}
+{%- if default_shipping_rate == 0 and shop.metafields.shipping.default_rate.value -%}
+  {%- assign default_shipping_rate = shop.metafields.shipping.default_rate.value -%}
+{%- endif -%}
+
+{%- if default_free_threshold == 0 and shop.metafields.shipping.free_threshold.value -%}
+  {%- assign default_free_threshold = shop.metafields.shipping.free_threshold.value -%}
+{%- endif -%}
+
+{%- comment -%} Fallback: Basic shipping rates by currency (only if nothing found) {%- endcomment -%}
+{%- if default_shipping_rate == 0 -%}
+  {%- case cart.currency.iso_code -%}
+    {%- when 'NOK' -%}
+      {%- assign default_shipping_rate = 79.00 -%}
+      {%- assign default_free_threshold = 999.00 -%}
+    {%- when 'USD' -%}
+      {%- assign default_shipping_rate = 7.99 -%}
+      {%- assign default_free_threshold = 95.00 -%}
+    {%- else -%}
+      {%- assign default_shipping_rate = 9.99 -%}
+      {%- assign default_free_threshold = 95.00 -%}
+  {%- endcase -%}
+{%- endif -%}
+
+    {%- comment -%} Determine if we should use ProductGroup for multiple variants {%- endcomment -%}
+    {% if product.variants.size > 1 %}
+    "@type": "ProductGroup",
+    "@id": "{{ shop.url }}{{ product.url }}#productgroup",
+    "name": {{ product.title | json }},
+    "description": {{ product.description | strip_html | truncate: 160 | json }},
+    "url": "{{ shop.url }}{{ product.url }}",
+    "productGroupID": {{ product.id | json }},
+    "brand": {
+      "@type": "Brand",
+      "name": {{ product.vendor | json }}
+    },
+    "image": [
+      {% for image in product.images limit: 5 %}
+        {{ image | image_url: '1200x1200' | json }}{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ],
+    "variesBy": [
+      {% for option in product.options %}
+        {{ option.name | json }}{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ],
+    {% if product.type != blank or product.collections.first %}
+    "category": {% if product.type != blank %}{{ product.type | json }}{% else %}{{ product.collections.first.title | json }}{% endif %},
+    {% endif %}
+    "hasVariant": [
+      {%- for variant in product.variants -%}
+        {%- assign is_valid_gtin_length = false -%}
+        {%- assign variant_shipping_rate = default_shipping_rate -%}
+        {%- assign variant_free_threshold = default_free_threshold -%}
+
+        {%- if variant.barcode != blank -%}
+          {%- assign gtin_string_length = variant.barcode | size -%}
+          {%- if gtin_string_length == 8 or gtin_string_length == 12 or gtin_string_length == 13 or gtin_string_length == 14 -%}
+            {%- assign is_valid_gtin_length = true -%}
+          {%- endif -%}
+        {%- endif -%}
+
+        {%- comment -%} Product-specific shipping overrides {%- endcomment -%}
+        {%- if product.metafields.shipping.rate.value -%}
+          {%- assign variant_shipping_rate = product.metafields.shipping.rate.value -%}
+        {%- endif -%}
+        
+        {%- if variant.requires_shipping == false -%}
+          {%- assign variant_shipping_rate = 0 -%}
+        {%- endif -%}
+        
+        {%- if variant.weight > 0 and shop.metafields.shipping.weight_based.value -%}
+          {%- assign weight_kg = variant.weight | divided_by: 1000.0 -%}
+          {%- if weight_kg > 10 -%}
+            {%- assign variant_shipping_rate = variant_shipping_rate | times: 2 -%}
+          {%- elsif weight_kg > 5 -%}
+            {%- assign variant_shipping_rate = variant_shipping_rate | times: 1.5 -%}
+          {%- endif -%}
+        {%- endif -%}
+
+        {
+          "@type": "Product",
+          "@id": "{{ shop.url }}{{ product.url }}?variant={{ variant.id }}#product",
+          "name": {% if product.has_only_default_variant %}{{ product.title | json }}{% else %}"{{ product.title | escape }} - {{ variant.title | escape }}"{% endif %},
+          "description": {{ product.description | strip_html | truncate: 160 | json }},
+          {%- if variant.sku != blank -%}
+            "sku": {{ variant.sku | json }},
+          {%- endif -%}
+          {%- if variant.barcode != blank -%}
+            {%- if is_valid_gtin_length -%}
+              "gtin": {{ variant.barcode | json }},
+            {%- else -%}
+              "mpn": {{ variant.barcode | json }},
+            {%- endif -%}
+          {%- elsif product.metafields.custom.gtin.value -%}
+            "gtin": {{ product.metafields.custom.gtin.value | json }},
+          {%- endif -%}
+          "image": [
+            {% if variant.image %}
+              {{ variant.image | image_url: '1200x1200' | json }}
+            {% else %}
+              {{ product.featured_image | image_url: '1200x1200' | json }}
+            {% endif %}
+          ],
+          "offers": {
+            "@type": "Offer",
+            "availability": {%- if variant.available -%}"https://schema.org/InStock"{%- elsif variant.incoming -%}"https://schema.org/BackOrder"{% else %}"https://schema.org/OutOfStock"{%- endif -%},
+            "price": {{ variant.price | divided_by: 100.0 | json }},
+            "priceCurrency": {{ cart.currency.iso_code | json }},
+            "priceValidUntil": "{{ 'now' | date: '%s' | plus: days_product_price_valid_until | date: '%Y-%m-%d' }}",
+            {% if variant.compare_at_price > variant.price %}
+            "priceSpecification": {
+              "@type": "PriceSpecification",
+              "price": {{ variant.price | divided_by: 100.0 | json }},
+              "priceCurrency": {{ cart.currency.iso_code | json }}
+            },
+            {% endif %}
+            "itemCondition": "https://schema.org/NewCondition",
+            "url": "{{ shop.url }}{{ product.url }}?variant={{ variant.id }}",
+            "seller": {
+              "@type": "Organization",
+              "name": {{ shop.name | json }}
+            },
+            "shippingDetails": {
+              "@type": "OfferShippingDetails",
+              "shippingRate": {
+                "@type": "MonetaryAmount",
+                "value": {{ variant_shipping_rate | default: 0 }},
+                "currency": {{ cart.currency.iso_code | json }}
+              },
+              {%- if variant_free_threshold > 0 -%}
+              "freeShippingThreshold": {
+                "@type": "MonetaryAmount",
+                "value": {{ variant_free_threshold }},
+                "currency": {{ cart.currency.iso_code | json }}
+              },
+              {%- endif -%}
+              "deliveryTime": {
+                "@type": "ShippingDeliveryTime",
+                "handlingTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": {% if product.metafields.shipping.handling_min.value %}{{ product.metafields.shipping.handling_min.value }}{% elsif shop.metafields.shipping.default_handling_min.value %}{{ shop.metafields.shipping.default_handling_min.value }}{% else %}1{% endif %},
+                  "maxValue": {% if product.metafields.shipping.handling_max.value %}{{ product.metafields.shipping.handling_max.value }}{% elsif shop.metafields.shipping.default_handling_max.value %}{{ shop.metafields.shipping.default_handling_max.value }}{% else %}3{% endif %},
+                  "unitCode": "DAY"
+                }
+                {%- if shop.metafields.shipping.transit_min.value and shop.metafields.shipping.transit_max.value -%}
+                ,"transitTime": {
+                  "@type": "QuantitativeValue",
+                  "minValue": {{ shop.metafields.shipping.transit_min.value }},
+                  "maxValue": {{ shop.metafields.shipping.transit_max.value }},
+                  "unitCode": "DAY"
+                }
+                {%- endif -%}
+              },
+              "shippingDestination": {
+                "@type": "DefinedRegion",
+                "addressCountry": {% if shop.country %}{{ shop.country | json }}{% else %}"NO"{% endif %}
+              }
+              {%- if shop.shipping_policy.body != blank -%}
+                ,"shippingSettingsLink": {{ shop.shipping_policy.url | prepend: request.origin | json }}
+              {%- endif -%}
+            },
+            "hasMerchantReturnPolicy": {
+              "@type": "MerchantReturnPolicy",
+              "applicableCountry": {% if shop.country %}{{ shop.country | json }}{% else %}"NO"{% endif %},
+              "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+              "merchantReturnDays": {% if shop.metafields.returns.return_days.value %}{{ shop.metafields.returns.return_days.value }}{% else %}30{% endif %},
+              "returnMethod": {% if shop.metafields.returns.return_method.value %}"{{ shop.metafields.returns.return_method.value }}"{% else %}"https://schema.org/ReturnByMail"{% endif %},
+              "returnFees": {% if shop.metafields.returns.return_fees.value %}"{{ shop.metafields.returns.return_fees.value }}"{% else %}"https://schema.org/FreeReturn"{% endif %}
+              {%- if shop.refund_policy.body != blank -%}
+                ,"merchantReturnLink": {{ shop.refund_policy.url | prepend: request.origin | json }}
+              {%- endif -%}
+            }
+          }
+        }{% unless forloop.last %},{% endunless %}
+      {%- endfor -%}
+    ]
+    {% else %}
+    {%- comment -%} Single Product Logic {%- endcomment -%}
+    {%- assign product_shipping_rate = default_shipping_rate -%}
+    {%- assign product_free_threshold = default_free_threshold -%}
+    
+    {%- comment -%} Product-specific shipping overrides {%- endcomment -%}
+    {%- if product.metafields.shipping.rate.value -%}
+      {%- assign product_shipping_rate = product.metafields.shipping.rate.value -%}
+    {%- endif -%}
+    
+    {%- if product.first_available_variant.requires_shipping == false -%}
+      {%- assign product_shipping_rate = 0 -%}
+    {%- endif -%}
+    
+    {%- if product.first_available_variant.weight > 0 and shop.metafields.shipping.weight_based.value -%}
+      {%- assign weight_kg = product.first_available_variant.weight | divided_by: 1000.0 -%}
+      {%- if weight_kg > 10 -%}
+        {%- assign product_shipping_rate = product_shipping_rate | times: 2 -%}
+      {%- elsif weight_kg > 5 -%}
+        {%- assign product_shipping_rate = product_shipping_rate | times: 1.5 -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    "@type": "Product",
+    "@id": "{{ shop.url }}{{ product.url }}#product",
+    "productID": {{ product.id | json }},
+    "name": {{ product.title | json }},
+    "description": {{ product.description | strip_html | truncate: 160 | json }},
+    "url": "{{ shop.url }}{{ product.url }}",
+    "sku": {{ product.first_available_variant.sku | json }},
+    {%- if product.selected_or_first_available_variant.barcode != blank -%}
+      {%- if is_valid_global_gtin_length -%}
+        "gtin": {{ product.selected_or_first_available_variant.barcode | json }},
+      {%- else -%}
+        "mpn": {{ product.selected_or_first_available_variant.barcode | json }},
+      {%- endif -%}
+    {%- elsif product.metafields.custom.gtin.value -%}
+      "gtin": {{ product.metafields.custom.gtin.value | json }},
+    {%- endif -%}
+    "brand": {
+      "@type": "Brand",
+      "name": {{ product.vendor | json }}
+    },
+    "image": [
+      {% for image in product.images limit: 5 %}
+        {{ image | image_url: '1200x1200' | json }}{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    ],
+    {% if product.type != blank or product.collections.first %}
+    "category": {% if product.type != blank %}{{ product.type | json }}{% else %}{{ product.collections.first.title | json }}{% endif %},
+    {% endif %}
+    "offers": {
+      "@type": "Offer",
+      "availability": {%- if product.available -%}"https://schema.org/InStock"{%- else -%}"https://schema.org/OutOfStock"{%- endif -%},
+      "price": {{ product.price | divided_by: 100.0 | json }},
+      "priceCurrency": {{ cart.currency.iso_code | json }},
+      "priceValidUntil": "{{ 'now' | date: '%s' | plus: days_product_price_valid_until | date: '%Y-%m-%d' }}",
+      {% if product.compare_at_price > product.price %}
+      "priceSpecification": {
+        "@type": "PriceSpecification",
+        "price": {{ product.price | divided_by: 100.0 | json }},
+        "priceCurrency": {{ cart.currency.iso_code | json }}
+      },
+      {% endif %}
+      "itemCondition": "https://schema.org/NewCondition",
+      "url": "{{ shop.url }}{{ product.url }}",
+      "seller": {
+        "@type": "Organization",
+        "name": {{ shop.name | json }}
+      },
+      "shippingDetails": {
+        "@type": "OfferShippingDetails",
+        "shippingRate": {
+          "@type": "MonetaryAmount",
+          "value": {{ product_shipping_rate | default: 0 }},
+          "currency": {{ cart.currency.iso_code | json }}
+        },
+        {%- if product_free_threshold > 0 -%}
+        "freeShippingThreshold": {
+          "@type": "MonetaryAmount",
+          "value": {{ product_free_threshold }},
+          "currency": {{ cart.currency.iso_code | json }}
+        },
+        {%- endif -%}
+        "deliveryTime": {
+          "@type": "ShippingDeliveryTime",
+          "handlingTime": {
+            "@type": "QuantitativeValue",
+            "minValue": {% if product.metafields.shipping.handling_min.value %}{{ product.metafields.shipping.handling_min.value }}{% elsif shop.metafields.shipping.default_handling_min.value %}{{ shop.metafields.shipping.default_handling_min.value }}{% else %}1{% endif %},
+            "maxValue": {% if product.metafields.shipping.handling_max.value %}{{ product.metafields.shipping.handling_max.value }}{% elsif shop.metafields.shipping.default_handling_max.value %}{{ shop.metafields.shipping.default_handling_max.value }}{% else %}3{% endif %},
+            "unitCode": "DAY"
+          }
+          {%- if shop.metafields.shipping.transit_min.value and shop.metafields.shipping.transit_max.value -%}
+          ,"transitTime": {
+            "@type": "QuantitativeValue",
+            "minValue": {{ shop.metafields.shipping.transit_min.value }},
+            "maxValue": {{ shop.metafields.shipping.transit_max.value }},
+            "unitCode": "DAY"
+          }
+          {%- endif -%}
+        },
+        "shippingDestination": {
+          "@type": "DefinedRegion",
+          "addressCountry": {% if shop.country %}{{ shop.country | json }}{% else %}"NO"{% endif %}
+        }
+        {%- if shop.shipping_policy.body != blank -%}
+          ,"shippingSettingsLink": {{ shop.shipping_policy.url | prepend: request.origin | json }}
+        {%- endif -%}
+      },
+      "hasMerchantReturnPolicy": {
+        "@type": "MerchantReturnPolicy",
+        "applicableCountry": {% if shop.country %}{{ shop.country | json }}{% else %}"NO"{% endif %},
+        "returnPolicyCategory": "https://schema.org/MerchantReturnFiniteReturnWindow",
+        "merchantReturnDays": {% if shop.metafields.returns.return_days.value %}{{ shop.metafields.returns.return_days.value }}{% else %}30{% endif %},
+        "returnMethod": {% if shop.metafields.returns.return_method.value %}"{{ shop.metafields.returns.return_method.value }}"{% else %}"https://schema.org/ReturnByMail"{% endif %},
+        "returnFees": {% if shop.metafields.returns.return_fees.value %}"{{ shop.metafields.returns.return_fees.value }}"{% else %}"https://schema.org/FreeReturn"{% endif %}
+        {%- if shop.refund_policy.body != blank -%}
+          ,"merchantReturnLink": {{ shop.refund_policy.url | prepend: request.origin | json }}
+        {%- endif -%}
+      }
+    }
+    {% endif %}
+    
+    {%- comment -%} Enhanced Judge.me Review Integration with Multiple Fallbacks {%- endcomment -%}
+    {%- comment -%} Priority 1: Judge.me specific metafields {%- endcomment -%}
+    {%- if product.metafields.judgeme.rating.value and product.metafields.judgeme.rating_count.value > 0 -%}
+      ,"aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ product.metafields.judgeme.rating.value }}",
+        "reviewCount": "{{ product.metafields.judgeme.rating_count.value }}",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+      {%- comment -%} Include individual reviews if available {%- endcomment -%}
+      {%- if product.metafields.judgeme.reviews.value.size > 0 -%}
+        ,"review": [
+          {%- for review in product.metafields.judgeme.reviews.value limit: 5 -%}
+            {
+              "@type": "Review",
+              "reviewRating": {
+                "@type": "Rating",
+                "ratingValue": "{{ review.rating }}",
+                "bestRating": "5",
+                "worstRating": "1"
+              },
+              "author": {
+                "@type": "Person",
+                "name": {{ review.reviewer.name | default: "Anonymous" | json }}
+              },
+              "datePublished": "{{ review.created_at | date: '%Y-%m-%d' }}",
+              "reviewBody": {{ review.body | strip_html | json }}
+            }{% unless forloop.last %},{% endunless %}
+          {%- endfor -%}
+        ]
+      {%- endif -%}
+    {%- comment -%} Priority 2: Generic reviews metafields {%- endcomment -%}
+    {%- elsif product.metafields.reviews.rating.value != blank and product.metafields.reviews.rating_count.value > 0 -%}
+      ,"aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ product.metafields.reviews.rating.value }}",
+        "reviewCount": "{{ product.metafields.reviews.rating_count.value }}",
+        "worstRating": "{{ product.metafields.reviews.rating.value.scale_min | default: '1' }}",
+        "bestRating": "{{ product.metafields.reviews.rating.value.scale_max | default: '5' }}"
+      }
+    {%- comment -%} Priority 3: Lipscore or other review system fallbacks {%- endcomment -%}
+    {%- elsif product.metafields.lipscore.rating.value or product.metafields.reviews.rating.value -%}
+      ,"aggregateRating": {
+        "@type": "AggregateRating",
+        "ratingValue": "{{ product.metafields.lipscore.rating.value | default: product.metafields.reviews.rating.value }}",
+        "reviewCount": "{{ product.metafields.lipscore.count.value | default: product.metafields.reviews.count.value | default: 1 }}",
+        "bestRating": "5",
+        "worstRating": "1"
+      }
+    {%- endif -%}
+    
+    {%- comment -%} Additional product properties {%- endcomment -%}
+    {% if product.metafields.custom.weight %}
+    ,"weight": {
+      "@type": "QuantitativeValue",
+      "value": "{{ product.metafields.custom.weight.value }}",
+      "unitCode": "{{ product.metafields.custom.weight_unit.value | default: 'GRM' }}"
+    }
+    {% endif %}
+  {%- endcapture -%}
+{%- elsif request.page_type == 'article' -%}
+  {%- capture main_entity_microdata -%}
+    "@type": "BlogPosting",
+    "mainEntityOfPage": "{{ article.url }}",
+    "articleSection": {{ blog.title | json }},
+    "keywords": "{{ article.tags | join: ', ' }}",
+    "headline": {{ article.title | json }},
+    "description": {{ article.excerpt_or_content | strip_html | truncatewords: 25 | json }},
+    "dateCreated": "{{ article.created_at | date: '%Y-%m-%dT%T' }}",
+    "datePublished": "{{ article.published_at | date: '%Y-%m-%dT%T' }}",
+    "dateModified": "{{ article.published_at | date: '%Y-%m-%dT%T' }}",
+    "image": {
+      "@type": "ImageObject",
+      "url": "https:{{ page_image | image_url: width: 1024 }}",
+      "image": "https:{{ page_image | image_url: width: 1024 }}",
+      "name": {{ page_image.alt | json }},
+      "width": "1024",
+      "height": "1024"
+    },
+    "author": {
+      "@type": "Person",
+      "name": "{{ article.user.first_name | escape }} {{ article.user.last_name | escape }}",
+      "givenName": {{ article.user.first_name | json }},
+      "familyName": {{ article.user.last_name | json }}
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": {{ shop.name | json }}
+    },
+    "commentCount": {{ article.comments_count }},
+    "comment": [
+      {%- for comment in article.comments limit: 5 -%}
+        {
+          "@type": "Comment",
+          "author": {{ comment.author | json }},
+          "datePublished": "{{ comment.created_at | date: '%Y-%m-%dT%T' }}",
+          "text": {{ comment.content | json }}
+        }{%- unless forloop.last -%},{%- endunless -%}
+      {%- endfor -%}
+    ]
+  {%- endcapture -%}
+{%- endif -%}
+
+{%- capture breadcrumb_entity_microdata -%}
+  "@type": "BreadcrumbList",
+  "itemListElement": [{
+      "@type": "ListItem",
+      "position": 1,
+      "name": "Home",
+      "item": "{{ shop.url }}"
+    }
+
+    {%- if request.page_type == 'product' -%}
+      {%- if collection -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ collection.title | json }},
+          "item": "{{ shop.url }}{{ collection.url }}"
+        }, {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ product.title | json }},
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
+      {%- elsif product.collections.first -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ product.collections.first.title | json }},
+          "item": "{{ shop.url }}{{ product.collections.first.url }}"
+        }, {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ product.title | json }},
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
+      {%- else -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ product.title | json }},
+          "item": "{{ shop.url }}{{ product.url }}"
+        }
+      {%- endif -%}
+    {%- elsif request.page_type == 'collection' -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ collection.title | json }},
+          "item": "{{ shop.url }}{{ collection.url }}"
+        }
+    {%- elsif request.page_type == 'blog' -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ blog.title | json }},
+          "item": "{{ shop.url }}{{ blog.url }}"
+        }
+    {%- elsif request.page_type == 'article' -%}
+        ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ blog.title | json }},
+          "item": "{{ shop.url }}{{ blog.url }}"
+        }, {
+          "@type": "ListItem",
+          "position": 3,
+          "name": {{ article.title | json }},
+          "item": "{{ shop.url }}{{ article.url }}"
+        }
+    {%- elsif request.page_type == 'page' -%}
+       ,{
+          "@type": "ListItem",
+          "position": 2,
+          "name": {{ page.title | json }},
+          "item": "{{ shop.url }}{{ page.url }}"
+        }
+    {%- endif -%}
+  ]
+{%- endcapture -%}
+
+{% if main_entity_microdata != blank %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    {{ main_entity_microdata }}
+  }
+  </script>
+{% endif %}
+
+{% if breadcrumb_entity_microdata != blank %}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    {{ breadcrumb_entity_microdata }}
+  }
+  </script>
+{% endif %}
+
+{%- if request.page_type == 'index' -%}
+  {%- assign potential_action_target = request.origin | append: routes.search_url | append: "?q={search_term_string}" -%}
+
+  <script type="application/ld+json">
+  [
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": {{ shop.name | json }},
+      "url": {{ shop.url | append: page.url | json }},
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {{ potential_action_target | json }},
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": {{ shop.name | json }},
+      {%- if shop.brand.logo -%}
+        "logo": {{ shop.brand.logo | image_url: width: shop.brand.logo.width | prepend: "https:" | json }},
+      {%- endif -%}
+      {%- if shop.brand.short_description -%}
+        "description": {{ shop.brand.short_description | json }},
+      {%- endif -%}
+      {%- if shop.brand.slogan -%}
+        "slogan": {{ shop.brand.slogan | json }},
+      {%- endif -%}
+      {%- if shop.brand.metafields.social_links.size > 0 -%}
+        "sameAs": [
+          {%- for social_link in shop.brand.metafields.social_links -%}
+            {{- social_link.last.value | json -}}{%- unless forloop.last -%},{%- endunless -%}
+          {%- endfor -%}
+        ],
+      {%- endif -%}
+      "url": {{ shop.url | append: page.url | json }}
+    }
+  ]
+  </script>
+{%- endif -%}

@@ -1,0 +1,423 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "breadcrumbs_Gxg9wp": {
+      "type": "breadcrumbs",
+      "settings": {
+        "container": "fixed",
+        "text_alignment": "start",
+        "padding_top": 16,
+        "padding_bottom": 20
+      }
+    },
+    "banner": {
+      "type": "main-collection-banner",
+      "blocks": {
+        "collection_info_zUNyKV": {
+          "type": "collection_info",
+          "settings": {
+            "heading_size": "h1",
+            "heading_tag": "h1",
+            "show_description": true,
+            "padding_top": 40,
+            "padding_bottom": 40
+          }
+        }
+      },
+      "block_order": [
+        "collection_info_zUNyKV"
+      ],
+      "disabled": true,
+      "custom_css": [],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-8",
+        "text_alignment": "left",
+        "show_collection_image": false,
+        "image_overlay_opacity": 0,
+        "image_position": "right",
+        "image_height": "extra-small",
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "image_height_mobile": "auto",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "image_with_text_rmVMkg": {
+      "type": "image-with-text",
+      "blocks": {
+        "badge_UFGfBd": {
+          "type": "badge",
+          "settings": {
+            "color_scheme": "",
+            "text": "Velg hva du skal lage!",
+            "position_mobile": "right"
+          }
+        },
+        "heading_NfK3RD": {
+          "type": "heading",
+          "settings": {
+            "heading": "{{ collection.title }}",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "hd2"
+          }
+        },
+        "text_K4fHUX": {
+          "type": "text",
+          "settings": {
+            "text": "{{ collection.description }}",
+            "subtext_color": true
+          }
+        },
+        "button_DkqEcg": {
+          "type": "button",
+          "settings": {
+            "button_label": "Godteri og drikke",
+            "button_link": "#shopify-section-template--17845852700746__banners_with_categories_9tRMNK",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "badge_UFGfBd",
+        "heading_NfK3RD",
+        "text_K4fHUX",
+        "button_DkqEcg"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "image": "{{ collection.image }}",
+        "image_position": "left",
+        "image_width": 50,
+        "desktop_content_position": "center",
+        "desktop_content_alignment": "left",
+        "mobile_content_alignment": "inherit",
+        "show_section_divider": false,
+        "divider_width": "fixed",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "17570074413b5ce83e": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_all_reviews_text_LB8dek": {
+          "type": "shopify://apps/judge-me-reviews/blocks/all_reviews_text/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_all_reviews_text_LB8dek"
+      ],
+      "settings": {
+        "include_margins": true,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "rich_text_WighYa": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_nbQJbp": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>Oppdag unike bakespesialiteter og finn alt du trenger</strong>",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2"
+          }
+        },
+        "text_hDNV9b": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ønsker du å imponere med spesielle hjemmebakte kreasjoner? Utforsk våre unike bakespesialiteter og finn inspirasjon til ekstraordinære godbiter. Fra trendige cake pops til nostalgiske pepperkakehus - vi har alle ingredienser, verktøy og teknikker du trenger for å mestre avanserte baketeknikker hjemme.</p>",
+            "text_size": "text-base",
+            "text_line_limit": "none",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "heading_nbQJbp",
+        "text_hDNV9b"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "use_color_scheme_in_container": false,
+        "content_spacing": "standard",
+        "content_alignment": "center",
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "banners_with_categories_9tRMNK": {
+      "type": "banners-with-categories",
+      "blocks": {
+        "heading_7cmRD8": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em>Velg hva du skal lage</em>",
+            "highlight_style": "hand_drawn_circle",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h5"
+          }
+        },
+        "category_6yEHec": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/2-19_43ebcd04-fc2b-4b10-b277-77236cbd8ba1.jpg",
+            "heading": "Drikke",
+            "link": "shopify://collections/drikke"
+          }
+        },
+        "category_TgzUNC": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/iskakeform-silikomart-diamant.jpg",
+            "heading": "Iskake",
+            "link": "shopify://collections/iskake"
+          }
+        },
+        "category_aUG3rX": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/4-2_d2a84f8d-95f6-4ab1-b7db-f78ccc1f1387.jpg",
+            "heading": "Iskrem",
+            "link": "shopify://collections/iskrem"
+          }
+        },
+        "category_fYqih4": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/3-8_3ec8d647-667e-4346-a72d-6fe5c5f032a5.jpg",
+            "heading": "Ispinner",
+            "link": "shopify://collections/ispinner"
+          }
+        },
+        "category_3nR88K": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/Design-uten-navn-44-1.jpg",
+            "heading": "Karamell",
+            "link": "shopify://collections/karamell"
+          }
+        },
+        "category_rgGUDB": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/konfekt-med-perforert-sfaere.jpg",
+            "heading": "Konfekt",
+            "link": "shopify://collections/konfekt"
+          }
+        },
+        "category_xqaTaq": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/rosa-og-blatt-sukkerspinn.jpg",
+            "heading": "Sukkerspinn",
+            "link": "shopify://collections/sukkerspinn"
+          }
+        },
+        "banner_card_6jmDdx": {
+          "type": "banner-card",
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/rosa-og-blatt-sukkerspinn.jpg",
+            "image_overlay_opacity": 40,
+            "column_span": 1,
+            "row_span": 1,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "bottom-center",
+            "content_alignment": "center",
+            "content_position_mobile": "middle-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://collections/sukkerspinn",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "<em>Sukkerspinn</em>",
+            "highlight_style": "wave_underline",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        },
+        "banner_card_WndCHU": {
+          "type": "banner-card",
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/CH24CCC102-002-Lifestyle-2.jpg",
+            "image_mobile": "shopify://shop_images/4-2_d2a84f8d-95f6-4ab1-b7db-f78ccc1f1387.jpg",
+            "image_overlay_opacity": 40,
+            "column_span": 1,
+            "row_span": 1,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "bottom-center",
+            "content_alignment": "center",
+            "content_position_mobile": "middle-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://collections/iskrem",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "<em>Iskrem</em>",
+            "highlight_style": "wave_underline",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        }
+      },
+      "block_order": [
+        "heading_7cmRD8",
+        "category_6yEHec",
+        "category_TgzUNC",
+        "category_aUG3rX",
+        "category_fYqih4",
+        "category_3nR88K",
+        "category_rgGUDB",
+        "category_xqaTaq",
+        "banner_card_6jmDdx",
+        "banner_card_WndCHU"
+      ],
+      "name": "t:sections.banners-with-categories.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "categories_bar_color_scheme": "",
+        "columns_mobile": "2",
+        "columns": 3,
+        "gap": "2xs",
+        "banner_height": "large",
+        "swipe_on_mobile": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "1757004903e254b505": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_testimonials_carousel_9djUnQ": {
+          "type": "shopify://apps/judge-me-reviews/blocks/testimonials_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "show_sample_reviews": true,
+            "reviews_selection": "all",
+            "products": [],
+            "star_rating": "all",
+            "max_reviews": 20,
+            "quote_marks_size": "small",
+            "product_name_text_size": "small",
+            "verified_badge_style": "icon",
+            "card_height": "medium",
+            "text_size": "small",
+            "stars_size": "medium",
+            "arrows_position": "bottom",
+            "max_width": 1100,
+            "corner_styling": "soft",
+            "quote_marks_style": "serif",
+            "card_color": "#f9f9f9",
+            "stars_and_quote_marks_color": "#108474",
+            "text_color": "#000000",
+            "arrows_color": "#000000",
+            "show_border": false,
+            "border_color": "#108474",
+            "show_drop_shadow": false,
+            "transition_speed": 5,
+            "header_text": "Customers are saying",
+            "show_average_rating": true
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_testimonials_carousel_9djUnQ"
+      ],
+      "settings": {
+        "include_margins": true,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "custom_css": [],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "products_per_page": 20,
+        "columns_desktop": 4,
+        "column_gap": "medium",
+        "row_gap": "large",
+        "pagination": "number",
+        "enable_filtering": true,
+        "enable_color_swatch": true,
+        "filter_type": "vertical",
+        "expand_filter_groups": "Availability, Price, Color, Size, Category",
+        "enable_sorting": true,
+        "enable_layout_switching": true,
+        "columns_mobile": "2",
+        "padding_top": 28,
+        "padding_bottom": 60,
+        "show_section_divider": true,
+        "divider_width": "fixed"
+      }
+    }
+  },
+  "order": [
+    "breadcrumbs_Gxg9wp",
+    "banner",
+    "image_with_text_rmVMkg",
+    "17570074413b5ce83e",
+    "rich_text_WighYa",
+    "banners_with_categories_9tRMNK",
+    "1757004903e254b505",
+    "product-grid"
+  ]
+}

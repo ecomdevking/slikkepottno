@@ -1,0 +1,706 @@
+<!-- Block: Recipe Shopping Button -->
+<div class="article__block recipe-shopping-block" {{ block.shopify_attributes }}>
+{% if article.metafields.custom.ingredients or article.metafields.custom.equipment %}
+  {% assign available_products = 0 %}
+  
+  <!-- Check if we have any available products -->
+  {% if article.metafields.custom.ingredients %}
+    {% assign ingredients = article.metafields.custom.ingredients.value %}
+    {% for category in ingredients.categories %}
+      {% for item in category.items %}
+        {% if item.product_handle and item.product_handle != "" and item.product_handle != "produkt-handle" %}
+          {% assign product = all_products[item.product_handle] %}
+          {% if product and product.available %}
+            {% assign available_products = available_products | plus: 1 %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+
+  {% if article.metafields.custom.equipment %}
+    {% assign equipment = article.metafields.custom.equipment.value %}
+    {% for category in equipment.categories %}
+      {% for item in category.items %}
+        {% if item.product_handle and item.product_handle != "" and item.product_handle != "produkt-handle" %}
+          {% assign product = all_products[item.product_handle] %}
+          {% if product and product.available %}
+            {% assign available_products = available_products | plus: 1 %}
+          {% endif %}
+        {% endif %}
+      {% endfor %}
+    {% endfor %}
+  {% endif %}
+
+  {% if available_products > 0 %}
+    <!-- Shopping Button -->
+    <div class="recipe-shopping-button-container">
+      <button type="button" class="recipe-shopping-btn" onclick="openRecipeModal()">
+        🛒 Kjøp det du trenger til denne oppskriften!
+        <span class="product-count">({{ available_products }} produkter)</span>
+      </button>
+    </div>
+
+    <!-- Modal -->
+    <div id="recipe-shopping-modal" class="recipe-modal-overlay">
+      <div class="recipe-modal">
+        <div class="recipe-modal-header">
+          <h3>🛒 Handle ingredienser til oppskriften</h3>
+          <button type="button" class="recipe-modal-close" onclick="closeRecipeModal()">&times;</button>
+        </div>
+
+        <div class="recipe-modal-body">
+          <div class="products-list">
+            <!-- Ingredients -->
+            {% if article.metafields.custom.ingredients %}
+              {% assign ingredients = article.metafields.custom.ingredients.value %}
+              {% for category in ingredients.categories %}
+                {% for item in category.items %}
+                  {% if item.product_handle and item.product_handle != "" and item.product_handle != "produkt-handle" %}
+                    {% assign product = all_products[item.product_handle] %}
+                    {% if product and product.available %}
+                      <div class="product-row">
+                        <input type="checkbox" 
+                               class="product-checkbox"
+                               data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                               data-price="{{ product.selected_or_first_available_variant.price | divided_by: 100.0 }}"
+                               data-title="{{ product.title | escape }}"
+                               id="modal-product-{{ product.id }}">
+                        
+                        <label for="modal-product-{{ product.id }}" class="product-label">
+                          {% if product.featured_image %}
+                            <img src="{{ product.featured_image | image_url: width: 48, height: 48 }}" 
+                                 alt="{{ product.title }}" 
+                                 class="product-thumb"
+                                 width="48"
+                                 height="48"
+                                 loading="lazy">
+                          {% else %}
+                            <div class="product-placeholder">📦</div>
+                          {% endif %}
+                          
+                          <span class="product-info">
+                            <span class="product-title">{{ item.name }}</span>
+                            {% if item.quantity and item.quantity != "" %}
+                              <span class="product-detail">{{ item.quantity }} {{ item.unit }}</span>
+                            {% endif %}
+                          </span>
+                          
+                          <span class="product-price">{{ product.selected_or_first_available_variant.price | money }}</span>
+                        </label>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+
+            <!-- Equipment -->
+            {% if article.metafields.custom.equipment %}
+              {% assign equipment = article.metafields.custom.equipment.value %}
+              {% for category in equipment.categories %}
+                {% for item in category.items %}
+                  {% if item.product_handle and item.product_handle != "" and item.product_handle != "produkt-handle" %}
+                    {% assign product = all_products[item.product_handle] %}
+                    {% if product and product.available %}
+                      <div class="product-row">
+                        <input type="checkbox" 
+                               class="product-checkbox"
+                               data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                               data-price="{{ product.selected_or_first_available_variant.price | divided_by: 100.0 }}"
+                               data-title="{{ product.title | escape }}"
+                               id="modal-product-{{ product.id }}">
+                        
+                        <label for="modal-product-{{ product.id }}" class="product-label">
+                          {% if product.featured_image %}
+                            <img src="{{ product.featured_image | image_url: width: 48, height: 48 }}" 
+                                 alt="{{ product.title }}" 
+                                 class="product-thumb"
+                                 width="48"
+                                 height="48"
+                                 loading="lazy">
+                          {% else %}
+                            <div class="product-placeholder">🔧</div>
+                          {% endif %}
+                          
+                          <span class="product-info">
+                            <span class="product-title">{{ item.name }}</span>
+                            {% if item.note and item.note != "" and item.note != "valgfri beskrivelse" %}
+                              <span class="product-detail">{{ item.note }}</span>
+                            {% endif %}
+                          </span>
+                          
+                          <span class="product-price">{{ product.selected_or_first_available_variant.price | money }}</span>
+                        </label>
+                      </div>
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="recipe-modal-footer">
+          <div class="cart-summary" id="modal-cart-summary">
+            <span id="modal-cart-total">0,00 kr</span> (<span id="modal-item-count">0</span> valgt)
+          </div>
+          <div class="cart-buttons">
+            <button type="button" class="btn-toggle" onclick="modalToggleAll()" id="modal-toggle-btn">Velg alle</button>
+            <button type="button" class="btn-cart" onclick="modalAddSelectedToCart()" id="modal-add-btn" disabled>
+              Legg i kurv
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endif %}
+</div>
+
+<style>
+.recipe-shopping-button-container {
+  text-align: center;
+  margin: 24px 0;
+}
+
+.recipe-shopping-btn {
+  background: linear-gradient(135deg, #007bff 0%, #0056b3 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 16px 24px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 280px;
+  justify-content: center;
+}
+
+.recipe-shopping-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+  background: linear-gradient(135deg, #0056b3 0%, #004085 100%);
+}
+
+.recipe-shopping-btn:active {
+  transform: translateY(0);
+}
+
+.product-count {
+  font-size: 14px;
+  opacity: 0.9;
+  font-weight: 400;
+}
+
+/* Modal Styles */
+.recipe-modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.recipe-modal-overlay.active {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.recipe-modal {
+  background: white;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 600px;
+  max-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease;
+}
+
+@keyframes modalSlideIn {
+  from { 
+    opacity: 0; 
+    transform: scale(0.9) translateY(20px); 
+  }
+  to { 
+    opacity: 1; 
+    transform: scale(1) translateY(0); 
+  }
+}
+
+.recipe-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.recipe-modal-header h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #333;
+  font-weight: 600;
+}
+
+.recipe-modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.recipe-modal-close:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.recipe-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.products-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.product-row {
+  display: flex;
+  align-items: center;
+  padding: 12px;
+  border: 1px solid #f0f0f0;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+}
+
+.product-row:hover {
+  border-color: #007bff;
+  background: #f8f9ff;
+}
+
+.product-checkbox {
+  margin: 0 12px 0 0;
+  accent-color: #007bff;
+  transform: scale(1.2);
+}
+
+.product-label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  flex: 1;
+  gap: 12px;
+}
+
+.product-thumb, .product-placeholder {
+  width: 48px;
+  height: 48px;
+  border-radius: 6px;
+  flex-shrink: 0;
+}
+
+.product-thumb {
+  object-fit: cover;
+  border: 1px solid #e0e0e0;
+}
+
+.product-placeholder {
+  background: #f5f5f5;
+  border: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+.product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.product-title {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  line-height: 1.3;
+}
+
+.product-detail {
+  font-size: 14px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.product-price {
+  font-size: 16px;
+  font-weight: 600;
+  color: #007bff;
+  flex-shrink: 0;
+}
+
+.recipe-modal-footer {
+  border-top: 1px solid #e0e0e0;
+  padding: 16px 24px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.cart-summary {
+  font-size: 14px;
+  color: #666;
+}
+
+#modal-cart-total {
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.cart-buttons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.btn-toggle, .btn-cart {
+  padding: 10px 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fff;
+  color: #333;
+}
+
+.btn-toggle:hover {
+  background: #f8f9fa;
+  border-color: #007bff;
+  color: #007bff;
+}
+
+.btn-cart {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+  min-width: 120px;
+}
+
+.btn-cart:hover:not(:disabled) {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+.btn-cart:disabled {
+  background: #6c757d;
+  border-color: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Mobile optimization */
+@media (max-width: 768px) {
+  .recipe-shopping-btn {
+    padding: 14px 20px;
+    font-size: 14px;
+    min-width: 260px;
+  }
+
+  .recipe-modal {
+    width: 95%;
+    max-height: 90vh;
+    margin: 20px;
+  }
+  
+  .recipe-modal-header {
+    padding: 16px 20px 12px;
+  }
+  
+  .recipe-modal-header h3 {
+    font-size: 18px;
+  }
+  
+  .recipe-modal-body {
+    padding: 16px 20px;
+  }
+  
+  .product-row {
+    padding: 10px;
+  }
+  
+  .product-thumb, .product-placeholder {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .product-title {
+    font-size: 14px;
+  }
+  
+  .product-detail {
+    font-size: 12px;
+  }
+  
+  .product-price {
+    font-size: 14px;
+  }
+  
+  .recipe-modal-footer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    padding: 16px 20px;
+  }
+  
+  .cart-summary {
+    text-align: center;
+    order: -1;
+  }
+  
+  .cart-buttons {
+    justify-content: center;
+  }
+  
+  .btn-toggle, .btn-cart {
+    flex: 1;
+    max-width: 140px;
+  }
+}
+
+/* Success toast */
+.success-toast {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: #28a745;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  z-index: 10000;
+  font-size: 14px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@media (max-width: 768px) {
+  .success-toast {
+    top: 10px;
+    right: 10px;
+    left: 10px;
+    text-align: center;
+  }
+}
+</style>
+
+<script>
+let modalSelectAllState = false;
+
+function openRecipeModal() {
+  const modal = document.getElementById('recipe-shopping-modal');
+  modal.classList.add('active');
+  document.body.style.overflow = 'hidden';
+  modalUpdateCartDisplay();
+}
+
+function closeRecipeModal() {
+  const modal = document.getElementById('recipe-shopping-modal');
+  modal.classList.remove('active');
+  document.body.style.overflow = '';
+}
+
+function modalUpdateCartDisplay() {
+  const checkboxes = document.querySelectorAll('#recipe-shopping-modal .product-checkbox:checked');
+  let total = 0;
+  
+  checkboxes.forEach(checkbox => {
+    total += parseFloat(checkbox.dataset.price);
+  });
+  
+  document.getElementById('modal-cart-total').textContent = `${total.toFixed(2).replace('.', ',')} kr`;
+  document.getElementById('modal-item-count').textContent = checkboxes.length;
+  
+  const addButton = document.getElementById('modal-add-btn');
+  if (addButton) {
+    addButton.disabled = checkboxes.length === 0;
+  }
+  
+  // Update toggle button text
+  const toggleBtn = document.getElementById('modal-toggle-btn');
+  const totalCheckboxes = document.querySelectorAll('#recipe-shopping-modal .product-checkbox').length;
+  if (checkboxes.length === totalCheckboxes && checkboxes.length > 0) {
+    toggleBtn.textContent = 'Fjern alle';
+    modalSelectAllState = true;
+  } else {
+    toggleBtn.textContent = 'Velg alle';
+    modalSelectAllState = false;
+  }
+}
+
+function modalToggleAll() {
+  const checkboxes = document.querySelectorAll('#recipe-shopping-modal .product-checkbox');
+  checkboxes.forEach(checkbox => {
+    checkbox.checked = !modalSelectAllState;
+  });
+  modalUpdateCartDisplay();
+}
+
+function modalAddSelectedToCart() {
+  const selectedItems = [];
+  const checkboxes = document.querySelectorAll('#recipe-shopping-modal .product-checkbox:checked');
+  
+  checkboxes.forEach(checkbox => {
+    selectedItems.push({
+      id: checkbox.dataset.variantId,
+      quantity: 1
+    });
+  });
+  
+  if (selectedItems.length === 0) return;
+
+  const button = document.getElementById('modal-add-btn');
+  const originalText = button.textContent;
+  button.textContent = 'Legger til...';
+  button.disabled = true;
+
+  modalAddItemsSequentially(selectedItems, 0, button, originalText);
+}
+
+function modalAddItemsSequentially(items, index, button, originalText) {
+  if (index >= items.length) {
+    // All done
+    showSuccessMessage(items.length);
+    
+    // Clear selections
+    document.querySelectorAll('#recipe-shopping-modal .product-checkbox').forEach(cb => cb.checked = false);
+    modalUpdateCartDisplay();
+    button.textContent = originalText;
+    
+    // Close modal after success
+    setTimeout(() => {
+      closeRecipeModal();
+    }, 1500);
+    
+    // Trigger cart update event for theme
+    document.dispatchEvent(new CustomEvent('cart:updated'));
+    
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('id', items[index].id);
+  formData.append('quantity', items[index].quantity);
+
+  fetch('/cart/add.js', {
+    method: 'POST',
+    body: formData
+  })
+  .then(response => response.json())
+  .then(data => {
+    modalAddItemsSequentially(items, index + 1, button, originalText);
+  })
+  .catch(error => {
+    console.error('Error adding item:', error);
+    button.textContent = 'Feil - prøv igjen';
+    setTimeout(() => {
+      button.textContent = originalText;
+      button.disabled = false;
+    }, 2000);
+  });
+}
+
+function showSuccessMessage(count) {
+  const toast = document.createElement('div');
+  toast.className = 'success-toast';
+  toast.textContent = `✅ ${count} produkt${count > 1 ? 'er' : ''} lagt til i kurven!`;
+  document.body.appendChild(toast);
+  
+  setTimeout(() => {
+    toast.remove();
+  }, 4000);
+}
+
+// Close modal when clicking outside
+document.addEventListener('click', function(e) {
+  const modal = document.getElementById('recipe-shopping-modal');
+  if (e.target === modal) {
+    closeRecipeModal();
+  }
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') {
+    const modal = document.getElementById('recipe-shopping-modal');
+    if (modal.classList.contains('active')) {
+      closeRecipeModal();
+    }
+  }
+});
+
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+  const modalCheckboxes = document.querySelectorAll('#recipe-shopping-modal .product-checkbox');
+  modalCheckboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', modalUpdateCartDisplay);
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Recipe Shopping Button",
+  "settings": [
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button Text",
+      "default": "🛒 Kjøp det du trenger til denne oppskriften!"
+    },
+    {
+      "type": "text",
+      "id": "modal_title",
+      "label": "Modal Title", 
+      "default": "🛒 Handle ingredienser til oppskriften"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Recipe Shopping Button"
+    }
+  ]
+}
+{% endschema %}

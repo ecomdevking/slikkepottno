@@ -1,0 +1,1215 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "breadcrumbs_Gxg9wp": {
+      "type": "breadcrumbs",
+      "settings": {
+        "container": "fixed",
+        "text_alignment": "start",
+        "padding_top": 16,
+        "padding_bottom": 20
+      }
+    },
+    "banner": {
+      "type": "main-collection-banner",
+      "blocks": {
+        "collection_info_zUNyKV": {
+          "type": "collection_info",
+          "settings": {
+            "heading_size": "h1",
+            "heading_tag": "h1",
+            "show_description": true,
+            "padding_top": 40,
+            "padding_bottom": 40
+          }
+        }
+      },
+      "block_order": [
+        "collection_info_zUNyKV"
+      ],
+      "disabled": true,
+      "custom_css": [],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-8",
+        "text_alignment": "left",
+        "show_collection_image": false,
+        "image_overlay_opacity": 0,
+        "image_position": "right",
+        "image_height": "extra-small",
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "image_height_mobile": "auto",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "image_cards_tij3nG": {
+      "type": "image-cards",
+      "blocks": {
+        "image_card_t8dJXe": {
+          "type": "image_card",
+          "settings": {
+            "color_scheme": "",
+            "image_ratio": "adapt",
+            "image_overlay_opacity": 0,
+            "content_position": "split-top-subheading",
+            "content_alignment": "center",
+            "content_spacing": "medium",
+            "content_gap": "fitted",
+            "card_link": "",
+            "subheading": "Add a tagline",
+            "subheading_style": "",
+            "heading": "Image card",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h3",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "show_badge": false,
+            "badge_color_scheme": "",
+            "badge_shape": "circle",
+            "badge_position": "top-right",
+            "badge_subtext": "Save",
+            "badge_text": "99$",
+            "color_scheme_mobile": "",
+            "show_text_below": false,
+            "content_alignment_mobile": "center",
+            "enable_preload_image": false
+          }
+        },
+        "image_card_WdkJQj": {
+          "type": "image_card",
+          "settings": {
+            "color_scheme": "",
+            "image_ratio": "adapt",
+            "image_overlay_opacity": 0,
+            "content_position": "split-top-subheading",
+            "content_alignment": "center",
+            "content_spacing": "medium",
+            "content_gap": "fitted",
+            "card_link": "",
+            "subheading": "Add a tagline",
+            "subheading_style": "",
+            "heading": "Image card",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h3",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "show_badge": false,
+            "badge_color_scheme": "",
+            "badge_shape": "circle",
+            "badge_position": "top-right",
+            "badge_subtext": "Save",
+            "badge_text": "99$",
+            "color_scheme_mobile": "",
+            "show_text_below": false,
+            "content_alignment_mobile": "center",
+            "enable_preload_image": false
+          }
+        },
+        "image_card_UqA4gN": {
+          "type": "image_card",
+          "settings": {
+            "color_scheme": "",
+            "image_ratio": "adapt",
+            "image_overlay_opacity": 0,
+            "content_position": "split-top-subheading",
+            "content_alignment": "center",
+            "content_spacing": "medium",
+            "content_gap": "fitted",
+            "card_link": "",
+            "subheading": "Add a tagline",
+            "subheading_style": "",
+            "heading": "Image card",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h3",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "show_badge": false,
+            "badge_color_scheme": "",
+            "badge_shape": "circle",
+            "badge_position": "top-right",
+            "badge_subtext": "Save",
+            "badge_text": "99$",
+            "color_scheme_mobile": "",
+            "show_text_below": false,
+            "content_alignment_mobile": "center",
+            "enable_preload_image": false
+          }
+        },
+        "image_card_LbTgaE": {
+          "type": "image_card",
+          "settings": {
+            "color_scheme": "",
+            "image_ratio": "adapt",
+            "image_overlay_opacity": 0,
+            "content_position": "split-top-subheading",
+            "content_alignment": "center",
+            "content_spacing": "medium",
+            "content_gap": "fitted",
+            "card_link": "",
+            "subheading": "Add a tagline",
+            "subheading_style": "",
+            "heading": "Image card",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h3",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "show_badge": false,
+            "badge_color_scheme": "",
+            "badge_shape": "circle",
+            "badge_position": "top-right",
+            "badge_subtext": "Save",
+            "badge_text": "99$",
+            "color_scheme_mobile": "",
+            "show_text_below": false,
+            "content_alignment_mobile": "center",
+            "enable_preload_image": false
+          }
+        },
+        "image_card_jtCyQR": {
+          "type": "image_card",
+          "settings": {
+            "color_scheme": "",
+            "image_ratio": "adapt",
+            "image_overlay_opacity": 0,
+            "content_position": "split-top-subheading",
+            "content_alignment": "center",
+            "content_spacing": "medium",
+            "content_gap": "fitted",
+            "card_link": "",
+            "subheading": "Add a tagline",
+            "subheading_style": "",
+            "heading": "Image card",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h3",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "show_badge": false,
+            "badge_color_scheme": "",
+            "badge_shape": "circle",
+            "badge_position": "top-right",
+            "badge_subtext": "Save",
+            "badge_text": "99$",
+            "color_scheme_mobile": "",
+            "show_text_below": false,
+            "content_alignment_mobile": "center",
+            "enable_preload_image": false
+          }
+        },
+        "image_card_4ceAbG": {
+          "type": "image_card",
+          "settings": {
+            "color_scheme": "",
+            "image_ratio": "adapt",
+            "image_overlay_opacity": 0,
+            "content_position": "split-top-subheading",
+            "content_alignment": "center",
+            "content_spacing": "medium",
+            "content_gap": "fitted",
+            "card_link": "",
+            "subheading": "Add a tagline",
+            "subheading_style": "",
+            "heading": "Image card",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h3",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "show_badge": false,
+            "badge_color_scheme": "",
+            "badge_shape": "circle",
+            "badge_position": "top-right",
+            "badge_subtext": "Save",
+            "badge_text": "99$",
+            "color_scheme_mobile": "",
+            "show_text_below": false,
+            "content_alignment_mobile": "center",
+            "enable_preload_image": false
+          }
+        }
+      },
+      "block_order": [
+        "image_card_t8dJXe",
+        "image_card_WdkJQj",
+        "image_card_UqA4gN",
+        "image_card_LbTgaE",
+        "image_card_jtCyQR",
+        "image_card_4ceAbG"
+      ],
+      "name": "t:sections.image-cards.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "center",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "Image cards",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "description_size": "text-sm",
+        "columns_desktop": 4,
+        "column_gap": "medium",
+        "row_gap": "inherit",
+        "enable_slider": true,
+        "content_overflow": true,
+        "navigation_position": "bottom",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "show_progress_bar": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "image_with_text_rmVMkg": {
+      "type": "image-with-text",
+      "blocks": {
+        "badge_UFGfBd": {
+          "type": "badge",
+          "settings": {
+            "color_scheme": "",
+            "text": "Velg hva du skal lage!",
+            "position_mobile": "right"
+          }
+        },
+        "heading_NfK3RD": {
+          "type": "heading",
+          "settings": {
+            "heading": "{{ collection.title }}",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "hd2"
+          }
+        },
+        "text_K4fHUX": {
+          "type": "text",
+          "settings": {
+            "text": "{{ collection.description }}",
+            "subtext_color": true
+          }
+        },
+        "button_DkqEcg": {
+          "type": "button",
+          "settings": {
+            "button_label": "Stil kaker",
+            "button_link": "#shopify-section-template--17833126789194__banners_with_categories_9tRMNK",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "badge_UFGfBd",
+        "heading_NfK3RD",
+        "text_K4fHUX",
+        "button_DkqEcg"
+      ],
+      "name": "t:sections.image-with-text.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "image": "{{ collection.image }}",
+        "image_position": "left",
+        "image_width": 50,
+        "desktop_content_position": "center",
+        "desktop_content_alignment": "left",
+        "mobile_content_alignment": "inherit",
+        "show_section_divider": false,
+        "divider_width": "fixed",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "17570074413b5ce83e": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_all_reviews_text_LB8dek": {
+          "type": "shopify://apps/judge-me-reviews/blocks/all_reviews_text/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_all_reviews_text_LB8dek"
+      ],
+      "settings": {
+        "include_margins": true,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "rich_text_WighYa": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_nbQJbp": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>Velg din kakestil og finn alt du trenger</strong>",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2"
+          }
+        },
+        "text_hDNV9b": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Ønsker du å lage en spektakulær hjemmebakt kake? Utforsk våre kakekategorier og finn inspirasjon til ditt neste bakeprosjekt. Vi har alle ingredienser, verktøy og utstyr du trenger for å lage profesjonelle kaker hjemme.</p>",
+            "text_size": "text-base",
+            "text_line_limit": "none",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "heading_nbQJbp",
+        "text_hDNV9b"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "use_color_scheme_in_container": false,
+        "content_spacing": "standard",
+        "content_alignment": "center",
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "featured_blog_zdhyxY": {
+      "type": "featured-blog",
+      "name": "t:sections.featured-blog.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "Blog posts",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h2",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--underline",
+        "button_icon": "none",
+        "blog": "",
+        "post_limit": 3,
+        "columns_desktop": 3,
+        "column_gap": "medium",
+        "row_gap": "large",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "card_title_size": "h4",
+        "show_tags": true,
+        "show_excerpt": false,
+        "show_date": true,
+        "show_author": true,
+        "show_button": false,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "banners_with_categories_9tRMNK": {
+      "type": "banners-with-categories",
+      "blocks": {
+        "category_6yEHec": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/Untitled-design-7_f67445ba-3983-45a3-aed0-067823a0233d.jpg",
+            "heading": "Regnbuekake",
+            "link": "shopify://collections/regnbuekake"
+          }
+        },
+        "category_TgzUNC": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/9181d5b91957e2b39bb5dfb28e19ab59-image.jpg",
+            "heading": "Rullekake",
+            "link": "shopify://collections/rullekake"
+          }
+        },
+        "category_aUG3rX": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/funcakes-kakemiks-glutenfri-red-velvet.jpg",
+            "heading": "Red velvet kake",
+            "link": "shopify://collections/red-velvet-kake"
+          }
+        },
+        "category_fYqih4": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/3-4_89398269-0872-450e-85d2-b38757355fbc.jpg",
+            "heading": "Ostekake",
+            "link": "shopify://collections/ostekake"
+          }
+        },
+        "category_3nR88K": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/last_ned.jpg",
+            "heading": "Strikkekake",
+            "link": "shopify://collections/strikkekake"
+          }
+        },
+        "category_rgGUDB": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/F54205_1_34ae0cbd9a9993d99e463112c32d9889.jpg",
+            "heading": "Drip Cake",
+            "link": "shopify://collections/drip-cake"
+          }
+        },
+        "category_tPkLNc": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/F83455_1_59ad31ee85d39f9d9d68c0c0d1e0d3a7_0a6da248-2b67-4a81-b690-fec0db34f2bf.jpg",
+            "heading": "Bento Cake",
+            "link": "shopify://collections/bento-cake"
+          }
+        },
+        "category_MVJUmK": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/Untitled-design-11_d12cc119-a237-4c8a-831c-c35e1a758004.jpg",
+            "heading": "Vintage Cake",
+            "link": "shopify://collections/vintage-cake"
+          }
+        },
+        "category_eqg7mR": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/last_ned_1.jpg",
+            "heading": "sjokoladekake",
+            "link": "shopify://collections/sjokoladekake"
+          }
+        },
+        "category_YHYLU7": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/2100050_amb1.jpg",
+            "heading": "Terte",
+            "link": "shopify://collections/terte"
+          }
+        },
+        "category_jBnHnc": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/Untitled-design-102-1.jpg",
+            "heading": "Marsipankake",
+            "link": "shopify://collections/marsipankake"
+          }
+        },
+        "category_bQYzhH": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/1-46-d9ab9108_91f66981-0cfd-41b1-9087-32cbcaab07a8.webp",
+            "heading": "Langpannekake",
+            "link": "shopify://collections/langpannekake"
+          }
+        },
+        "heading_wVFDmd": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em>Velg hva du skal lage</em>",
+            "highlight_style": "none",
+            "highlight_font_style": "normal",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h5"
+          }
+        },
+        "banner_card_6jmDdx": {
+          "type": "banner-card",
+          "disabled": true,
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/Untitled-design-7_f67445ba-3983-45a3-aed0-067823a0233d.jpg",
+            "image_overlay_opacity": 40,
+            "column_span": 1,
+            "row_span": 1,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "bottom-center",
+            "content_alignment": "center",
+            "content_position_mobile": "middle-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://collections/regnbuekake",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "<em>Regnbuekake</em>",
+            "highlight_style": "wave_underline",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        },
+        "banner_card_WndCHU": {
+          "type": "banner-card",
+          "disabled": true,
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/Untitled-design-102-1.jpg",
+            "image_overlay_opacity": 40,
+            "column_span": 1,
+            "row_span": 1,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "bottom-center",
+            "content_alignment": "center",
+            "content_position_mobile": "middle-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://collections/marsipankake",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "<em>Marsipankake</em>",
+            "highlight_style": "wave_underline",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        }
+      },
+      "block_order": [
+        "category_6yEHec",
+        "category_TgzUNC",
+        "category_aUG3rX",
+        "category_fYqih4",
+        "category_3nR88K",
+        "category_rgGUDB",
+        "category_tPkLNc",
+        "category_MVJUmK",
+        "category_eqg7mR",
+        "category_YHYLU7",
+        "category_jBnHnc",
+        "category_bQYzhH",
+        "heading_wVFDmd",
+        "banner_card_6jmDdx",
+        "banner_card_WndCHU"
+      ],
+      "name": "t:sections.banners-with-categories.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-13",
+        "categories_bar_color_scheme": "scheme-1",
+        "columns_mobile": "2",
+        "columns": 3,
+        "gap": "2xs",
+        "banner_height": "large",
+        "swipe_on_mobile": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "banners_with_categories_NxDVBQ": {
+      "type": "banners-with-categories",
+      "blocks": {
+        "category_zyXfjF": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/Untitled-design-7_f67445ba-3983-45a3-aed0-067823a0233d.jpg",
+            "heading": "Regnbuekake",
+            "link": "shopify://collections/regnbuekake"
+          }
+        },
+        "category_wXAVtg": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/9181d5b91957e2b39bb5dfb28e19ab59-image.jpg",
+            "heading": "Rullekake",
+            "link": "shopify://collections/rullekake"
+          }
+        },
+        "category_CXcnd6": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/funcakes-kakemiks-glutenfri-red-velvet.jpg",
+            "heading": "Red velvet kake",
+            "link": "shopify://collections/red-velvet-kake"
+          }
+        },
+        "category_k93zyD": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/3-4_89398269-0872-450e-85d2-b38757355fbc.jpg",
+            "heading": "Ostekake",
+            "link": "shopify://collections/ostekake"
+          }
+        },
+        "category_WQGrcY": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/last_ned.jpg",
+            "heading": "Strikkekake",
+            "link": "shopify://collections/strikkekake"
+          }
+        },
+        "category_PLgfpW": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/F54205_1_34ae0cbd9a9993d99e463112c32d9889.jpg",
+            "heading": "Drip Cake",
+            "link": "shopify://collections/drip-cake"
+          }
+        },
+        "category_4hrM6H": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/F83455_1_59ad31ee85d39f9d9d68c0c0d1e0d3a7_0a6da248-2b67-4a81-b690-fec0db34f2bf.jpg",
+            "heading": "Bento Cake",
+            "link": "shopify://collections/bento-cake"
+          }
+        },
+        "category_FVMFiE": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/Untitled-design-11_d12cc119-a237-4c8a-831c-c35e1a758004.jpg",
+            "heading": "Vintage Cake",
+            "link": "shopify://collections/vintage-cake"
+          }
+        },
+        "category_4qBEPH": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/last_ned_1.jpg",
+            "heading": "sjokoladekake",
+            "link": "shopify://collections/sjokoladekake"
+          }
+        },
+        "category_trQbJc": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/2100050_amb1.jpg",
+            "heading": "Terte",
+            "link": "shopify://collections/terte"
+          }
+        },
+        "category_ERcnTx": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/Untitled-design-102-1.jpg",
+            "heading": "Marsipankake",
+            "link": "shopify://collections/marsipankake"
+          }
+        },
+        "category_yYtEkx": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/1-46-d9ab9108_91f66981-0cfd-41b1-9087-32cbcaab07a8.webp",
+            "heading": "Langpannekake",
+            "link": "shopify://collections/langpannekake"
+          }
+        },
+        "heading_8EUL7r": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em>Kaker til barnebursdag</em>",
+            "highlight_style": "none",
+            "highlight_font_style": "normal",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h5"
+          }
+        },
+        "banner_card_Y4w6n9": {
+          "type": "banner-card",
+          "disabled": true,
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/Untitled-design-7_f67445ba-3983-45a3-aed0-067823a0233d.jpg",
+            "image_overlay_opacity": 40,
+            "column_span": 1,
+            "row_span": 1,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "bottom-center",
+            "content_alignment": "center",
+            "content_position_mobile": "middle-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://collections/regnbuekake",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "<em>Regnbuekake</em>",
+            "highlight_style": "wave_underline",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        },
+        "banner_card_48UbpN": {
+          "type": "banner-card",
+          "disabled": true,
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/Untitled-design-102-1.jpg",
+            "image_overlay_opacity": 40,
+            "column_span": 1,
+            "row_span": 1,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "bottom-center",
+            "content_alignment": "center",
+            "content_position_mobile": "middle-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://collections/marsipankake",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "<em>Marsipankake</em>",
+            "highlight_style": "wave_underline",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        }
+      },
+      "block_order": [
+        "category_zyXfjF",
+        "category_wXAVtg",
+        "category_CXcnd6",
+        "category_k93zyD",
+        "category_WQGrcY",
+        "category_PLgfpW",
+        "category_4hrM6H",
+        "category_FVMFiE",
+        "category_4qBEPH",
+        "category_trQbJc",
+        "category_ERcnTx",
+        "category_yYtEkx",
+        "heading_8EUL7r",
+        "banner_card_Y4w6n9",
+        "banner_card_48UbpN"
+      ],
+      "name": "t:sections.banners-with-categories.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-13",
+        "categories_bar_color_scheme": "scheme-1",
+        "columns_mobile": "2",
+        "columns": 3,
+        "gap": "2xs",
+        "banner_height": "large",
+        "swipe_on_mobile": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "rich_text_tUfkJy": {
+      "type": "rich-text",
+      "blocks": {
+        "heading_ai9dfA": {
+          "type": "heading",
+          "settings": {
+            "heading": "<strong>Alt du trenger for å lage den perfekte kaken</strong>",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2"
+          }
+        },
+        "text_ikR6xX": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Bla gjennom kakestilene nedenfor for å finne din favoritt. Hver kategori inneholder oppskrifter, tips og direkte lenker til alle ingrediensene og utstyret du trenger. Fra enkle familiefavoritter til avanserte dekorasjonsteknikker - vi hjelper deg å lykkes med hjemmebaking.</p>",
+            "text_size": "text-base",
+            "text_line_limit": "none",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "heading_ai9dfA",
+        "text_ikR6xX"
+      ],
+      "name": "t:sections.rich-text.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "use_color_scheme_in_container": false,
+        "content_spacing": "standard",
+        "content_alignment": "center",
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "banners_with_categories_a6LEjk": {
+      "type": "banners-with-categories",
+      "blocks": {
+        "banner_card_LJGgcf": {
+          "type": "banner-card",
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/6-2_c684b1a7-21ad-4910-95a6-e2d38e2e0b87.jpg",
+            "image_overlay_opacity": 40,
+            "column_span": 1,
+            "row_span": 1,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "bottom-center",
+            "content_alignment": "center",
+            "content_position_mobile": "middle-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://collections/stitch-kake",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "<em>Stitch kake</em>",
+            "highlight_style": "wave_underline",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        },
+        "category_NH3qyF": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/5b73ebc8260cfad2fe1195c4458860ad-image.jpg",
+            "heading": "Brannbilkake",
+            "link": "shopify://collections/brannbilkake"
+          }
+        },
+        "category_9HqCNQ": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/2-12_96dcf05a-f9e8-4b42-b626-bd8e27465af8.jpg",
+            "heading": "Fotballbanekake",
+            "link": "shopify://collections/fotballbanekake"
+          }
+        },
+        "category_GHDPaL": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/PME-Fotballkake-med-fotballkakelys.jpg",
+            "heading": "Fotballkake",
+            "link": "shopify://collections/fotballkake"
+          }
+        },
+        "category_AXkTNw": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/timthumb-13.jpg",
+            "heading": "Sjørøverkake",
+            "link": "shopify://collections/sjoroverkake"
+          }
+        },
+        "category_FidTjy": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/06242e1bb1e44b4909f06884d8ba8352-image.jpg",
+            "heading": "Bamsekake",
+            "link": "shopify://collections/bamsekake"
+          }
+        },
+        "category_nRPjV9": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/2-6.jpg",
+            "heading": "Dukkekake",
+            "link": "shopify://collections/dukkekake"
+          }
+        },
+        "category_YKmGyf": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/2-26_717b47f3-da4b-4b9e-b41e-69cb72d7fa43.jpg",
+            "heading": "Enhjørning kake",
+            "link": "shopify://collections/enhjorning-kake"
+          }
+        },
+        "category_FeaYpx": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/1-1_c9501329-b43b-45ee-9396-31d83c293b16.jpg",
+            "heading": "Barbiekake",
+            "link": "shopify://collections/barbiekake"
+          }
+        },
+        "category_qj4WLz": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/Flaggkake-300x150.jpg",
+            "heading": "Flaggkake",
+            "link": "shopify://collections/flaggkake"
+          }
+        },
+        "category_CUxMWY": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/tallkake_1_d78f527d-5b24-4b67-afab-18be10a98011.png",
+            "heading": "Tallkake",
+            "link": "shopify://collections/tallkake"
+          }
+        },
+        "category_ntdxDG": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/Untitled-design-102-1.jpg",
+            "heading": "Cartoon Cake",
+            "link": "shopify://collections/cartoon-cake"
+          }
+        },
+        "category_GRERTN": {
+          "type": "category",
+          "settings": {
+            "image": "shopify://shop_images/basketballbane-kake.jpg",
+            "heading": "Basketball kake",
+            "link": "shopify://collections/basketball-kake"
+          }
+        },
+        "heading_VK7wtg": {
+          "type": "heading",
+          "settings": {
+            "heading": "<em>Velg hva du skal lage</em>",
+            "highlight_style": "hand_drawn_circle",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h5"
+          }
+        }
+      },
+      "block_order": [
+        "banner_card_LJGgcf",
+        "category_NH3qyF",
+        "category_9HqCNQ",
+        "category_GHDPaL",
+        "category_AXkTNw",
+        "category_FidTjy",
+        "category_nRPjV9",
+        "category_YKmGyf",
+        "category_FeaYpx",
+        "category_qj4WLz",
+        "category_CUxMWY",
+        "category_ntdxDG",
+        "category_GRERTN",
+        "heading_VK7wtg"
+      ],
+      "name": "t:sections.banners-with-categories.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "categories_bar_color_scheme": "scheme-1",
+        "columns_mobile": "2",
+        "columns": 3,
+        "gap": "2xs",
+        "banner_height": "large",
+        "swipe_on_mobile": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "1757004903e254b505": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_testimonials_carousel_9djUnQ": {
+          "type": "shopify://apps/judge-me-reviews/blocks/testimonials_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "show_sample_reviews": true,
+            "reviews_selection": "all",
+            "products": [],
+            "star_rating": "all",
+            "max_reviews": 20,
+            "quote_marks_size": "small",
+            "product_name_text_size": "small",
+            "verified_badge_style": "icon",
+            "card_height": "medium",
+            "text_size": "small",
+            "stars_size": "medium",
+            "arrows_position": "bottom",
+            "max_width": 1100,
+            "corner_styling": "soft",
+            "quote_marks_style": "serif",
+            "card_color": "#f9f9f9",
+            "stars_and_quote_marks_color": "#108474",
+            "text_color": "#000000",
+            "arrows_color": "#000000",
+            "show_border": false,
+            "border_color": "#108474",
+            "show_drop_shadow": false,
+            "transition_speed": 5,
+            "header_text": "Customers are saying",
+            "show_average_rating": true
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_testimonials_carousel_9djUnQ"
+      ],
+      "settings": {
+        "include_margins": true,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "disabled": true,
+      "custom_css": [],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "products_per_page": 20,
+        "columns_desktop": 4,
+        "column_gap": "medium",
+        "row_gap": "large",
+        "pagination": "number",
+        "enable_filtering": true,
+        "enable_color_swatch": true,
+        "filter_type": "vertical",
+        "expand_filter_groups": "Availability, Price, Color, Size, Category",
+        "enable_sorting": true,
+        "enable_layout_switching": true,
+        "columns_mobile": "2",
+        "padding_top": 28,
+        "padding_bottom": 60,
+        "show_section_divider": true,
+        "divider_width": "fixed"
+      }
+    }
+  },
+  "order": [
+    "breadcrumbs_Gxg9wp",
+    "banner",
+    "image_cards_tij3nG",
+    "image_with_text_rmVMkg",
+    "17570074413b5ce83e",
+    "rich_text_WighYa",
+    "featured_blog_zdhyxY",
+    "banners_with_categories_9tRMNK",
+    "banners_with_categories_NxDVBQ",
+    "rich_text_tUfkJy",
+    "banners_with_categories_a6LEjk",
+    "1757004903e254b505",
+    "product-grid"
+  ]
+}

@@ -1,0 +1,1268 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "image_with_text_overlay_b8VTVL": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_kqqRFX": {
+          "type": "heading",
+          "settings": {
+            "heading": "Sommer og tid for is",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "hd1"
+          }
+        },
+        "text_H4iEtx": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Fyll opp fryseren med hjemmelaget is til sommeren</p>",
+            "text_size": "text-base"
+          }
+        },
+        "button_tGp6dB": {
+          "type": "button",
+          "settings": {
+            "button_label": "Ispinneformer",
+            "button_link": "shopify://collections/ispinneformer",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "heading_kqqRFX",
+        "text_H4iEtx",
+        "button_tGp6dB"
+      ],
+      "disabled": true,
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "container": "full",
+        "image": "shopify://shop_images/Copy_of_17._MAI_BANNER_1200x600_-2_24386f40-f7d7-4846-adb0-d81f70ec930c.webp",
+        "desktop_height": "large",
+        "overlay_opacity": 45,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "color_scheme": "scheme-inverse",
+        "content_position": "middle-center",
+        "content_alignment": "center",
+        "mobile_height": "auto",
+        "content_position_mobile": "middle-center-mobile",
+        "content_alignment_mobile": "left",
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "enable_preload_image": false
+      }
+    },
+    "collection_list_QtABtP": {
+      "type": "collection-list",
+      "blocks": {
+        "featured_collection_kTEypD": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "sjokolade",
+            "title": ""
+          }
+        },
+        "featured_collection_CnTxQT": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "marsipan",
+            "title": ""
+          }
+        },
+        "featured_collection_UrgQix": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "fondant",
+            "title": "Fondant"
+          }
+        },
+        "featured_collection_zTjnGN": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "kakeunderlag",
+            "title": ""
+          }
+        },
+        "featured_collection_DWTxYY": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "kakeesker",
+            "title": ""
+          }
+        },
+        "featured_collection_BEyQPT": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tipper-og-sproyteposer",
+            "title": "Tipper"
+          }
+        },
+        "featured_collection_78fJzA": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "bakeutstyr",
+            "title": ""
+          }
+        },
+        "featured_collection_xayYpx": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "spiselig",
+            "title": ""
+          }
+        },
+        "featured_collection_BUrQhj": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "",
+            "title": ""
+          }
+        }
+      },
+      "block_order": [
+        "featured_collection_kTEypD",
+        "featured_collection_CnTxQT",
+        "featured_collection_UrgQix",
+        "featured_collection_zTjnGN",
+        "featured_collection_DWTxYY",
+        "featured_collection_BEyQPT",
+        "featured_collection_78fJzA",
+        "featured_collection_xayYpx",
+        "featured_collection_BUrQhj"
+      ],
+      "disabled": true,
+      "name": "t:sections.collection-list.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "center",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--underline",
+        "button_icon": "none",
+        "card_color_scheme": "",
+        "card_style": "standard",
+        "card_heading_size": "text-base",
+        "card_text_line_limit": "none",
+        "card_image_ratio": "1/1",
+        "card_image_width": "large",
+        "card_image_padding": "none",
+        "rounded_card_image": true,
+        "card_show_border": false,
+        "mobile_layout": "vertical",
+        "columns_desktop": 8,
+        "column_gap": "2xs",
+        "row_gap": "2xs",
+        "grid_bordered": false,
+        "columns_mobile": "3",
+        "swipe_on_mobile": true,
+        "padding_top": 20,
+        "padding_bottom": 10,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "collection_list_slider_m9qKN8": {
+      "type": "collection-list-slider",
+      "blocks": {
+        "featured_collection_tgWApV": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "sjokolade",
+            "title": ""
+          }
+        },
+        "featured_collection_fD4qpE": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "marsipan",
+            "title": ""
+          }
+        },
+        "featured_collection_ecfnnz": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "fondant",
+            "title": "Fondant"
+          }
+        },
+        "featured_collection_rJJgbt": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "kakeunderlag",
+            "title": "Kakebrett"
+          }
+        },
+        "featured_collection_cGmbpW": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "kakeesker",
+            "title": ""
+          }
+        },
+        "featured_collection_cWEPHA": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "tipper-og-sproyteposer",
+            "title": "Tipper"
+          }
+        },
+        "featured_collection_PGiFtB": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "bakeutstyr",
+            "title": ""
+          }
+        },
+        "featured_collection_FaEJUa": {
+          "type": "featured_collection",
+          "settings": {
+            "collection": "spiselig",
+            "title": ""
+          }
+        }
+      },
+      "block_order": [
+        "featured_collection_tgWApV",
+        "featured_collection_fD4qpE",
+        "featured_collection_ecfnnz",
+        "featured_collection_rJJgbt",
+        "featured_collection_cGmbpW",
+        "featured_collection_cWEPHA",
+        "featured_collection_PGiFtB",
+        "featured_collection_FaEJUa"
+      ],
+      "name": "t:sections.collection-list-slider.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "center",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--underline",
+        "button_icon": "none",
+        "card_color_scheme": "",
+        "card_style": "standard",
+        "card_heading_size": "text-base",
+        "card_image_ratio": "1/1",
+        "card_image_width": "medium",
+        "card_image_padding": "none",
+        "rounded_card_image": true,
+        "mobile_layout": "vertical",
+        "carousel_item_size": "fixed",
+        "columns_desktop": 8,
+        "carousel_control_color_scheme": "",
+        "padding_top": 10,
+        "padding_bottom": 10,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "grid_banner_ykCHRE": {
+      "type": "grid-banner",
+      "blocks": {
+        "banner_card_K7AW9p": {
+          "type": "banner-card",
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/20241003_103325763_iOS_2.jpg",
+            "image_overlay_opacity": 30,
+            "column_span": 2,
+            "row_span": 2,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "bottom-left",
+            "content_alignment": "left",
+            "content_position_mobile": "middle-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://collections/halloween",
+            "subheading": "Alt til",
+            "subheading_style": "",
+            "heading": "Halloween",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "#e5e5e5",
+            "highlight_text_color": "#c4301c",
+            "heading_size": "hd2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "text": "",
+            "text_size": "text-lg",
+            "button_label": "Kjøp her",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        },
+        "banner_card_gYkHjt": {
+          "type": "banner-card",
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/Blodige_cupcakes.jpg",
+            "image_overlay_opacity": 25,
+            "column_span": 1,
+            "row_span": 2,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "top-center",
+            "content_alignment": "center",
+            "content_position_mobile": "middle-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://collections/halloween-produktpakker",
+            "subheading": "Gjør det enkelt!",
+            "subheading_style": "",
+            "heading": "Ferdige produktpakker til Halloween",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h1",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "text": "",
+            "text_size": "text-lg",
+            "button_label": "",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        },
+        "banner_card_if9thL": {
+          "type": "banner-card",
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/3-10-600x600_6035b6bd-87d1-4176-9dcf-bb4af21b4ab1.jpg",
+            "image_overlay_opacity": 25,
+            "column_span": 1,
+            "row_span": 1,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "bottom-center",
+            "content_alignment": "center",
+            "content_position_mobile": "bottom-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://blogs/halloween",
+            "subheading": "Se alle",
+            "subheading_style": "",
+            "heading": "Halloweenoppskrifter",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        },
+        "banner_card_Bq9RWT": {
+          "type": "banner-card",
+          "settings": {
+            "color_scheme": "scheme-inverse",
+            "image": "shopify://shop_images/Skjermbilde_2025-09-22_kl._13.23.40.png",
+            "image_overlay_opacity": 30,
+            "column_span": 1,
+            "row_span": 1,
+            "content_spacing": "medium",
+            "content_gap": "standard",
+            "content_position": "bottom-center",
+            "content_alignment": "center",
+            "content_position_mobile": "middle-center",
+            "content_alignment_mobile": "center",
+            "card_link": "shopify://collections/halloween-nyheter",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "Halloween nyheter",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "#f5f5f5",
+            "highlight_text_color": "",
+            "heading_size": "h1",
+            "heading_size_mobile": "custom",
+            "heading_size_custom": 46,
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "Kjøp her",
+            "button_style": "btn--primary",
+            "button_icon": "none",
+            "button_size": "btn--medium",
+            "block_custom_class": "",
+            "enable_preload_image": false
+          }
+        }
+      },
+      "block_order": [
+        "banner_card_K7AW9p",
+        "banner_card_gYkHjt",
+        "banner_card_if9thL",
+        "banner_card_Bq9RWT"
+      ],
+      "name": "t:sections.grid-banner.presets__1.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "section_header_alignment": "center",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h2",
+        "description": "",
+        "description_size": "text-base",
+        "button_label": "",
+        "button_link": "shopify://products/halloween-mystery-box-forundringspakke-til-halloweenbaking",
+        "button_style": "btn--primary",
+        "button_icon": "caret-right",
+        "columns": 4,
+        "banner_height": "auto",
+        "gap": "2xs",
+        "enable_swiper_mobile": true,
+        "show_section_divider": false,
+        "divider_width": "fixed",
+        "padding_top": 20,
+        "padding_bottom": 80
+      }
+    },
+    "multicolumn_icon_yVPFni": {
+      "type": "multicolumn-icon",
+      "blocks": {
+        "column_iiV6jE": {
+          "type": "column",
+          "settings": {
+            "icon": "truck",
+            "max_width": 28,
+            "max_width_mb": 28,
+            "title": "Gratis frakt på ordre over 1000kr",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h6",
+            "heading_font": "heading",
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        },
+        "column_cVnyEQ": {
+          "type": "column",
+          "settings": {
+            "icon": "map-pin",
+            "max_width": 28,
+            "max_width_mb": 28,
+            "title": "Rask levering fra lager i Norge",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h6",
+            "heading_font": "heading",
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        },
+        "column_qXgLCX": {
+          "type": "column",
+          "settings": {
+            "icon": "arrow-up-left",
+            "max_width": 28,
+            "max_width_mb": 28,
+            "title": "Åpent kjøp i 30 dager",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h6",
+            "heading_font": "heading",
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        },
+        "column_bjcpCA": {
+          "type": "column",
+          "settings": {
+            "icon": "heart",
+            "max_width": 28,
+            "max_width_mb": 28,
+            "title": "Norsk nettbutikk uten ekstra avgifter",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h6",
+            "heading_font": "heading",
+            "text": "",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "column_iiV6jE",
+        "column_cVnyEQ",
+        "column_qXgLCX",
+        "column_bjcpCA"
+      ],
+      "name": "t:sections.multicolumn-with-icon.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "header_layout": "vertical",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--underline",
+        "button_icon": "none",
+        "enable_sticky": false,
+        "card_color_scheme": "",
+        "content_alignment": "left",
+        "image_position": "left",
+        "icon_color": "#1d349a",
+        "columns_desktop": 4,
+        "column_gap": "large",
+        "row_gap": "inherit",
+        "show_divider_col": true,
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "show_section_divider": false,
+        "divider_width": "fixed",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    },
+    "featured_collection_bdaamt": {
+      "type": "featured-collection",
+      "blocks": {
+        "collection_ydJPzX": {
+          "type": "collection",
+          "settings": {
+            "collection": "kakestro-og-perler",
+            "title": "Kakestrø",
+            "show_banner": false,
+            "color_scheme": "scheme-1",
+            "card_link": "",
+            "image_overlay_opacity": 20,
+            "content_position": "split-bottom-button",
+            "content_alignment": "left",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "text_size": "text-base",
+            "button_label": "Shop now",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        },
+        "collection_PYiqLx": {
+          "type": "collection",
+          "settings": {
+            "collection": "konditorfarge",
+            "title": "",
+            "show_banner": false,
+            "color_scheme": "scheme-1",
+            "card_link": "",
+            "image_overlay_opacity": 20,
+            "content_position": "split-bottom-button",
+            "content_alignment": "left",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "text_size": "text-base",
+            "button_label": "Shop now",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        },
+        "collection_g3RxBj": {
+          "type": "collection",
+          "settings": {
+            "collection": "former",
+            "title": "",
+            "show_banner": false,
+            "color_scheme": "scheme-1",
+            "card_link": "",
+            "image_overlay_opacity": 0,
+            "content_position": "top-left",
+            "content_alignment": "left",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "Collections",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "text_size": "text-base",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "collection_ydJPzX",
+        "collection_PYiqLx",
+        "collection_g3RxBj"
+      ],
+      "custom_css": [],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "Populære kategorier",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h2",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--primary",
+        "button_icon": "none",
+        "limit": 7,
+        "columns": 5,
+        "column_gap": "medium",
+        "row_gap": "large",
+        "enable_slider": true,
+        "content_overflow": true,
+        "navigation_position": "bottom",
+        "pcard_image_ratio": "",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "show_progress_bar": true,
+        "padding_top": 40,
+        "padding_bottom": 0,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "spacer_gHibUq": {
+      "type": "spacer",
+      "name": "t:sections.spacer.name",
+      "settings": {
+        "color_scheme": "",
+        "show_section_divider": false,
+        "divider_width": "fixed",
+        "padding_top": 30,
+        "padding_bottom": 30,
+        "padding_top_mobile": 24,
+        "padding_bottom_mobile": 24
+      }
+    },
+    "1755405553e5de7f8e": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_featured_carousel_qkqUdN": {
+          "type": "shopify://apps/judge-me-reviews/blocks/featured_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "disabled": true,
+          "settings": {
+            "maxwidth": 1080
+          }
+        },
+        "judge_me_reviews_testimonials_carousel_nNQRG6": {
+          "type": "shopify://apps/judge-me-reviews/blocks/testimonials_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "disabled": true,
+          "settings": {
+            "show_sample_reviews": true,
+            "reviews_selection": "store_reviews",
+            "products": [],
+            "star_rating": "5_star",
+            "max_reviews": 20,
+            "quote_marks_size": "small",
+            "product_name_text_size": "small",
+            "verified_badge_style": "icon",
+            "card_height": "medium",
+            "text_size": "small",
+            "stars_size": "medium",
+            "arrows_position": "bottom",
+            "max_width": 1100,
+            "corner_styling": "soft",
+            "quote_marks_style": "serif",
+            "card_color": "#f9f9f9",
+            "stars_and_quote_marks_color": "#aacbc0",
+            "text_color": "#000000",
+            "arrows_color": "#000000",
+            "show_border": false,
+            "border_color": "#108474",
+            "show_drop_shadow": false,
+            "transition_speed": 3,
+            "header_text": "La kundene snakke for oss",
+            "show_average_rating": true
+          }
+        },
+        "judge_me_reviews_all_reviews_text_6fLdGA": {
+          "type": "shopify://apps/judge-me-reviews/blocks/all_reviews_text/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_featured_carousel_qkqUdN",
+        "judge_me_reviews_testimonials_carousel_nNQRG6",
+        "judge_me_reviews_all_reviews_text_6fLdGA"
+      ],
+      "settings": {
+        "include_margins": true,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "collection_cards_fFbiUR": {
+      "type": "collection-cards",
+      "blocks": {
+        "collection_Jz4ggn": {
+          "type": "collection",
+          "settings": {
+            "collection": "halloween-spiselig-kakepynt",
+            "title": "Spiselig pynt"
+          }
+        },
+        "collection_8dRhhN": {
+          "type": "collection",
+          "settings": {
+            "collection": "halloween-kakestrossel",
+            "title": "Kakestrøssel"
+          }
+        },
+        "collection_pgK6yb": {
+          "type": "collection",
+          "settings": {
+            "collection": "halloween-muffinsformer",
+            "title": "Muffinsformer"
+          }
+        },
+        "collection_GEqPiT": {
+          "type": "collection",
+          "settings": {
+            "collection": "halloween-pynt-til-festen",
+            "title": "Pynt til festen"
+          }
+        },
+        "collection_AraGjw": {
+          "type": "collection",
+          "disabled": true,
+          "settings": {
+            "collection": "",
+            "title": ""
+          }
+        },
+        "collection_AJWBX3": {
+          "type": "collection",
+          "disabled": true,
+          "settings": {
+            "collection": "",
+            "title": ""
+          }
+        }
+      },
+      "block_order": [
+        "collection_Jz4ggn",
+        "collection_8dRhhN",
+        "collection_pgK6yb",
+        "collection_GEqPiT",
+        "collection_AraGjw",
+        "collection_AJWBX3"
+      ],
+      "name": "t:sections.collection-cards.presets",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "Populære Halloween-kategorier",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h2",
+        "description": "",
+        "text_size": "text-sm",
+        "columns_desktop": 4,
+        "column_gap": "medium",
+        "row_gap": "inherit",
+        "enable_slider": true,
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "card_color_scheme": "",
+        "image_ratio": "3/4",
+        "show_product_count": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "featured_products_tab_BhMHF6": {
+      "type": "featured-products-tab",
+      "blocks": {
+        "tab_6td7zn": {
+          "type": "tab",
+          "settings": {
+            "color_scheme": "",
+            "title": "Product list 1",
+            "products": []
+          }
+        },
+        "tab_GfxBba": {
+          "type": "tab",
+          "settings": {
+            "color_scheme": "",
+            "title": "Product list 2",
+            "products": []
+          }
+        },
+        "tab_QXx7iz": {
+          "type": "tab",
+          "settings": {
+            "color_scheme": "",
+            "title": "Product list 3",
+            "products": []
+          }
+        }
+      },
+      "block_order": [
+        "tab_6td7zn",
+        "tab_GfxBba",
+        "tab_QXx7iz"
+      ],
+      "disabled": true,
+      "name": "t:sections.featured-products-tab.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "subheading": "dd",
+        "heading": "Produktpakker til kaker",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "Button label",
+        "button_link": "",
+        "button_style": "btn--primary",
+        "button_icon": "none",
+        "pcard_image_ratio": "adapt",
+        "swipe_on_mobile": true,
+        "show_section_divider": false,
+        "divider_width": "fixed",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    },
+    "featured_blog_q9EYQj": {
+      "type": "featured-blog",
+      "name": "t:sections.featured-blog.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "Oppskrifter",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h2",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "Se alle",
+        "button_link": "shopify://blogs/oppskrifter",
+        "button_style": "btn--primary",
+        "button_icon": "none",
+        "blog": "oppskrifter",
+        "post_limit": 4,
+        "filter_by_tag": false,
+        "selected_tag": "",
+        "columns_desktop": 4,
+        "column_gap": "2xs",
+        "row_gap": "2xs",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "card_title_size": "h4",
+        "show_tags": false,
+        "show_excerpt": true,
+        "show_date": false,
+        "show_author": false,
+        "show_button": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "favorite_products_cwYmCb": {
+      "type": "favorite-products",
+      "blocks": {
+        "product_xrytgc": {
+          "type": "product",
+          "settings": {
+            "color_scheme": "",
+            "product": "funcakes-mix-sveitsisk-marengssmorkrem-400g",
+            "image": "shopify://shop_images/F10145_1_9e58dbe06c058786aaea66a46575cb96_a7e72517-18fc-4deb-8ac5-0d64f7cfb8b0.webp",
+            "text": "<p>\"Lett å lage, smaker godt og enkel å jobbe med. Denne ble en favoritt\"</p>",
+            "text_size": "h1",
+            "author": "Cindy",
+            "bio": ""
+          }
+        },
+        "product_43r9EB": {
+          "type": "product",
+          "settings": {
+            "color_scheme": "scheme-1",
+            "product": "callebaut-lys-sjokolade-1kg",
+            "image": "shopify://shop_images/1_06ce88dd-3a9e-4078-8fd8-8800ff7af521.webp",
+            "text": "<p>\"Callebaut sjokolade er en av de beste sjokoladene jeg har smakt. Helt nydelig !! Passer perfekt til ganache. Anbefaler!</p>",
+            "text_size": "h1",
+            "author": "Olga J",
+            "bio": ""
+          }
+        }
+      },
+      "block_order": [
+        "product_xrytgc",
+        "product_43r9EB"
+      ],
+      "name": "t:sections.favorite-products.name",
+      "settings": {
+        "color_scheme": "",
+        "layout": "content-right",
+        "heading": "Favorittprodukt!",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "slide_height": "medium",
+        "pcard_style": "card",
+        "pcard_image_ratio": "",
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "lookbook_slider_rGFXFi": {
+      "type": "lookbook-slider",
+      "blocks": {
+        "lookbook_card_VNjJ3R": {
+          "type": "lookbook_card",
+          "settings": {
+            "product_list": [
+              "colour-mill-oljebasert-farge-fuchisa-20ml",
+              "colour-mill-oljebasert-farge-yellow-20ml",
+              "pme-standard-muffinsformer-pastell-pk-100",
+              "funcakes-sjokoladekuler-gull-metallic-60g"
+            ],
+            "width": 50,
+            "width_mobile": 50,
+            "image": "shopify://shop_images/2_96faf884-9e46-468d-9779-c7e9e2d9950b.webp",
+            "heading": "Regnbuecupcakes",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "#ffffff",
+            "highlight_text_color": "",
+            "heading_size": "h5"
+          }
+        },
+        "lookbook_card_NNggfN": {
+          "type": "lookbook_card",
+          "settings": {
+            "product_list": [
+              "produktpakke-til-kokos-og-vaniljeispinner-med-bringebaer",
+              "silikomart-ispinneformer-tango",
+              "silikomart-ispinneformer-klassisk",
+              "silikomart-ispinneformer-vintage-mini",
+              "pme-frysetorket-bringebaer-12g"
+            ],
+            "width": 50,
+            "width_mobile": 50,
+            "image": "shopify://shop_images/A_2.webp",
+            "heading": "Kokos- og vaniljeispinner",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h5"
+          }
+        },
+        "lookbook_card_c3gw9k": {
+          "type": "lookbook_card",
+          "settings": {
+            "product_list": [
+              "kakeform-enhjorning",
+              "produktpakke-til-flat-enhjorningkake-2"
+            ],
+            "width": 50,
+            "width_mobile": 50,
+            "image": "shopify://shop_images/3_ac5533f8-a9ad-4c52-96ec-65a58b9df2f4.webp",
+            "heading": "Enhjørningkake",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h5"
+          }
+        },
+        "lookbook_card_dkJkmt": {
+          "type": "lookbook_card",
+          "settings": {
+            "product_list": [
+              "kakebilde-fotballbane",
+              "fotballkake-kit-fotballbanekake",
+              "kaketopper-fotball-spillere-og-mal-til-fotballkake-9-deler"
+            ],
+            "width": 50,
+            "width_mobile": 50,
+            "image": "shopify://shop_images/IMG_3662.webp",
+            "heading": "Fotballbanekake",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h5"
+          }
+        },
+        "lookbook_card_Tn4cPD": {
+          "type": "lookbook_card",
+          "settings": {
+            "product_list": [
+              "funcakes-mix-sveitsisk-marengssmorkrem-400g",
+              "hermetisk-kirsebaer-maraschino-kirsebaer-225g",
+              "happy-sprinkles-strosselmiks-but-first-unicorns-90g",
+              "colour-mill-oljebasert-farge-hot-pink-20ml",
+              "kakebilde-enhjorning-rund-20cm"
+            ],
+            "width": 50,
+            "width_mobile": 50,
+            "image": "shopify://shop_images/3_5c11ee66-bf4c-43e9-961c-9dfd3433c072.webp",
+            "heading": "Enhjørningkake",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h5"
+          }
+        },
+        "lookbook_card_3xkAHN": {
+          "type": "lookbook_card",
+          "settings": {
+            "product_list": [
+              "decora-kakeskrape-eller-dekoreringsskrape-chevron"
+            ],
+            "width": 50,
+            "width_mobile": 50,
+            "image": "shopify://shop_images/0271029_amb1_a7a7ffde-5dfa-45b1-8e26-30500eb6b7db.jpg",
+            "heading": "Kakeskrape",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h5"
+          }
+        }
+      },
+      "block_order": [
+        "lookbook_card_VNjJ3R",
+        "lookbook_card_NNggfN",
+        "lookbook_card_c3gw9k",
+        "lookbook_card_dkJkmt",
+        "lookbook_card_Tn4cPD",
+        "lookbook_card_3xkAHN"
+      ],
+      "name": "t:sections.lookbook-slider.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "Bak dette hjemme",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h2",
+        "description": "",
+        "description_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--primary",
+        "button_icon": "none",
+        "column_gap": "small",
+        "enable_slider": true,
+        "slide_height": "medium",
+        "enable_swiper_mobile": true,
+        "show_progress_bar": true,
+        "show_section_divider": false,
+        "divider_width": "fixed",
+        "padding_top": 80,
+        "padding_bottom": 80
+      }
+    },
+    "image_with_text_overlay_LjKpGy": {
+      "type": "image-with-text-overlay",
+      "blocks": {
+        "heading_FWnFej": {
+          "type": "heading",
+          "settings": {
+            "heading": "Personlig kakebilde",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "hd1"
+          }
+        },
+        "text_6cmxpY": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Bestill kakebilde med ditt favorittmotiv!</p>",
+            "text_size": "text-base"
+          }
+        },
+        "button_aqwWmb": {
+          "type": "button",
+          "settings": {
+            "button_label": "KJØP HER",
+            "button_link": "shopify://collections/kakebilde",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "heading_FWnFej",
+        "text_6cmxpY",
+        "button_aqwWmb"
+      ],
+      "name": "t:sections.image-with-text-overlay.name",
+      "settings": {
+        "container": "full",
+        "image": "shopify://shop_images/2-23_db3087da-6b45-4518-bc1a-d6764655154a.jpg",
+        "desktop_height": "large",
+        "overlay_opacity": 45,
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "color_scheme": "scheme-inverse",
+        "content_position": "middle-center",
+        "content_alignment": "center",
+        "mobile_height": "auto",
+        "content_position_mobile": "middle-center-mobile",
+        "content_alignment_mobile": "left",
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "enable_preload_image": false
+      }
+    }
+  },
+  "order": [
+    "image_with_text_overlay_b8VTVL",
+    "collection_list_QtABtP",
+    "collection_list_slider_m9qKN8",
+    "grid_banner_ykCHRE",
+    "multicolumn_icon_yVPFni",
+    "featured_collection_bdaamt",
+    "spacer_gHibUq",
+    "1755405553e5de7f8e",
+    "collection_cards_fFbiUR",
+    "featured_products_tab_BhMHF6",
+    "featured_blog_q9EYQj",
+    "favorite_products_cwYmCb",
+    "lookbook_slider_rGFXFi",
+    "image_with_text_overlay_LjKpGy"
+  ]
+}

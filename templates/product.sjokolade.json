@@ -1,0 +1,499 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "breadcrumbs": {
+      "type": "breadcrumbs",
+      "custom_css": [
+        "@media (min-width: 1280px) {.breadcrumbs {padding-inline: 5rem; }}"
+      ],
+      "settings": {
+        "container": "fixed",
+        "text_alignment": "start",
+        "padding_top": 16,
+        "padding_bottom": 20
+      }
+    },
+    "main": {
+      "type": "main-product",
+      "blocks": {
+        "badges": {
+          "type": "badges",
+          "settings": {
+            "show_soldout_badge": true,
+            "show_sale_badge": true,
+            "sale_badge_type": "percentage"
+          }
+        },
+        "judge_me_reviews_preview_badge_hGU6UM": {
+          "type": "shopify://apps/judge-me-reviews/blocks/preview_badge/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {}
+        },
+        "title": {
+          "type": "title",
+          "settings": {
+            "heading_size": "h1"
+          }
+        },
+        "price": {
+          "type": "price",
+          "settings": {}
+        },
+        "grid_icon_box_FJjLjh": {
+          "type": "grid-icon-box",
+          "settings": {
+            "show_below_product_media": false,
+            "columns_desktop": 4,
+            "column_gap": "2xs",
+            "row_gap": "inherit",
+            "columns_mobile": "3",
+            "swipe_on_mobile": true,
+            "icon_1": "smiley",
+            "heading_1": "Kvalitetssmak",
+            "icon_2": "globe",
+            "heading_2": "De beste leverandørene",
+            "icon_3": "heart",
+            "heading_3": "Perfekt for baking",
+            "icon_4": "none",
+            "heading_4": "",
+            "icon_5": "none",
+            "heading_5": "",
+            "icon_6": "none",
+            "heading_6": "",
+            "icon_7": "none",
+            "heading_7": "",
+            "icon_8": "none",
+            "heading_8": ""
+          }
+        },
+        "inventory": {
+          "type": "inventory",
+          "settings": {
+            "text_style": "body",
+            "inventory_threshold": 10,
+            "show_inventory_quantity": true
+          }
+        },
+        "variant_picker": {
+          "type": "variant_picker",
+          "settings": {
+            "picker_type": "button",
+            "swatch_type": "shopify_swatch",
+            "swatch_style": "square",
+            "swatch_size": 32,
+            "button_style": "normal",
+            "size_title": "Size",
+            "size_chart_from_page": ""
+          }
+        },
+        "buy_buttons": {
+          "type": "buy_buttons",
+          "settings": {
+            "show_quantity_selector": true,
+            "show_dynamic_checkout": false,
+            "show_gift_card_recipient": true
+          }
+        },
+        "icon_with_text_UAYgQU": {
+          "type": "icon-with-text",
+          "settings": {
+            "layout": "vertical",
+            "title_font": "body",
+            "title_size": "text-base",
+            "icon_1": "truck",
+            "heading_1": "Rask levering fra lager i Norge",
+            "icon_2": "gift",
+            "heading_2": "Gratis frakt over 1000kr",
+            "icon_3": "check",
+            "heading_3": "Godkjente varer for Norge"
+          }
+        },
+        "divider_edhDfp": {
+          "type": "divider",
+          "settings": {
+            "show_below_product_media": false
+          }
+        },
+        "text_74UEQC": {
+          "type": "text",
+          "settings": {
+            "text": "<strong>Produktbeskrivelse:</strong>",
+            "text_style": "body"
+          }
+        },
+        "description": {
+          "type": "description",
+          "settings": {}
+        },
+        "meta": {
+          "type": "meta",
+          "settings": {
+            "link_color": "#000000",
+            "show_vendor": true,
+            "show_product_type": true,
+            "show_sku": true,
+            "show_barcode": false
+          }
+        },
+        "payment_info": {
+          "type": "payment_info",
+          "settings": {
+            "color_scheme": "scheme-info",
+            "heading": "Payment & Security",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h5",
+            "description": "<p>Your payment information is processed securely. We do not store credit card details nor have access to your credit card information.</p>",
+            "show_payment_icons": true,
+            "show_below_product_media": false
+          }
+        },
+        "pickup_availability": {
+          "type": "pickup_availability",
+          "settings": {}
+        },
+        "complementary": {
+          "type": "complementary",
+          "settings": {
+            "block_heading": "Perfect Match With",
+            "heading_size": "h4",
+            "show_below_product_media": false,
+            "make_collapsible_row": false,
+            "icon": "tag",
+            "product_list_limit": 6,
+            "layout": "grid",
+            "columns": 3,
+            "image_ratio": "1/1",
+            "enable_quick_add": true
+          }
+        },
+        "collapsible-row-1": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Frakt & levering",
+            "heading_size": "h4",
+            "icon": "none",
+            "content": "",
+            "page": "content",
+            "default_open": true,
+            "show_below_product_media": false
+          }
+        },
+        "collapsible-row-2": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Retur og angring",
+            "heading_size": "h4",
+            "icon": "none",
+            "content": "<p>Designed with care and crafted from premium materials, our products combine durability, comfort, and timeless style. Each piece is thoughtfully made to enhance your living space, offering a perfect balance of functionality and elegance that complements any home and suits your unique lifestyle.</p>",
+            "page": "",
+            "default_open": false,
+            "show_below_product_media": false
+          }
+        },
+        "collapsible-row-3": {
+          "type": "collapsible_tab",
+          "settings": {
+            "heading": "Materials & Care",
+            "heading_size": "h4",
+            "icon": "none",
+            "content": "<p>Carefully crafted from durable, sustainable materials, each piece is designed for long-lasting use and timeless style. For proper care, wipe gently with a soft, damp cloth to remove dust and dirt. Avoid using harsh chemicals, abrasive cleaners, or excessive moisture to protect the finish and maintain its pristine look.</p>",
+            "page": "",
+            "default_open": false,
+            "show_below_product_media": false
+          }
+        },
+        "divider_pPz3Kw": {
+          "type": "divider",
+          "disabled": true,
+          "settings": {
+            "show_below_product_media": false
+          }
+        },
+        "sticky_atc_bar_7HgNgP": {
+          "type": "sticky-atc-bar",
+          "settings": {
+            "visibility": "all",
+            "style": "minimalist",
+            "container": "full",
+            "show_atc_button": true,
+            "show_dynamic_checkout_buttons": false,
+            "show_quantity": true
+          }
+        }
+      },
+      "block_order": [
+        "badges",
+        "judge_me_reviews_preview_badge_hGU6UM",
+        "title",
+        "price",
+        "grid_icon_box_FJjLjh",
+        "inventory",
+        "variant_picker",
+        "buy_buttons",
+        "icon_with_text_UAYgQU",
+        "divider_edhDfp",
+        "text_74UEQC",
+        "description",
+        "meta",
+        "payment_info",
+        "pickup_availability",
+        "complementary",
+        "collapsible-row-1",
+        "collapsible-row-2",
+        "collapsible-row-3",
+        "divider_pPz3Kw",
+        "sticky_atc_bar_7HgNgP"
+      ],
+      "custom_css": [
+        "@media (min-width: 1280px) {.product {padding-inline: 5rem; }}"
+      ],
+      "settings": {
+        "color_scheme": "scheme-1",
+        "use_color_scheme_in_container": false,
+        "enable_sticky_info": true,
+        "media_size": "large",
+        "gallery_layout": "vertical-carousel",
+        "mobile_thumbnails": "show",
+        "show_image_border": false,
+        "enable_image_zoom": true,
+        "enable_video_looping": true,
+        "padding_top": 0,
+        "padding_bottom": 60
+      }
+    },
+    "17554060013534cde4": {
+      "type": "apps",
+      "blocks": {
+        "judge_me_reviews_testimonials_carousel_zGy6nx": {
+          "type": "shopify://apps/judge-me-reviews/blocks/testimonials_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "show_sample_reviews": true,
+            "reviews_selection": "all",
+            "products": [],
+            "star_rating": "all",
+            "max_reviews": 20,
+            "quote_marks_size": "small",
+            "product_name_text_size": "small",
+            "verified_badge_style": "icon",
+            "card_height": "medium",
+            "text_size": "small",
+            "stars_size": "medium",
+            "arrows_position": "bottom",
+            "max_width": 1100,
+            "corner_styling": "soft",
+            "quote_marks_style": "serif",
+            "card_color": "#f9f9f9",
+            "stars_and_quote_marks_color": "#108474",
+            "text_color": "#000000",
+            "arrows_color": "#000000",
+            "show_border": false,
+            "border_color": "#108474",
+            "show_drop_shadow": false,
+            "transition_speed": 5,
+            "header_text": "Customers are saying",
+            "show_average_rating": true
+          }
+        }
+      },
+      "block_order": [
+        "judge_me_reviews_testimonials_carousel_zGy6nx"
+      ],
+      "settings": {
+        "include_margins": true,
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "multicolumn_g7MAXj": {
+      "type": "multicolumn",
+      "blocks": {
+        "column_jcyTGG": {
+          "type": "column",
+          "settings": {
+            "title": "Column",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h4",
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        },
+        "column_dLFxex": {
+          "type": "column",
+          "settings": {
+            "title": "Column",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h4",
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        },
+        "column_CJA7t3": {
+          "type": "column",
+          "settings": {
+            "title": "Column",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h4",
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        },
+        "column_6WBVGa": {
+          "type": "column",
+          "settings": {
+            "title": "Column",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h4",
+            "text": "<p>Pair text with an image to focus on your chosen product, collection, or blog post. Add details on availability, style, or even provide a review.</p>",
+            "text_size": "text-base",
+            "button_label": "",
+            "button_link": "",
+            "button_style": "btn--underline",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "column_jcyTGG",
+        "column_dLFxex",
+        "column_CJA7t3",
+        "column_6WBVGa"
+      ],
+      "name": "t:sections.multicolumn.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "Multicolumn",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--underline",
+        "button_icon": "none",
+        "content_alignment": "left",
+        "show_col_count": false,
+        "show_image": true,
+        "columns_desktop": 4,
+        "column_gap": "large",
+        "row_gap": "inherit",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "show_section_divider": false,
+        "divider_width": "fixed",
+        "padding_top": 50,
+        "padding_bottom": 50
+      }
+    },
+    "related-products": {
+      "type": "related-products",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "Du liker kanskje også",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h2",
+        "description": "",
+        "limit": 6,
+        "columns": 5,
+        "column_gap": "medium",
+        "row_gap": "inherit",
+        "enable_slider": true,
+        "navigation_position": "bottom",
+        "pcard_image_ratio": "",
+        "columns_mobile": "2",
+        "swipe_on_mobile": true,
+        "show_progress_bar": true,
+        "padding_top": 60,
+        "padding_bottom": 0,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
+    "recently_viewed_products_Bbgqym": {
+      "type": "recently-viewed-products",
+      "name": "t:sections.recently-viewed-products.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "Produkter du nylig har sett på",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "limit": 8,
+        "columns": 4,
+        "column_gap": "medium",
+        "row_gap": "inherit",
+        "enable_slider": true,
+        "navigation_position": "bottom",
+        "pcard_image_ratio": "",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    }
+  },
+  "order": [
+    "breadcrumbs",
+    "main",
+    "17554060013534cde4",
+    "multicolumn_g7MAXj",
+    "related-products",
+    "recently_viewed_products_Bbgqym"
+  ]
+}

@@ -1,0 +1,125 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
+{
+  "sections": {
+    "breadcrumbs_Gxg9wp": {
+      "type": "breadcrumbs",
+      "settings": {
+        "container": "fixed",
+        "text_alignment": "start",
+        "padding_top": 16,
+        "padding_bottom": 20
+      }
+    },
+    "banner": {
+      "type": "main-collection-banner",
+      "blocks": {
+        "collection_info_zUNyKV": {
+          "type": "collection_info",
+          "settings": {
+            "heading_size": "h1",
+            "heading_tag": "h1",
+            "show_description": true,
+            "padding_top": 40,
+            "padding_bottom": 40
+          }
+        }
+      },
+      "block_order": [
+        "collection_info_zUNyKV"
+      ],
+      "custom_css": [],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "text_alignment": "left",
+        "show_collection_image": true,
+        "image_overlay_opacity": 0,
+        "image_position": "right",
+        "image_height": "extra-small",
+        "enable_parallax": false,
+        "parallax_direction": "vertical",
+        "image_height_mobile": "auto",
+        "padding_top": 0,
+        "padding_bottom": 0
+      }
+    },
+    "product-grid": {
+      "type": "main-collection-product-grid",
+      "custom_css": [],
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "scheme-1",
+        "products_per_page": 20,
+        "columns_desktop": 5,
+        "column_gap": "large",
+        "row_gap": "large",
+        "pagination": "load_more",
+        "enable_filtering": true,
+        "enable_color_swatch": true,
+        "filter_type": "drawer",
+        "expand_filter_groups": "Availability, Price, Color, Size, Category",
+        "enable_sorting": true,
+        "enable_layout_switching": true,
+        "columns_mobile": "2",
+        "padding_top": 28,
+        "padding_bottom": 60,
+        "show_section_divider": true,
+        "divider_width": "fixed"
+      }
+    },
+    "featured_blog_dC4AQt": {
+      "type": "featured-blog",
+      "name": "t:sections.featured-blog.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "{{ section.settings.blog.title }}",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h2",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "Se alle",
+        "button_link": "shopify://blogs/oppskrifter",
+        "button_style": "btn--primary",
+        "button_icon": "none",
+        "blog": "oppskrifter",
+        "post_limit": 3,
+        "columns_desktop": 3,
+        "column_gap": "medium",
+        "row_gap": "large",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "card_title_size": "h4",
+        "show_tags": true,
+        "show_excerpt": true,
+        "show_date": true,
+        "show_author": false,
+        "show_button": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    }
+  },
+  "order": [
+    "breadcrumbs_Gxg9wp",
+    "banner",
+    "product-grid",
+    "featured_blog_dC4AQt"
+  ]
+}

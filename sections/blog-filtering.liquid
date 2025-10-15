@@ -1,0 +1,445 @@
+<style>
+  .slikkepott-blog-filter-section {
+    margin: 0;
+    padding: 0 20px;
+    padding-top: {{ section.settings.padding_top }}px;
+    padding-bottom: {{ section.settings.padding_bottom }}px;
+  }
+  
+  .slikkepott-blog-filter-title {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: 2.5rem;
+    color: #333;
+    font-weight: 600;
+  }
+  
+  /* Tag filter buttons */
+  .slikkepott-tag-filter-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    padding: 25px;
+    background: #f8f8f8;
+    border-radius: 12px;
+  }
+  
+  .slikkepott-tag-filter-button {
+    background-color: {{ section.settings.button_color }};
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    min-width: 120px;
+    text-align: center;
+  }
+  
+  .slikkepott-tag-filter-button:hover {
+    background-color: {{ section.settings.button_hover_color }};
+    transform: translateY(-1px);
+  }
+  
+  .slikkepott-tag-filter-button.slikkepott-active {
+    background-color: #333;
+  }
+  
+  /* Article grid */
+  .slikkepott-articles-grid {
+    display: grid;
+    grid-template-columns: repeat({{ section.settings.grid_columns_desktop }}, 1fr);
+    gap: 25px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  
+  @media (max-width: 768px) {
+    .slikkepott-articles-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .slikkepott-articles-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+  }
+  
+  .slikkepott-article-card {
+    background: #fff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s ease;
+    border: 1px solid #f0f0f0;
+  }
+  
+  .slikkepott-article-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+  
+  .slikkepott-article-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    display: block;
+  }
+  
+  @media (max-width: 768px) {
+    .slikkepott-article-image {
+      height: 150px;
+    }
+  }
+  
+  .slikkepott-article-content {
+    padding: 20px;
+  }
+  
+  @media (max-width: 768px) {
+    .slikkepott-article-content {
+      padding: 15px;
+    }
+  }
+  
+  .slikkepott-article-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+  
+  @media (max-width: 768px) {
+    .slikkepott-article-title {
+      font-size: 1.3rem;
+    }
+  }
+  
+  .slikkepott-article-excerpt {
+    color: #666;
+    font-size: 1.1rem;
+    line-height: 1.6;
+    margin-bottom: 15px;
+  }
+  
+  .slikkepott-article-meta {
+    font-size: 1rem;
+    color: #999;
+    margin-bottom: 15px;
+  }
+  
+  .slikkepott-article-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  
+  .slikkepott-article-tag {
+    background: #f0f0f0;
+    color: #666;
+    padding: 6px 12px;
+    border-radius: 15px;
+    font-size: 0.9rem;
+    font-weight: 500;
+  }
+  
+  .slikkepott-read-more-button {
+    display: inline-block;
+    background-color: {{ section.settings.button_color }};
+    color: white;
+    padding: 12px 20px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .slikkepott-read-more-button:hover {
+    background-color: #9a0100;
+    color: white;
+  }
+  
+  .slikkepott-no-articles {
+    text-align: center;
+    padding: 60px 20px;
+    color: #666;
+    font-size: 1.1rem;
+  }
+</style>
+
+<div class="slikkepott-blog-filter-section">
+  <h3 class="slikkepott-blog-filter-title">{{ section.settings.section_title }}</h3>
+  
+  <!-- Static Tag Filter Buttons (based on actual existing tags) -->
+  <div class="slikkepott-tag-filter-wrapper" id="slikkepott-filter-container">
+    <button class="slikkepott-tag-filter-button slikkepott-active" 
+            data-filter="all" 
+            onclick="slikkepottFilterArticles('all')">Se alle</button>
+    <button class="slikkepott-tag-filter-button" data-filter="cannoliboller" onclick="slikkepottFilterArticles('cannoliboller')">Cannoliboller</button>
+    <button class="slikkepott-tag-filter-button" data-filter="is" onclick="slikkepottFilterArticles('is')">Is</button>
+    <button class="slikkepott-tag-filter-button" data-filter="17-mai" onclick="slikkepottFilterArticles('17-mai')">17. mai</button>
+    <button class="slikkepott-tag-filter-button" data-filter="langpannekaker" onclick="slikkepottFilterArticles('langpannekaker')">Langpannekaker</button>
+    <button class="slikkepott-tag-filter-button" data-filter="inspirasjon" onclick="slikkepottFilterArticles('inspirasjon')">Inspirasjon</button>
+    <button class="slikkepott-tag-filter-button" data-filter="halloween" onclick="slikkepottFilterArticles('halloween')">Halloween</button>
+    <button class="slikkepott-tag-filter-button" data-filter="paske" onclick="slikkepottFilterArticles('paske')">Påske</button>
+    <button class="slikkepott-tag-filter-button" data-filter="oppskrifter" onclick="slikkepottFilterArticles('oppskrifter')">Oppskrifter</button>
+    <button class="slikkepott-tag-filter-button" data-filter="fastelavn" onclick="slikkepottFilterArticles('fastelavn')">Fastelavn</button>
+    <button class="slikkepott-tag-filter-button" data-filter="untagged" onclick="slikkepottFilterArticles('untagged')">Uten tags</button>
+  </div>
+  
+  <!-- Articles Grid -->
+  <div class="slikkepott-articles-grid" id="slikkepott-articles-container">
+    
+    {% comment %} Try multiple possible blog handles {% endcomment %}
+    {% assign all_articles = '' %}
+    {% assign blog_handles = 'oppskrifter,guide,inspirasjon,halloween,paske,fremgangsmater,jul,default-blog,news,blog,main-blog,recipes,guides' | split: ',' %}
+    
+    {% comment %} Collect all articles with expanded search {% endcomment %}
+    {% assign article_count = 0 %}
+    
+    {% for handle in blog_handles %}
+      {% assign current_blog = blogs[handle] %}
+      {% if current_blog and current_blog.articles.size > 0 %}
+        {% comment %} Debug: Show which blog we're processing {% endcomment %}
+        <!-- DEBUG: Processing {{ handle }} blog with {{ current_blog.articles.size }} articles -->
+        {% for article in current_blog.articles limit: 50 %}
+          {% assign article_count = article_count | plus: 1 %}
+          
+          <div class="slikkepott-article-card" 
+               data-tags="{% for tag in article.tags %}{{ tag | handle }}{% unless forloop.last %} {% endunless %}{% endfor %}"
+               data-published="{{ article.published_at }}"
+               data-blog="{{ handle }}">
+            
+            {% if article.image %}
+              <img src="{{ article.image | img_url: '400x300' }}" 
+                   alt="{{ article.title }}" 
+                   class="slikkepott-article-image">
+            {% else %}
+              <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #BC0100 0%, #9a0100 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 2rem;">
+                📝
+              </div>
+            {% endif %}
+            
+            <div class="slikkepott-article-content">
+              <h4 class="slikkepott-article-title">{{ article.title }}</h4>
+              
+              {% if article.excerpt != blank %}
+                <p class="slikkepott-article-excerpt">{{ article.excerpt | strip_html | truncate: 120 }}</p>
+              {% else %}
+                <p class="slikkepott-article-excerpt">{{ article.content | strip_html | truncate: 120 }}</p>
+              {% endif %}
+              
+              <div class="slikkepott-article-meta">
+                {{ article.published_at | date: "%d. %B %Y" }} - {{ handle }}
+              </div>
+              
+              <div class="slikkepott-article-tags">
+                {% for tag in article.tags limit: 3 %}
+                  <span class="slikkepott-article-tag">{{ tag }}</span>
+                {% endfor %}
+              </div>
+              
+              <a href="{{ article.url }}" class="slikkepott-read-more-button">Les mer</a>
+            </div>
+          </div>
+          
+        {% endfor %}
+      {% else %}
+        <!-- DEBUG: {{ handle }} blog not found or empty -->
+      {% endif %}
+    {% endfor %}
+    
+    {% if article_count == 0 %}
+      <div class="slikkepott-no-articles">
+        <p>Ingen artikler funnet.</p>
+      </div>
+    {% endif %}
+  </div>
+</div>
+
+<script>
+function slikkepottFilterArticles(filterTag) {
+  const articles = document.querySelectorAll('.slikkepott-article-card');
+  const buttons = document.querySelectorAll('.slikkepott-tag-filter-button');
+  
+  // Update active button
+  buttons.forEach(btn => btn.classList.remove('slikkepott-active'));
+  document.querySelector(`[data-filter="${filterTag}"]`).classList.add('slikkepott-active');
+  
+  let visibleCount = 0;
+  
+  // Filter articles
+  articles.forEach(article => {
+    const articleTags = article.getAttribute('data-tags');
+    
+    if (filterTag === 'all') {
+      article.style.display = 'block';
+      visibleCount++;
+    } else if (filterTag === 'untagged') {
+      // Show articles with no tags
+      if (!articleTags || articleTags.trim() === '') {
+        article.style.display = 'block';
+        visibleCount++;
+      } else {
+        article.style.display = 'none';
+      }
+    } else {
+      // Handle both spaced tags and concatenated tags + case insensitive matching
+      const hasTag = articleTags && (
+        articleTags.toLowerCase().includes(filterTag.toLowerCase()) || 
+        articleTags.toLowerCase().includes(filterTag.replace('-', '').toLowerCase()) ||
+        articleTags.toLowerCase().split(' ').includes(filterTag.toLowerCase()) ||
+        // Handle concatenated tags like "17-maiinspirasjonlangpannekaker"
+        articleTags.toLowerCase().includes(filterTag.replace('-', '').toLowerCase())
+      );
+      
+      if (hasTag) {
+        article.style.display = 'block';
+        visibleCount++;
+      } else {
+        article.style.display = 'none';
+      }
+    }
+  });
+  
+  // Debug: Log filtering results
+  console.log(`Filter: ${filterTag}, Visible articles: ${visibleCount}`);
+  
+  // Show message if no articles found
+  let noArticlesMsg = document.querySelector('.slikkepott-filter-message');
+  if (noArticlesMsg) noArticlesMsg.remove();
+  
+  if (visibleCount === 0 && filterTag !== 'all') {
+    const container = document.getElementById('slikkepott-articles-container');
+    const message = document.createElement('div');
+    message.className = 'slikkepott-filter-message';
+    message.style.cssText = 'text-align: center; padding: 40px; color: #666; font-size: 1.2rem;';
+    message.innerHTML = `<p>Ingen artikler funnet for "${filterTag}"</p>`;
+    container.appendChild(message);
+  }
+}
+
+// Debug: Show all article tags on page load
+document.addEventListener('DOMContentLoaded', function() {
+  const articles = document.querySelectorAll('.slikkepott-article-card');
+  console.log('=== ARTICLE DEBUG INFO ===');
+  console.log(`Total articles found: ${articles.length}`);
+  
+  articles.forEach((article, index) => {
+    const tags = article.getAttribute('data-tags');
+    const title = article.querySelector('.slikkepott-article-title')?.textContent || 'No title';
+    console.log(`${index + 1}: "${title}"`);
+    console.log(`   Tags: "${tags}"`);
+    console.log(`   Individual tags: [${tags ? tags.split(' ').join(', ') : 'none'}]`);
+    console.log('---');
+  });
+  
+  slikkepottFilterArticles('all');
+});
+</script>
+
+{% schema %}
+{
+  "name": "Blog Filter Section",
+  "tag": "section",
+  "class": "slikkepott-blog-filter-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "General Settings"
+    },
+    {
+      "type": "text",
+      "id": "section_title",
+      "label": "Section Title",
+      "default": "Våre oppskrifter og guider"
+    },
+    {
+      "type": "range",
+      "id": "articles_limit",
+      "label": "Maximum Articles to Show",
+      "min": 10,
+      "max": 100,
+      "step": 10,
+      "default": 50
+    },
+    {
+      "type": "header",
+      "content": "Styling"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button Color",
+      "default": "#BC0100"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_color",
+      "label": "Button Hover Color",
+      "default": "#9a0100"
+    },
+    {
+      "type": "select",
+      "id": "grid_columns_desktop",
+      "label": "Desktop Columns",
+      "options": [
+        {
+          "value": "2",
+          "label": "2 Columns"
+        },
+        {
+          "value": "3",
+          "label": "3 Columns"
+        },
+        {
+          "value": "4",
+          "label": "4 Columns"
+        }
+      ],
+      "default": "3"
+    },
+    {
+      "type": "header",
+      "content": "Section Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top Padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom Padding",
+      "min": 0,
+      "max": 100,
+      "step": 4,
+      "unit": "px",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Blog Filter Section"
+    }
+  ]
+}
+{% endschema %}

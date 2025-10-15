@@ -1,0 +1,1203 @@
+{%- liquid
+  assign header_layout = section.settings.header_layout
+  assign button_style = section.settings.button_style
+  assign button_label = section.settings.button_label
+  assign button_link = section.settings.button_link
+  assign button_icon = section.settings.button_icon
+
+  assign section_css_class = ''
+  assign col_alignment_class = ''
+  assign col_content_width = 100
+
+  assign side_button = true
+
+  if header_layout == 'standing-column'
+    assign header_layout = 'vertical'
+    assign side_button = false
+  endif
+
+  assign image_block = section.blocks | where: 'type', 'image_card' | first
+  if image_block
+    assign section_css_class = section_css_class | append: ' faq-section__has-image'
+    assign section_css_class = section_css_class | append: ' faq-section__image-position-' | append: image_block.settings.image_position | default: 'left'
+
+    assign image_vertical_alignment = image_block.settings.alignment | default: 'center'
+    assign col_alignment_class = col_alignment_class | append: ' justify-' | append: image_vertical_alignment
+
+    assign col_image_width = image_block.settings.image_width
+    assign col_content_width = col_content_width | minus: col_image_width
+  endif
+
+  assign item_font_family = section.settings.item_heading_font | default: 'body'
+  assign item_heading_size = section.settings.item_heading_size | default: 'h6'
+  assign item_trigger_class = ' font-' | append: item_font_family | append: ' ' | append: item_heading_size
+  assign item_icon_size = section.settings.item_icon_size | default: 'extra-large'
+
+  # Count FAQ items for schema
+  assign faq_items = section.blocks | where: 'type', 'faq_item'
+-%}
+
+{%- comment -%} FAQ Schema Markup {%- endcomment -%}
+{%- if faq_items.size > 0 -%}
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": [
+      {%- for block in faq_items -%}
+        {%- if block.settings.question != blank and block.settings.answer != blank -%}
+        {
+          "@type": "Question",
+          "name": {{ block.settings.question | json }},
+          "acceptedAnswer": {
+            "@type": "Answer",
+            "text": {{ block.settings.answer | strip_html | json }}
+          }
+        }{%- unless forloop.last -%},{%- endunless -%}
+        {%- endif -%}
+      {%- endfor -%}
+    ]
+  }
+  </script>
+{%- endif -%}
+
+{% render 'divider',
+  show_divider: section.settings.show_section_divider,
+  divider_width: section.settings.divider_width
+%}
+
+<div
+  class="section section-{{ section.id }} section--padding section--faq section-header-{{ section.settings.header_layout }} color-{{ section.settings.color_scheme }}{{ section_css_class }}"
+  style="--section-padding-top: {{ section.settings.padding_top }}px;--section-padding-bottom: {{ section.settings.padding_bottom }}px;"
+  data-id="{{ section.id }}"
+>
+  <div class="section__container page-width page-width--{{ section.settings.container }}">
+    <div class="section__wrapper">
+      {% render 'section-heading',
+        section_settings: section.settings,
+        header_layout: header_layout,
+        button_visible: true,
+        button_link: button_link,
+        button_style: button_style,
+        button_label: button_label,
+        button_icon: button_icon,
+        description_size: section.settings.text_size,
+        side_button: side_button
+      %}
+      <div class="section__content">
+        <div class="faq-section__wrapper f-flex f-grid--gap-{{ section.settings.column_gap }} f-grid--row-gap-{{ section.settings.row_gap }}">
+          {%- if image_block -%}
+            <div
+              class="faq-section__image-col f-column w-full flex flex-col md:order-{% if image_block.settings.desktop_image_position == 'right' %}last{% else %}first{% endif %}{% if image_block.settings.order_first %} order-first{% else %} order-last{% endif %}{{ col_alignment_class }}"
+              style="--col-width: {{ col_image_width }}%;"
+              {{ image_block.shopify_attributes }}
+            >
+              {% render 'card-image',
+                color_scheme: image_block.settings.color_scheme,
+                link: image_block.settings.card_link,
+                image: image_block.settings.image,
+                image_mobile: image_block.settings.image_mobile,
+                image_ratio: image_block.settings.image_ratio,
+                image_overlay_opacity: image_block.settings.image_overlay_opacity,
+                heading: image_block.settings.heading,
+                highlight_style: image_block.settings.highlight_style,
+                highlight_font_style: image_block.settings.highlight_font_style,
+                highlight_style_color: image_block.settings.highlight_style_color,
+                highlight_text_color: image_block.settings.highlight_text_color,
+                heading_size: image_block.settings.heading_size,
+                subheading: image_block.settings.subheading,
+                subheading_style: image_block.settings.subheading_style,
+                description: image_block.settings.description,
+                button_label: image_block.settings.button_label,
+                button_style: image_block.settings.button_style,
+                button_icon: image_block.settings.button_icon,
+                rich_text_size: image_block.settings.content_gap,
+                content_spacing: image_block.settings.content_spacing,
+                content_position: image_block.settings.content_position,
+                content_alignment: image_block.settings.content_alignment,
+                section_index: section.index,
+                forloop_index: 1,
+                heading_size_custom: image_block.settings.heading_size_custom,
+                heading_size_mobile: image_block.settings.heading_size_mobile
+              %}
+            </div>
+          {%- endif -%}
+          <div
+            class="faq-section__content-col f-column w-full flex flex-col items-center {{ col_alignment_class }}"
+            style="--col-width: {{ col_content_width }}%;"
+          >
+            <faq-section
+              class="block w-full accordion-parent"
+              data-color-scheme="color-{{ section.settings.item_color_scheme }}"
+            >
+              {%- for block in section.blocks -%}
+                {%- case block.type -%}
+                  {%- when 'faq_item' -%}
+                    <div
+                      class="faq-item accordion-item accordion-{{ section.settings.item_style }}{% if section.settings.item_style == 'card' %} blocks-radius{% endif %}"
+                      itemscope
+                      itemtype="https://schema.org/Question"
+                      {{ block.shopify_attributes }}
+                    >
+                      <details
+                        class="accordion-details"
+                        is="accordion-group"
+                        {% if block.settings.open %}
+                          open
+                          aria-expanded="true"
+                        {% else %}
+                          aria-expanded="false"
+                        {% endif %}
+                      >
+                        <summary class="accordion-details__summary flex items-center justify-between focus-inset gap-2">
+                          <div class="flex items-center gap-2">
+                            {% if block.settings.icon != 'none' %}
+                              {% render 'icons', icon: block.settings.icon, size: item_icon_size %}
+                            {%- endif -%}
+                            <h3 class="{{ item_trigger_class }} inline-richtext" itemprop="name">
+                              {{ block.settings.question }}
+                            </h3>
+                          </div>
+                          {%- render 'icon-plus-toggle' -%}
+                        </summary>
+                        <div 
+                          class="accordion-details__content rte{% if block.settings.use_subtext_color %} text-subtext{% endif %}"
+                          itemscope
+                          itemtype="https://schema.org/Answer"
+                        >
+                          <div itemprop="text">
+                            {{ block.settings.answer }}
+                            {{ block.settings.custom_liquid }}
+                            {{ block.settings.page.content }}
+                          </div>
+                        </div>
+                      </details>
+                    </div>
+                  {%- when 'heading' -%}
+                    {%- if block.settings.sub_heading != blank or block.settings.heading != blank -%}
+                      <div class="block-heading rich-text" {{ block.shopify_attributes }}>
+                        {%- if block.settings.sub_heading != blank -%}
+                          <div class="rich-text__subheading text-subheading">{{ block.settings.sub_heading }}</div>
+                        {%- endif -%}
+                        {%- if block.settings.heading != blank -%}
+                          <h2 class="rich-text__heading {{ block.settings.heading_size }}">
+                            {% render 'highlight-text',
+                              hl_text: block.settings.heading,
+                              hl_style: block.settings.highlight_style,
+                              hl_font_style: block.settings.highlight_font_style,
+                              hl_style_color: block.settings.highlight_style_color,
+                              hl_text_color: block.settings.highlight_text_color
+                            %}
+                          </h2>
+                        {%- endif -%}
+                      </div>
+                    {%- endif -%}
+                  {%- when 'image_card' -%}
+                    {%- comment -%} Image card is handled above {%- endcomment -%}
+                {%- endcase -%}
+              {%- endfor -%}
+            </faq-section>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "FAQ Section",
+  "tag": "section",
+  "class": "section",
+  "disabled_on": {
+    "groups": ["header", "footer", "custom.overlay"]
+  },
+  "settings": [
+    {
+      "type": "header",
+      "content": "General"
+    },
+    {
+      "type": "select",
+      "id": "container",
+      "options": [
+        {
+          "value": "fixed",
+          "label": "Fixed width"
+        },
+        {
+          "value": "narrow",
+          "label": "Narrow"
+        }
+      ],
+      "default": "fixed",
+      "label": "Container width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "header",
+      "content": "Section header"
+    },
+    {
+      "type": "select",
+      "id": "header_layout",
+      "label": "Header layout",
+      "options": [
+        {
+          "value": "vertical",
+          "label": "Vertical"
+        },
+        {
+          "value": "standing-column",
+          "label": "Standing column"
+        }
+      ],
+      "default": "vertical"
+    },
+    {
+      "id": "section_header_alignment",
+      "type": "select",
+      "label": "Text alignment",
+      "default": "left",
+      "options": [
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "id": "section_header_alignment_mobile",
+      "type": "select",
+      "label": "Mobile text alignment",
+      "default": "inherit",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "Same as desktop"
+        },
+        {
+          "value": "left",
+          "label": "Left"
+        },
+        {
+          "value": "center",
+          "label": "Center"
+        },
+        {
+          "value": "right",
+          "label": "Right"
+        }
+      ]
+    },
+    {
+      "type": "inline_richtext",
+      "id": "subheading",
+      "label": "Subheading"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Frequently Asked Questions"
+    },
+    {
+      "type": "select",
+      "id": "highlight_style",
+      "label": "Highlight style",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "hand_drawn_circle",
+          "label": "Hand drawn circle"
+        },
+        {
+          "value": "thick_underline",
+          "label": "Thick underline"
+        },
+        {
+          "value": "wave_underline",
+          "label": "Wave underline"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "highlight_font_style",
+      "label": "Highlight font style",
+      "options": [
+        {
+          "value": "italic",
+          "label": "Italic"
+        },
+        {
+          "value": "normal",
+          "label": "Normal"
+        }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "highlight_style_color",
+      "label": "Highlight style color"
+    },
+    {
+      "type": "color",
+      "id": "highlight_text_color",
+      "label": "Highlight text color"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Heading size",
+      "default": "h1",
+      "options": [
+        {
+          "value": "h5",
+          "label": "Small"
+        },
+        {
+          "value": "h4",
+          "label": "Medium"
+        },
+        {
+          "value": "h3",
+          "label": "Large"
+        },
+        {
+          "value": "h2",
+          "label": "Extra large"
+        },
+        {
+          "value": "h1",
+          "label": "XX Large"
+        },
+        {
+          "value": "hd2",
+          "label": "XXX Large"
+        },
+        {
+          "value": "hd1",
+          "label": "XXXX Large"
+        }
+      ]
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "select",
+      "id": "text_size",
+      "label": "Text size",
+      "default": "text-base",
+      "options": [
+        {
+          "value": "text-sm",
+          "label": "Small"
+        },
+        {
+          "value": "text-base",
+          "label": "Base"
+        },
+        {
+          "value": "text-lg",
+          "label": "Large"
+        },
+        {
+          "value": "text-inherit",
+          "label": "Inherit"
+        }
+      ]
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "button_style",
+      "label": "Button style",
+      "options": [
+        {
+          "value": "btn--primary",
+          "label": "Primary"
+        },
+        {
+          "value": "btn--secondary",
+          "label": "Secondary"
+        },
+        {
+          "value": "btn--underline",
+          "label": "Underline"
+        },
+        {
+          "value": "btn--plain",
+          "label": "Plain"
+        }
+      ],
+      "default": "btn--primary"
+    },
+    {
+      "type": "select",
+      "id": "button_icon",
+      "label": "Button icon",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "caret-right",
+          "label": "Caret right"
+        },
+        {
+          "value": "arrow-right",
+          "label": "Arrow right"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "select",
+      "id": "column_gap",
+      "options": [
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "2xs",
+          "label": "2XS"
+        },
+        {
+          "value": "extra-small",
+          "label": "XS"
+        },
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        },
+        {
+          "value": "extra-large",
+          "label": "XL"
+        }
+      ],
+      "default": "large",
+      "label": "Column gap"
+    },
+    {
+      "type": "select",
+      "id": "row_gap",
+      "options": [
+        {
+          "value": "inherit",
+          "label": "Inherit"
+        },
+        {
+          "value": "none",
+          "label": "None"
+        },
+        {
+          "value": "2xs",
+          "label": "2XS"
+        },
+        {
+          "value": "extra-small",
+          "label": "XS"
+        },
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        },
+        {
+          "value": "extra-large",
+          "label": "XL"
+        }
+      ],
+      "default": "inherit",
+      "label": "Row gap"
+    },
+    {
+      "type": "header",
+      "content": "FAQ Items"
+    },
+    {
+      "type": "select",
+      "id": "item_style",
+      "label": "Item style",
+      "default": "standard",
+      "options": [
+        {
+          "value": "standard",
+          "label": "Standard"
+        },
+        {
+          "value": "card",
+          "label": "Card"
+        }
+      ]
+    },
+    {
+      "type": "color_scheme",
+      "id": "item_color_scheme",
+      "label": "Item color scheme",
+      "default": "scheme-2"
+    },
+    {
+      "type": "select",
+      "id": "item_heading_font",
+      "label": "Question font family",
+      "default": "heading",
+      "options": [
+        {
+          "value": "body",
+          "label": "Body font"
+        },
+        {
+          "value": "heading",
+          "label": "Heading font"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "item_heading_size",
+      "label": "Question text size",
+      "default": "h4",
+      "options": [
+        {
+          "value": "text-base",
+          "label": "Base"
+        },
+        {
+          "value": "h5",
+          "label": "Small"
+        },
+        {
+          "value": "h4",
+          "label": "Medium"
+        },
+        {
+          "value": "h3",
+          "label": "Large"
+        }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "item_icon_size",
+      "label": "Icon size",
+      "options": [
+        {
+          "value": "extra-small",
+          "label": "XS"
+        },
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "extra-medium",
+          "label": "Medium"
+        },
+        {
+          "value": "medium",
+          "label": "Large"
+        },
+        {
+          "value": "large",
+          "label": "XL"
+        },
+        {
+          "value": "extra-large",
+          "label": "XXL"
+        }
+      ],
+      "default": "extra-large"
+    },
+    {
+      "type": "header",
+      "content": "Section padding"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Top padding",
+      "default": 50,
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Bottom padding",
+      "default": 50,
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Section divider"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_section_divider",
+      "default": false,
+      "label": "Show section divider"
+    },
+    {
+      "type": "select",
+      "id": "divider_width",
+      "label": "Divider width",
+      "options": [
+        {
+          "value": "fixed",
+          "label": "Fixed"
+        },
+        {
+          "value": "full",
+          "label": "Full"
+        }
+      ],
+      "default": "fixed"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "faq_item",
+      "name": "FAQ Item",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "car-simple",
+              "label": "Car"
+            },
+            {
+              "value": "truck",
+              "label": "Truck"
+            },
+            {
+              "value": "package",
+              "label": "Package"
+            },
+            {
+              "value": "currency-circle-dollar",
+              "label": "Dollar"
+            },
+            {
+              "value": "gift",
+              "label": "Gift"
+            },
+            {
+              "value": "heart",
+              "label": "Heart"
+            },
+            {
+              "value": "globe",
+              "label": "Globe"
+            },
+            {
+              "value": "check",
+              "label": "Check"
+            },
+            {
+              "value": "lightning",
+              "label": "Lightning"
+            },
+            {
+              "value": "calendar-blank",
+              "label": "Calendar"
+            },
+            {
+              "value": "bell-ringing",
+              "label": "Bell"
+            },
+            {
+              "value": "location",
+              "label": "Location"
+            },
+            {
+              "value": "tag",
+              "label": "Tag"
+            },
+            {
+              "value": "smiley",
+              "label": "Smiley"
+            },
+            {
+              "value": "clock",
+              "label": "Clock"
+            },
+            {
+              "value": "phone",
+              "label": "Phone"
+            },
+            {
+              "value": "chat",
+              "label": "Chat"
+            }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "text",
+          "id": "question",
+          "label": "Question",
+          "default": "What is your return policy?"
+        },
+        {
+          "type": "richtext",
+          "id": "answer",
+          "label": "Answer",
+          "default": "<p>We offer a 30-day return policy on all items. Items must be in original condition with tags attached.</p>"
+        },
+        {
+          "type": "liquid",
+          "id": "custom_liquid",
+          "label": "Custom Liquid"
+        },
+        {
+          "type": "page",
+          "id": "page",
+          "label": "Page content"
+        },
+        {
+          "type": "checkbox",
+          "id": "open",
+          "label": "Open by default"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_subtext_color",
+          "label": "Use subdued text color for answer"
+        }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "Heading",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "text",
+          "id": "sub_heading",
+          "label": "Subheading"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Common Questions",
+          "info": "Highlight specific words by wrapping them in <strong> tags."
+        },
+        {
+          "type": "select",
+          "id": "highlight_style",
+          "label": "Highlight style",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "hand_drawn_circle",
+              "label": "Hand drawn circle"
+            },
+            {
+              "value": "thick_underline",
+              "label": "Thick underline"
+            },
+            {
+              "value": "wave_underline",
+              "label": "Wave underline"
+            }
+          ]
+        },
+        {
+          "type": "select",
+          "id": "highlight_font_style",
+          "label": "Highlight font style",
+          "options": [
+            {
+              "value": "italic",
+              "label": "Italic"
+            },
+            {
+              "value": "normal",
+              "label": "Normal"
+            }
+          ]
+        },
+        {
+          "type": "color",
+          "id": "highlight_style_color",
+          "label": "Highlight style color"
+        },
+        {
+          "type": "color",
+          "id": "highlight_text_color",
+          "label": "Highlight text color"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "Heading size",
+          "default": "h1",
+          "options": [
+            {
+              "value": "h5",
+              "label": "Small"
+            },
+            {
+              "value": "h4",
+              "label": "Medium"
+            },
+            {
+              "value": "h3",
+              "label": "Large"
+            },
+            {
+              "value": "h2",
+              "label": "Extra large"
+            },
+            {
+              "value": "h1",
+              "label": "XX Large"
+            },
+            {
+              "value": "hd2",
+              "label": "XXX Large"
+            },
+            {
+              "value": "hd1",
+              "label": "XXXX Large"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "type": "image_card",
+      "name": "Image Card",
+      "limit": 1,
+      "settings": [
+        {
+          "type": "color_scheme",
+          "id": "color_scheme",
+          "label": "Color scheme",
+          "default": "scheme-1"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "desktop_image_position",
+          "label": "Desktop image position",
+          "default": "left",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "image_width",
+          "label": "Desktop image width",
+          "default": 50,
+          "min": 30,
+          "max": 70,
+          "step": 1,
+          "unit": "%"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "Vertical alignment",
+          "default": "center",
+          "options": [
+            {
+              "value": "start",
+              "label": "Top"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "end",
+              "label": "Bottom"
+            }
+          ]
+        },
+        {
+          "type": "header",
+          "content": "Image"
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "select",
+          "id": "image_ratio",
+          "label": "Image ratio",
+          "default": "adapt",
+          "options": [
+            {
+              "value": "adapt",
+              "label": "Adapt to image"
+            },
+            {
+              "value": "1/1",
+              "label": "Square"
+            },
+            {
+              "value": "3/4",
+              "label": "Portrait"
+            },
+            {
+              "value": "4/3",
+              "label": "Landscape"
+            }
+          ]
+        },
+        {
+          "type": "range",
+          "id": "image_overlay_opacity",
+          "min": 0,
+          "max": 100,
+          "step": 2,
+          "unit": "%",
+          "label": "Image overlay opacity",
+          "default": 0
+        },
+        {
+          "type": "header",
+          "content": "Content"
+        },
+        {
+          "type": "select",
+          "id": "content_position",
+          "label": "Content position",
+          "options": [
+            {
+              "value": "top-center",
+              "label": "Top center"
+            },
+            {
+              "value": "middle-center",
+              "label": "Middle center"
+            },
+            {
+              "value": "bottom-center",
+              "label": "Bottom center"
+            }
+          ],
+          "default": "top-center"
+        },
+        {
+          "type": "select",
+          "id": "content_alignment",
+          "label": "Content alignment",
+          "default": "center",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ]
+        },
+        {
+          "type": "url",
+          "id": "card_link",
+          "label": "Card link"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "subheading",
+          "label": "Subheading"
+        },
+        {
+          "type": "inline_richtext",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Need Help?",
+          "info": "Highlight specific words by wrapping them in <strong> tags."
+        },
+        {
+          "type": "richtext",
+          "id": "description",
+          "label": "Description",
+          "default": "<p>Find answers to common questions or contact our support team.</p>"
+        },
+        {
+          "type": "text",
+          "id": "button_label",
+          "label": "Button label",
+          "default": "Contact Support"
+        },
+        {
+          "type": "select",
+          "id": "button_style",
+          "label": "Button style",
+          "options": [
+            {
+              "value": "btn--primary",
+              "label": "Primary"
+            },
+            {
+              "value": "btn--secondary",
+              "label": "Secondary"
+            },
+            {
+              "value": "btn--underline",
+              "label": "Underline"
+            },
+            {
+              "value": "btn--plain",
+              "label": "Plain"
+            }
+          ],
+          "default": "btn--primary"
+        },
+        {
+          "type": "select",
+          "id": "button_icon",
+          "label": "Button icon",
+          "options": [
+            {
+              "value": "none",
+              "label": "None"
+            },
+            {
+              "value": "caret-right",
+              "label": "Caret right"
+            },
+            {
+              "value": "arrow-right",
+              "label": "Arrow right"
+            }
+          ],
+          "default": "none"
+        },
+        {
+          "type": "header",
+          "content": "Mobile"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_mobile",
+          "label": "Mobile image"
+        },
+        {
+          "type": "checkbox",
+          "id": "order_first",
+          "label": "Show image first on mobile",
+          "default": false
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ Section",
+      "blocks": [
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "What is your return policy?",
+            "answer": "<p>We offer a 30-day return policy on all items. Items must be in original condition with tags attached.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "How long does shipping take?",
+            "answer": "<p>Standard shipping typically takes 3-5 business days. Express shipping is available for 1-2 business days.</p>"
+          }
+        },
+        {
+          "type": "faq_item",
+          "settings": {
+            "question": "Do you offer international shipping?",
+            "answer": "<p>Yes, we ship to most countries worldwide. International shipping times vary by location but typically take 7-14 business days.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
