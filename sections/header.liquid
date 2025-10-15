@@ -83,7 +83,10 @@
     {%- else -%}
       <div class="header__logo flex justify-center items-center z-1">
     {%- endif -%}
-    {%- if section.settings.header_layout == 'logo-left' or section.settings.header_layout == 'logo-left-search-center' and section.settings.enable_collapse_on_scroll -%}
+    {%- if section.settings.header_layout == 'logo-left'
+      or section.settings.header_layout == 'logo-left-search-center'
+      and section.settings.enable_collapse_on_scroll
+    -%}
       <button
         class="menu-drawer-button toggle-navigation-button btn btn--inherit flex-col items-center justify-center hidden lg:flex shrink-0"
         aria-label="{{ 'accessibility.menu_drawer' | t }}"
@@ -157,9 +160,14 @@
       </button>
     </div>
 
-    <div class="header__icons header__icons--right flex justify-end z-1">
+    <div class="header__icons header__icons--right flex justify-end z-1 flex flex-col">
       <div class="header__buttons flex items-center justify-center">
-        {%- if custom_link and custom_link.settings.link != blank or custom_link.settings.label != blank or custom_link.settings.custom_icon != blank or custom_link.settings.icon != 'none' -%}
+        {%- if custom_link
+          and custom_link.settings.link != blank
+          or custom_link.settings.label != blank
+          or custom_link.settings.custom_icon != blank
+          or custom_link.settings.icon != 'none'
+        -%}
           <a
             href="{{ custom_link.settings.link | default: "#" }}"
             class="cusstom-button flex items-center justify-center gap-2 reversed-link{% if custom_link.settings.label == blank %} reversed-link--icon-only{% endif %}"
@@ -239,6 +247,12 @@
           </cart-count>
         </a>
       </div>
+      {%- if section.settings.show_free_shipping_goal and settings.free_shipping_minimum_amount != blank -%}
+        {%- assign minimum_amount = settings.free_shipping_minimum_amount | remove: ' ' -%}
+        <div class="header__free-shipping-inline w-[50%]">
+          {%- render 'free-shipping-goal', minimum_amount: minimum_amount, classes: 'header-shipping-bar-inline' -%}
+        </div>
+      {%- endif -%}
     </div>
   </div>
   {%- if section.settings.menu != blank -%}
@@ -515,6 +529,17 @@
       "step": 1,
       "unit": "px",
       "default": 16
+    },
+    {
+      "type": "header",
+      "content": "Free shipping goal"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_free_shipping_goal",
+      "label": "Show free shipping goal in header",
+      "default": false,
+      "info": "Set the minimum amount for Free Shipping in the [theme settings](/editor?context=theme&category=cart)."
     }
   ],
   "blocks": [

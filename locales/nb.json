@@ -160,8 +160,8 @@
         "apply_error_message": "Denne rabattkoden kan ikke brukes med din handlekurv."
       },
       "free_shipping": {
-        "remaining_html": "Bruk {{ remaining_amount }} for å oppnå fri frakt!",
-        "congratulations_html": "Gratulerer du får fri frakt!"
+        "remaining_html": "{{ remaining_amount }} igjen til gratis frakt!",
+        "congratulations_html": "Du får gratis frakt! 🎉"
       },
       "shipping_calculator": {
         "title": "Estimert frakt",
