@@ -192,8 +192,16 @@
       // Use dynamic cart data if available, otherwise fall back to static data
       const cartItems = window.currentCartItems || {{ cart.items | json }};
       
-      // Process bundle groups (don't reset anything initially to preserve automatic discounts)
-      // We'll handle resets on a case-by-case basis within each bundle group
+      // First, ensure all products have their original prices displayed
+      cartItems.forEach((item, index) => {
+        const cartItemElement = document.querySelector(`#CartItem-${index + 1}`);
+        if (cartItemElement) {
+          // Reset to original price display for all items
+          resetToOriginalPrice(cartItemElement, item);
+        }
+      });
+      
+      // Then apply bundle discounts to valid bundle groups
       Object.keys(bundleGroups).forEach(bundleId => {
         const group = bundleGroups[bundleId];
         const isValidBundle = validateBundleGroup(group);
@@ -211,57 +219,30 @@
               item: item,
               bundleData: bundleData
             });
-            const cartItemElement = document.querySelector(`#CartItem-${index + 1}`);
-            // Reset to original price first, then apply bundle discount
-            resetToOriginalPrice(cartItemElement, item);
             applyBundleDiscountToCartItem(index, item, bundleData);
-            // Hide discount tags for valid bundle items
-            if (cartItemElement) {
-              toggleDiscountTags(cartItemElement, true);
-            }
           });
         } else {
-          // Invalid bundle group - show as regular products
+          // Invalid bundle group - show as regular products (original price only)
           console.log(`Invalid bundle group ${bundleId} - showing as regular products`);
           group.forEach(({ index, item }) => {
             const cartItemElement = document.querySelector(`#CartItem-${index + 1}`);
             if (cartItemElement) {
-              // Check if this item has an automatic discount
-              if (item.original_price !== item.final_price) {
-                // Has automatic discount - apply automatic discount display
-                console.log(`Invalid bundle item ${index} has automatic discount - applying automatic discount display`);
-                applyAutomaticDiscountDisplay(cartItemElement, item);
-              } else {
-                // No automatic discount - reset to original price
-                resetToOriginalPrice(cartItemElement, item);
-                console.log(`Reset invalid bundle item ${index} to original price (no discount)`);
-              }
+              resetToOriginalPrice(cartItemElement, item);
               removeBundleIndicator(cartItemElement);
-              // Show discount tags for invalid bundle items (if they have discounts)
-              toggleDiscountTags(cartItemElement, false);
+              console.log(`Reset invalid bundle item ${index} to original price`);
             }
           });
         }
       });
       
-      // Ensure non-bundle products show correct prices (apply automatic discounts)
+      // Ensure non-bundle products show original prices
       cartItems.forEach((item, index) => {
         if (!item.properties || !item.properties._is_bundle) {
           const cartItemElement = document.querySelector(`#CartItem-${index + 1}`);
           if (cartItemElement) {
-            // Check if this product has an automatic discount
-            if (item.original_price !== item.final_price) {
-              // Has automatic discount - apply automatic discount display
-              console.log(`Item ${index} has automatic discount - applying automatic discount display`);
-              applyAutomaticDiscountDisplay(cartItemElement, item);
-              // Ensure discount tags are visible for regular products with discounts
-              toggleDiscountTags(cartItemElement, false);
-            } else {
-              // No discount - reset to ensure clean display
-              resetToOriginalPrice(cartItemElement, item);
-              removeBundleIndicator(cartItemElement);
-              console.log(`Reset non-bundle item ${index} to original price`);
-            }
+            resetToOriginalPrice(cartItemElement, item);
+            removeBundleIndicator(cartItemElement);
+            console.log(`Reset non-bundle item ${index} to original price`);
           }
         }
       });
@@ -383,70 +364,6 @@
           titleContainer.parentNode.replaceChild(originalTitle, titleContainer);
         }
       }
-    }
-    
-    // Function to toggle discount tag visibility based on bundle validity
-    function toggleDiscountTags(cartItemElement, isValidBundle) {
-      const discountsList = cartItemElement.querySelector('.cart-item__discounts');
-      if (discountsList) {
-        if (isValidBundle) {
-          // Valid bundle - hide discount tags
-          discountsList.style.display = 'none';
-          console.log('Hiding discount tags for valid bundle item');
-        } else {
-          // Invalid bundle - show discount tags
-          discountsList.style.display = '';
-          console.log('Showing discount tags for invalid bundle item');
-        }
-      }
-    }
-    
-    // Function to apply automatic discount display (for products with Shopify automatic discounts)
-    function applyAutomaticDiscountDisplay(cartItemElement, item) {
-      const priceElements = cartItemElement.querySelectorAll('.price');
-      
-      console.log(`Applying automatic discount display for item:`, {
-        originalPrice: item.original_price,
-        finalPrice: item.final_price
-      });
-
-      priceElements.forEach((priceElement) => {
-        // Clear existing content
-        priceElement.innerHTML = '';
-
-        // Format prices
-        const formattedOriginalPrice = new Intl.NumberFormat('no-NO', {
-          style: 'currency',
-          currency: 'NOK'
-        }).format(item.original_price / 100);
-
-        const formattedFinalPrice = new Intl.NumberFormat('no-NO', {
-          style: 'currency',
-          currency: 'NOK'
-        }).format(item.final_price / 100);
-
-        console.log(`Formatted automatic discount prices:`, {
-          original: formattedOriginalPrice,
-          final: formattedFinalPrice
-        });
-
-        // Create final price (current price) - this is the main price
-        const regularPriceSpan = document.createElement('span');
-        regularPriceSpan.className = 'price__regular font-body-bolder';
-        regularPriceSpan.textContent = formattedFinalPrice;
-        priceElement.appendChild(regularPriceSpan);
-
-        // Create original price (crossed out)
-        const salePriceSpan = document.createElement('s');
-        salePriceSpan.className = 'price__sale font-body text-subtext';
-        salePriceSpan.textContent = formattedOriginalPrice;
-        priceElement.appendChild(salePriceSpan);
-
-        // Add sale styling to show both prices
-        priceElement.classList.add('price--on-sale');
-
-        console.log(`Automatic discount price element updated:`, priceElement.innerHTML);
-      });
     }
     
     // Function to update line total price with discount
@@ -737,6 +654,25 @@
       }, 100);
     }
     
+    // Function to check if discount codes are applied
+    function hasDiscountCodesApplied() {
+      // Check for discount code elements in the DOM
+      const discountElements = document.querySelectorAll('.cart__discounts .discount');
+      const hasDiscounts = discountElements.length > 0;
+      
+      // Also check for discount codes in cart data if available
+      const cartData = window.currentCartData || null;
+      const hasCartDiscounts = cartData && cartData.cart_level_discount_applications && cartData.cart_level_discount_applications.length > 0;
+      
+      console.log('Discount check:', {
+        domDiscounts: hasDiscounts,
+        cartDiscounts: hasCartDiscounts,
+        discountElements: discountElements.length
+      });
+      
+      return hasDiscounts || hasCartDiscounts;
+    }
+    
     // Function to update cart subtotal based on actual prices
     function updateCartSubtotal() {
       console.log('=== UPDATING CART SUBTOTAL ===');
@@ -744,6 +680,18 @@
       // Always get fresh cart data
       const cartItems = window.currentCartItems || {{ cart.items | json }};
       console.log('Cart items for subtotal calculation:', cartItems);
+      
+      // Check if there are any discount codes applied
+      const hasDiscountCodes = hasDiscountCodesApplied();
+      console.log('Has discount codes:', hasDiscountCodes);
+      
+      // If discount codes are applied, completely skip JavaScript override
+      // Let Shopify handle the calculation with discount codes
+      if (hasDiscountCodes) {
+        console.log('Discount codes detected - skipping JavaScript override to preserve discount code functionality');
+        console.log('Letting Shopify handle the final calculation with discount codes');
+        return;
+      }
       
       let calculatedTotal = 0;
       
@@ -796,40 +744,26 @@
             
             console.log(`✅ Valid bundle item ${index}: True Original ${trueOriginalLinePrice}, Discounted ${discountedLinePrice}`);
           } else {
-            // This is an invalid bundle - check if it has automatic discount
-            if (item.original_price !== item.final_price) {
-              // Invalid bundle item with automatic discount - use final_line_price
-              calculatedTotal += item.final_line_price;
-              console.log(`❌ Invalid bundle item ${index} with automatic discount: ${item.final_line_price} (original: ${item.original_line_price})`);
-            } else {
-              // Invalid bundle item without automatic discount - use true original price
-              const bundleData = getBundleDataFromItem(item);
-              let trueOriginalPrice = item.original_price; // Use original_price from cart item
-              
-              if (bundleData && bundleData.productsData && Array.isArray(bundleData.productsData)) {
-                const productData = bundleData.productsData.find(p => p.id == item.variant_id);
-                if (productData && productData.price) {
-                  trueOriginalPrice = productData.price;
-                }
+            // This is an invalid bundle or bundle without discount - use true original price
+            const bundleData = getBundleDataFromItem(item);
+            let trueOriginalPrice = item.original_price; // Use original_price from cart item
+            
+            if (bundleData && bundleData.productsData && Array.isArray(bundleData.productsData)) {
+              const productData = bundleData.productsData.find(p => p.id == item.variant_id);
+              if (productData && productData.price) {
+                trueOriginalPrice = productData.price;
               }
-              
-              const trueOriginalLinePrice = trueOriginalPrice * item.quantity;
-              calculatedTotal += trueOriginalLinePrice;
-              
-              console.log(`❌ Invalid bundle item ${index}: True Original ${trueOriginalLinePrice} (no automatic discount)`);
             }
+            
+            const trueOriginalLinePrice = trueOriginalPrice * item.quantity;
+            calculatedTotal += trueOriginalLinePrice;
+            
+            console.log(`❌ Invalid bundle item ${index}: True Original ${trueOriginalLinePrice} (no discount)`);
           }
         } else {
-          // This is a regular product - check if it has automatic discount
-          if (item.original_price !== item.final_price) {
-            // Has automatic discount - use final_line_price
-            calculatedTotal += item.final_line_price;
-            console.log(`💰 Regular item ${index} with automatic discount: ${item.final_line_price} (original: ${item.original_line_price})`);
-          } else {
-            // No discount - use original_line_price
-            calculatedTotal += item.original_line_price;
-            console.log(`📦 Regular item ${index}: ${item.original_line_price}`);
-          }
+          // This is a regular product - use original price
+          calculatedTotal += item.original_line_price;
+          console.log(`📦 Regular item ${index}: ${item.original_line_price}`);
         }
       });
       
@@ -1028,6 +962,42 @@
       });
     }
     
+    // Observe discount code changes in the cart footer
+    const cartFooter = document.querySelector('.cart__footer');
+    if (cartFooter) {
+      const discountObserver = new MutationObserver(function(mutations) {
+        let shouldUpdate = false;
+        mutations.forEach(function(mutation) {
+          if (mutation.type === 'childList') {
+            // Check if discount elements were added or removed
+            const discountElements = document.querySelectorAll('.cart__discounts .discount');
+            if (discountElements.length !== window.lastDiscountCount) {
+              console.log(`Discount count changed from ${window.lastDiscountCount} to ${discountElements.length}`);
+              window.lastDiscountCount = discountElements.length;
+              shouldUpdate = true;
+            }
+          }
+        });
+        
+        if (shouldUpdate) {
+          console.log('Discount codes changed - updating subtotal');
+          setTimeout(() => {
+            getCurrentCartData().then(() => {
+              updateCartSubtotal();
+            });
+          }, 200);
+        }
+      });
+      
+      discountObserver.observe(cartFooter, {
+        childList: true,
+        subtree: true
+      });
+      
+      // Initialize discount count
+      window.lastDiscountCount = document.querySelectorAll('.cart__discounts .discount').length;
+    }
+    
     // Also listen for any AJAX cart updates
     document.addEventListener('DOMContentLoaded', function() {
       // Override any existing cart update functions
@@ -1069,6 +1039,10 @@
         const response = await fetch('/cart.js');
         const cartData = await response.json();
         console.log('Current cart data from API:', cartData);
+        
+        // Store cart data globally for discount code checking
+        window.currentCartData = cartData;
+        
         return cartData;
       } catch (error) {
         console.error('Error fetching cart data:', error);
@@ -1110,6 +1084,25 @@
     window.addEventListener('cartUpdated', reinitializeBundleDisplay);
     window.addEventListener('cartChanged', reinitializeBundleDisplay);
     
+    // Listen for discount code changes
+    document.addEventListener('cart:discount:applied', function() {
+      console.log('Discount code applied - refreshing cart data and updating subtotal');
+      setTimeout(() => {
+        getCurrentCartData().then(() => {
+          updateCartSubtotal();
+        });
+      }, 500);
+    });
+    
+    document.addEventListener('cart:discount:removed', function() {
+      console.log('Discount code removed - refreshing cart data and updating subtotal');
+      setTimeout(() => {
+        getCurrentCartData().then(() => {
+          updateCartSubtotal();
+        });
+      }, 500);
+    });
+    
     // Make functions globally available for debugging
     window.getBundleDataFromItem = getBundleDataFromItem;
     window.processBundleProducts = processBundleProducts;
@@ -1120,8 +1113,6 @@
     window.updateCartSubtotal = updateCartSubtotal;
     window.reinitializeBundleDisplay = reinitializeBundleDisplay;
     window.updateQuantityControls = updateQuantityControls;
-    window.toggleDiscountTags = toggleDiscountTags;
-    window.applyAutomaticDiscountDisplay = applyAutomaticDiscountDisplay;
     
     // Add manual trigger for testing
     window.forceBundleUpdate = function() {
@@ -1440,40 +1431,7 @@
                                   {%- endif -%}
                                 </div>
                                 <div class="grid gap-2 hidden lg:grid">
-                                  {%- liquid
-                                    # Check if this is a valid bundle item to hide discount tags
-                                    assign show_discount_tag = true
-                                    assign is_bundle_check = false
-                                    assign is_valid_bundle_check = false
-
-                                    if item.properties._is_bundle and item.properties._bundle_id
-                                      assign is_bundle_check = true
-                                      assign bundle_id_check = item.properties._bundle_id
-                                      assign bundle_count_check = 0
-                                      assign expected_components_check = 0
-
-                                      # Count items in this bundle group
-                                      for other_item in cart.items
-                                        if other_item.properties._bundle_id == bundle_id_check
-                                          assign bundle_count_check = bundle_count_check | plus: 1
-                                        endif
-                                      endfor
-
-                                      # Get expected number of components
-                                      if item.properties._bundle_products_data
-                                        assign bundle_products_data_check = item.properties._bundle_products_data | parse_json
-                                        assign expected_components_check = bundle_products_data_check.size
-                                      endif
-
-                                      # Bundle is valid if we have ALL expected components
-                                      if bundle_count_check == expected_components_check and expected_components_check >= 2
-                                        assign is_valid_bundle_check = true
-                                        # Hide discount tags for valid bundle items
-                                        assign show_discount_tag = false
-                                      endif
-                                    endif
-                                  -%}
-                                  {%- if item.line_level_discount_allocations != blank and show_discount_tag -%}
+                                  {%- if item.line_level_discount_allocations != blank -%}
                                     <ul class="cart-item__discounts discounts list-unstyled flex gap-1" role="list" aria-label="{{ 'customer.order.discount' | t }}">
                                       {%- for discount_allocation in item.line_level_discount_allocations -%}
                                         <li class="discount text-sm-extra font-body-bold flex items-center gap-2">
@@ -1505,46 +1463,29 @@
                                           assign line_discount_amount = item.original_line_price | times: bundle_discount_percent | divided_by: 100
                                           assign discounted_line_price = item.original_line_price | minus: line_discount_amount
                                         endif
-
-                                        # Check if regular product has automatic discount
-                                        assign has_automatic_discount = false
-                                        if item.original_price != item.final_price and is_bundle_item == false
-                                          assign has_automatic_discount = true
-                                        endif
                                       -%}
-                                      
-                                      {%- if is_bundle_item -%}
-                                        {%- comment -%} Bundle product - show discounted price with original crossed out {%- endcomment -%}
+                                      {%- if item.original_price != item.final_price or is_bundle_item -%}
                                         <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
                                         <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
                                         <span class="price__regular">
                                           {%- liquid 
-                                            if settings.currency_code_enabled
-                                              echo discounted_price | money_with_currency
+                                            if is_bundle_item
+                                              if settings.currency_code_enabled
+                                                echo discounted_price | money_with_currency
+                                              else
+                                                echo discounted_price | money
+                                              endif
                                             else
-                                              echo discounted_price | money
-                                            endif
+                                              if settings.currency_code_enabled
+                                                echo item.final_price | money_with_currency
+                                              else
+                                                echo item.final_price | money
+                                              endif
+                                            endif  
                                           -%}
                                         </span>
                                         <s class="price__sale font-body text-subtext">{{ money_price }}</s>
-                                        
-                                      {%- elsif has_automatic_discount -%}
-                                        {%- comment -%} Regular product with automatic discount - show final price with original crossed out {%- endcomment -%}
-                                        <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
-                                        <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
-                                        <span class="price__regular">
-                                          {%- liquid 
-                                            if settings.currency_code_enabled
-                                              echo item.final_price | money_with_currency
-                                            else
-                                              echo item.final_price | money
-                                            endif
-                                          -%}
-                                        </span>
-                                        <s class="price__sale font-body text-subtext">{{ money_price }}</s>
-                                        
                                       {%- else -%}
-                                        {%- comment -%} Regular product without discount - show regular price only {%- endcomment -%}
                                         {{- money_price -}}
                                       {%- endif -%}
             
@@ -1732,40 +1673,7 @@
                                     {%- endif -%}
                                   </div>
                                   <div class="grid gap-2 lg:hidden">
-                                    {%- liquid
-                                      # Check if this is a valid bundle item to hide discount tags (mobile)
-                                      assign show_discount_tag_mobile = true
-                                      assign is_bundle_check_mobile = false
-                                      assign is_valid_bundle_check_mobile = false
-
-                                      if item.properties._is_bundle and item.properties._bundle_id
-                                        assign is_bundle_check_mobile = true
-                                        assign bundle_id_check_mobile = item.properties._bundle_id
-                                        assign bundle_count_check_mobile = 0
-                                        assign expected_components_check_mobile = 0
-
-                                        # Count items in this bundle group
-                                        for other_item in cart.items
-                                          if other_item.properties._bundle_id == bundle_id_check_mobile
-                                            assign bundle_count_check_mobile = bundle_count_check_mobile | plus: 1
-                                          endif
-                                        endfor
-
-                                        # Get expected number of components
-                                        if item.properties._bundle_products_data
-                                          assign bundle_products_data_check_mobile = item.properties._bundle_products_data | parse_json
-                                          assign expected_components_check_mobile = bundle_products_data_check_mobile.size
-                                        endif
-
-                                        # Bundle is valid if we have ALL expected components
-                                        if bundle_count_check_mobile == expected_components_check_mobile and expected_components_check_mobile >= 2
-                                          assign is_valid_bundle_check_mobile = true
-                                          # Hide discount tags for valid bundle items
-                                          assign show_discount_tag_mobile = false
-                                        endif
-                                      endif
-                                    -%}
-                                    {%- if item.line_level_discount_allocations != blank and show_discount_tag_mobile -%}
+                                    {%- if item.line_level_discount_allocations != blank -%}
                                       <ul class="cart-item__discounts discounts list-unstyled flex justify-end gap-1" role="list" aria-label="{{ 'customer.order.discount' | t }}">
                                         {%- for discount_allocation in item.line_level_discount_allocations -%}
                                           <li class="discount text-sm-extra font-body-bold flex items-center gap-2">
@@ -1776,49 +1684,14 @@
                                       </ul>
                                     {%- endif -%}
                                     <div class="cart-item__prices">
-                                      <div class="price text-right flex flex-wrap items-center gap-x-2 font-body-bolder{% if item.original_price != item.final_price or item.properties._is_bundle %} price--on-sale{% endif %}">
+                                      <div class="price text-right flex flex-wrap items-center gap-x-2 font-body-bolder{% if item.original_price != item.final_price %} price--on-sale{% endif %}">
                                         {%- liquid
                                           assign money_price = item.original_price | money
                                           if settings.currency_code_enabled
                                             assign money_price = item.original_price | money_with_currency
                                           endif
-
-                                          # Check if this is a bundle product and calculate discounted price
-                                          assign is_bundle_item_mobile = false
-                                          assign bundle_discount_percent_mobile = 0
-                                          assign discounted_price_mobile = item.original_price
-                                          
-                                          if item.properties._is_bundle and item.properties._discount_value
-                                            assign is_bundle_item_mobile = true
-                                            assign bundle_discount_percent_mobile = item.properties._discount_value | times: 1.0
-                                            assign discount_amount_mobile = item.original_price | times: bundle_discount_percent_mobile | divided_by: 100
-                                            assign discounted_price_mobile = item.original_price | minus: discount_amount_mobile
-                                          endif
-
-                                          # Check if regular product has automatic discount
-                                          assign has_automatic_discount_mobile = false
-                                          if item.original_price != item.final_price and is_bundle_item_mobile == false
-                                            assign has_automatic_discount_mobile = true
-                                          endif
                                         -%}
-                                        
-                                        {%- if is_bundle_item_mobile -%}
-                                          {%- comment -%} Bundle product - show discounted price with original crossed out {%- endcomment -%}
-                                          <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
-                                          <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
-                                          <span class="price__regular">
-                                            {%- liquid 
-                                              if settings.currency_code_enabled
-                                                echo discounted_price_mobile | money_with_currency
-                                              else
-                                                echo discounted_price_mobile | money
-                                              endif
-                                            -%}
-                                          </span>
-                                          <s class="price__sale font-body text-subtext">{{ money_price }}</s>
-                                          
-                                        {%- elsif has_automatic_discount_mobile -%}
-                                          {%- comment -%} Regular product with automatic discount - show final price with original crossed out {%- endcomment -%}
+                                        {%- if item.original_price != item.final_price -%}
                                           <span class="visually-hidden">{{ 'products.product.price.regular_price' | t }}</span>
                                           <span class="visually-hidden">{{ 'products.product.price.sale_price' | t }}</span>
                                           <span class="price__regular">
@@ -1831,9 +1704,7 @@
                                             -%}
                                           </span>
                                           <s class="price__sale font-body text-subtext">{{ money_price }}</s>
-                                          
                                         {%- else -%}
-                                          {%- comment -%} Regular product without discount - show regular price only {%- endcomment -%}
                                           {{- money_price -}}
                                         {%- endif -%}
               
@@ -2031,40 +1902,10 @@
                               
                               # Check if this is a bundle product and calculate discounted line price
                               if item.properties._is_bundle and item.properties._discount_value
-                                # Check if this bundle group is still valid
-                                assign bundle_id_line = item.properties._bundle_id
-                                assign bundle_count_line = 0
-                                assign expected_components_line = 0
-                                
-                                # Count items in this bundle group
-                                for other_item in cart.items
-                                  if other_item.properties._bundle_id == bundle_id_line
-                                    assign bundle_count_line = bundle_count_line | plus: 1
-                                  endif
-                                endfor
-                                
-                                # Get expected number of components
-                                if item.properties._bundle_products_data
-                                  assign bundle_products_data_line = item.properties._bundle_products_data | parse_json
-                                  assign expected_components_line = bundle_products_data_line.size
-                                endif
-                                
-                                # Bundle is valid only if we have ALL expected components
-                                assign is_valid_bundle_line = false
-                                if bundle_count_line == expected_components_line and expected_components_line >= 2
-                                  assign is_valid_bundle_line = true
-                                endif
-                                
-                                # Only apply bundle discount if bundle is valid
-                                if is_valid_bundle_line
-                                  assign discount_percent = item.properties._discount_value | times: 1.0
-                                  assign original_line_price = item.original_line_price
-                                  assign discount_amount = original_line_price | times: discount_percent | divided_by: 100
-                                  assign line_price = original_line_price | minus: discount_amount
-                                else
-                                  # Invalid bundle - use final_line_price (includes automatic discount if present)
-                                  assign line_price = item.final_line_price
-                                endif
+                                assign discount_percent = item.properties._discount_value | times: 1.0
+                                assign original_line_price = item.original_line_price
+                                assign discount_amount = original_line_price | times: discount_percent | divided_by: 100
+                                assign line_price = original_line_price | minus: discount_amount
                               endif
                               
                               if settings.currency_code_enabled
@@ -2206,74 +2047,84 @@
                         </span>
                         <span class="totals__subtotal-value" id="cart-subtotal-value">
                           {%- liquid
-                            assign calculated_total = 0
-
-                            # Group bundle products to check validity
-                            assign bundle_groups = ''
-                            for item in cart.items
-                              if item.properties._is_bundle and item.properties._bundle_id
-                                assign bundle_id = item.properties._bundle_id
-                                unless bundle_groups contains bundle_id
-                                  assign bundle_groups = bundle_groups | append: bundle_id | append: ','
-                                endunless
+                            # Check if discount codes are applied
+                            assign has_discount_codes = false
+                            if cart.cart_level_discount_applications.size > 0
+                              assign has_discount_codes = true
+                            endif
+                            
+                            # If discount codes are applied, use Shopify's total
+                            if has_discount_codes
+                              if settings.currency_code_enabled
+                                echo cart.total_price | money_with_currency
+                              else
+                                echo cart.total_price | money
                               endif
-                            endfor
+                            else
+                              # No discount codes - calculate with bundle logic
+                              assign calculated_total = 0
 
-                            # Calculate total based on bundle validity
-                            for item in cart.items
-                              if item.properties._is_bundle and item.properties._bundle_id
-                                # Check if this bundle group is still valid (has ALL required components)
-                                assign bundle_id = item.properties._bundle_id
-                                assign bundle_count = 0
-                                assign expected_components = 0
-                                
-                                # Count items in this bundle group
-                                for other_item in cart.items
-                                  if other_item.properties._bundle_id == bundle_id
-                                    assign bundle_count = bundle_count | plus: 1
-                                  endif
-                                endfor
-                                
-                                # Get expected number of components from bundle products data
-                                if item.properties._bundle_products_data
-                                  assign bundle_products_data = item.properties._bundle_products_data | parse_json
-                                  assign expected_components = bundle_products_data.size
+                              # Group bundle products to check validity
+                              assign bundle_groups = ''
+                              for item in cart.items
+                                if item.properties._is_bundle and item.properties._bundle_id
+                                  assign bundle_id = item.properties._bundle_id
+                                  unless bundle_groups contains bundle_id
+                                    assign bundle_groups = bundle_groups | append: bundle_id | append: ','
+                                  endunless
                                 endif
-                                
-                                # Bundle is valid only if we have ALL expected components
-                                assign is_valid_bundle = false
-                                if bundle_count == expected_components and expected_components >= 2
-                                  assign is_valid_bundle = true
-                                endif
-                                
-                                if is_valid_bundle and item.properties._discount_value
-                                  # Valid bundle - apply discount
-                                  assign discount_percent = item.properties._discount_value | times: 1.0
+                              endfor
+
+                              # Calculate total based on bundle validity
+                              for item in cart.items
+                                if item.properties._is_bundle and item.properties._bundle_id
+                                  # Check if this bundle group is still valid (has ALL required components)
+                                  assign bundle_id = item.properties._bundle_id
+                                  assign bundle_count = 0
+                                  assign expected_components = 0
                                   
-                                  # Try to get original price from bundle products data
-                                  assign true_original_price = item.variant.price
+                                  # Count items in this bundle group
+                                  for other_item in cart.items
+                                    if other_item.properties._bundle_id == bundle_id
+                                      assign bundle_count = bundle_count | plus: 1
+                                    endif
+                                  endfor
+                                  
+                                  # Get expected number of components from bundle products data
                                   if item.properties._bundle_products_data
                                     assign bundle_products_data = item.properties._bundle_products_data | parse_json
-                                    for bundle_product in bundle_products_data
-                                      if bundle_product.id == item.variant_id
-                                        assign true_original_price = bundle_product.price
-                                        break
-                                      endif
-                                    endfor
+                                    assign expected_components = bundle_products_data.size
                                   endif
                                   
-                                  # Calculate true original line price and then apply discount
-                                  assign true_original_line_price = true_original_price | times: item.quantity
-                                  assign discount_amount = true_original_line_price | times: discount_percent | divided_by: 100
-                                  assign discounted_line_price = true_original_line_price | minus: discount_amount
-                                  assign calculated_total = calculated_total | plus: discounted_line_price
-                                else
-                                  # Invalid bundle - check if it has automatic discount
-                                  if item.original_price != item.final_price
-                                    # Invalid bundle with automatic discount - use final_line_price
-                                    assign calculated_total = calculated_total | plus: item.final_line_price
+                                  # Bundle is valid only if we have ALL expected components
+                                  assign is_valid_bundle = false
+                                  if bundle_count == expected_components and expected_components >= 2
+                                    assign is_valid_bundle = true
+                                  endif
+                                  
+                                  if is_valid_bundle and item.properties._discount_value
+                                    # Valid bundle - apply discount
+                                    assign discount_percent = item.properties._discount_value | times: 1.0
+                                    
+                                    # Try to get original price from bundle products data
+                                    assign true_original_price = item.variant.price
+                                    if item.properties._bundle_products_data
+                                      assign bundle_products_data = item.properties._bundle_products_data | parse_json
+                                      for bundle_product in bundle_products_data
+                                        if bundle_product.id == item.variant_id
+                                          assign true_original_price = bundle_product.price
+                                          break
+                                        endif
+                                      endfor
+                                    endif
+                                    
+                                    # Calculate true original line price and then apply discount
+                                    assign true_original_line_price = true_original_price | times: item.quantity
+                                    assign discount_amount = true_original_line_price | times: discount_percent | divided_by: 100
+                                    assign discounted_line_price = true_original_line_price | minus: discount_amount
+                                    assign calculated_total = calculated_total | plus: discounted_line_price
                                   else
-                                    # Invalid bundle without automatic discount - use true original price
+                                    # Invalid bundle - use true original price without discount
                                     assign true_original_price = item.variant.price
                                     if item.properties._bundle_products_data
                                       assign bundle_products_data = item.properties._bundle_products_data | parse_json
@@ -2288,23 +2139,17 @@
                                     assign true_original_line_price = true_original_price | times: item.quantity
                                     assign calculated_total = calculated_total | plus: true_original_line_price
                                   endif
-                                endif
-                              else
-                                # This is a regular product - check if it has automatic discount
-                                if item.original_price != item.final_price
-                                  # Has automatic discount - use final_line_price
-                                  assign calculated_total = calculated_total | plus: item.final_line_price
                                 else
-                                  # No discount - use original_line_price
+                                  # This is a regular product - use original price
                                   assign calculated_total = calculated_total | plus: item.original_line_price
                                 endif
-                              endif
-                            endfor
+                              endfor
 
-                            if settings.currency_code_enabled
-                              echo calculated_total | money_with_currency
-                            else
-                              echo calculated_total | money
+                              if settings.currency_code_enabled
+                                echo calculated_total | money_with_currency
+                              else
+                                echo calculated_total | money
+                              endif
                             endif
                           -%}
                           

@@ -506,6 +506,18 @@
       const cartItems = window.currentCartItems || {{ cart.items | json }};
       console.log('Cart items for subtotal calculation:', cartItems);
 
+      // Check if there are any discount codes applied
+      const hasDiscountCodes = {{ cart.cart_level_discount_applications.size }} > 0;
+      console.log('Has discount codes:', hasDiscountCodes);
+      
+      // If discount codes are applied, completely skip JavaScript override
+      // Let Shopify handle the calculation with discount codes
+      if (hasDiscountCodes) {
+        console.log('Discount codes detected - skipping JavaScript override to preserve discount code functionality');
+        console.log('Letting Shopify handle the final calculation with discount codes');
+        return;
+      }
+
       let calculatedTotal = 0;
 
       // Get bundle groups to check which items should have discounts
@@ -1237,7 +1249,7 @@
 
                                   # Get expected number of components from bundle products data
                                   if item.properties._bundle_products_data
-                                    assign bundle_products_data = item.properties._bundle_products_data | json
+                                    assign bundle_products_data = item.properties._bundle_products_data | parse_json
                                     assign expected_components = bundle_products_data.size
                                   endif
 
@@ -1379,7 +1391,7 @@
 
                                 # Get expected number of components
                                 if item.properties._bundle_products_data
-                                  assign bundle_products_data_check = item.properties._bundle_products_data | json
+                                  assign bundle_products_data_check = item.properties._bundle_products_data | parse_json
                                   assign expected_components_check = bundle_products_data_check.size
                                 endif
 
@@ -1846,77 +1858,69 @@
                   </span>
                   <span class="totals__subtotal-value" id="cart-drawer-subtotal-value">
                     {%- liquid
-                      assign calculated_total = 0
-
-                      # Group bundle products to check validity
-                      assign bundle_groups = ''
-                      for item in cart.items
-                        if item.properties._is_bundle and item.properties._bundle_id
-                          assign bundle_id = item.properties._bundle_id
-                          unless bundle_groups contains bundle_id
-                            assign bundle_groups = bundle_groups | append: bundle_id | append: ','
-                          endunless
+                      # Check if discount codes are applied
+                      assign has_discount_codes = false
+                      if cart.cart_level_discount_applications.size > 0
+                        assign has_discount_codes = true
+                      endif
+                      
+                      # If discount codes are applied, use Shopify's total
+                      if has_discount_codes
+                        if settings.currency_code_enabled
+                          echo cart.total_price | money_with_currency
+                        else
+                          echo cart.total_price | money
                         endif
-                      endfor
+                      else
+                        # No discount codes - use our bundle calculation
+                        assign calculated_total = 0
 
-                      # Calculate total based on bundle validity
-                      for item in cart.items
-                        if item.properties._is_bundle and item.properties._bundle_id
-                          # Check if this bundle group is still valid (has ALL required components)
-                          assign bundle_id = item.properties._bundle_id
-                          assign bundle_count = 0
-                          assign expected_components = 0
-
-                          # Count items in this bundle group
-                          for other_item in cart.items
-                            if other_item.properties._bundle_id == bundle_id
-                              assign bundle_count = bundle_count | plus: 1
-                            endif
-                          endfor
-
-                          # Get expected number of components from bundle products data
-                          if item.properties._bundle_products_data
-                            assign bundle_products_data = item.properties._bundle_products_data | json
-                            assign expected_components = bundle_products_data.size
+                        # Group bundle products to check validity
+                        assign bundle_groups = ''
+                        for item in cart.items
+                          if item.properties._is_bundle and item.properties._bundle_id
+                            assign bundle_id = item.properties._bundle_id
+                            unless bundle_groups contains bundle_id
+                              assign bundle_groups = bundle_groups | append: bundle_id | append: ','
+                            endunless
                           endif
+                        endfor
 
-                          # Bundle is valid only if we have ALL expected components
-                          assign is_valid_bundle = false
-                          if bundle_count == expected_components and expected_components >= 2
-                            assign is_valid_bundle = true
-                          endif
+                        # Calculate total based on bundle validity
+                        for item in cart.items
+                          if item.properties._is_bundle and item.properties._bundle_id
+                            # Check if this bundle group is still valid (has ALL required components)
+                            assign bundle_id = item.properties._bundle_id
+                            assign bundle_count = 0
+                            assign expected_components = 0
 
-                          if is_valid_bundle and item.properties._discount_value
-                            # Valid bundle - apply discount
-                            assign discount_percent = item.properties._discount_value | times: 1.0
+                            # Count items in this bundle group
+                            for other_item in cart.items
+                              if other_item.properties._bundle_id == bundle_id
+                                assign bundle_count = bundle_count | plus: 1
+                              endif
+                            endfor
 
-                            # Try to get original price from bundle products data
-                            assign true_original_price = item.variant.price
+                            # Get expected number of components from bundle products data
                             if item.properties._bundle_products_data
-                              assign bundle_products_data = item.properties._bundle_products_data | json
-                              for bundle_product in bundle_products_data
-                                if bundle_product.id == item.variant_id
-                                  assign true_original_price = bundle_product.price
-                                  break
-                                endif
-                              endfor
+                              assign bundle_products_data = item.properties._bundle_products_data | parse_json
+                              assign expected_components = bundle_products_data.size
                             endif
 
-                            # Calculate true original line price and then apply discount
-                            assign true_original_line_price = true_original_price | times: item.quantity
-                            assign discount_amount = true_original_line_price | times: discount_percent | divided_by: 100
-                            assign discounted_line_price = true_original_line_price | minus: discount_amount
-                            assign calculated_total = calculated_total | plus: discounted_line_price
-                          else
-                            # Invalid bundle - check if it has automatic discount
-                            if item.original_price != item.final_price
-                              # Invalid bundle with automatic discount - use final_line_price
-                              assign calculated_total = calculated_total | plus: item.final_line_price
-                            else
-                              # Invalid bundle without automatic discount - use true original price
+                            # Bundle is valid only if we have ALL expected components
+                            assign is_valid_bundle = false
+                            if bundle_count == expected_components and expected_components >= 2
+                              assign is_valid_bundle = true
+                            endif
+
+                            if is_valid_bundle and item.properties._discount_value
+                              # Valid bundle - apply discount
+                              assign discount_percent = item.properties._discount_value | times: 1.0
+
+                              # Try to get original price from bundle products data
                               assign true_original_price = item.variant.price
                               if item.properties._bundle_products_data
-                                assign bundle_products_data = item.properties._bundle_products_data | json
+                                assign bundle_products_data = item.properties._bundle_products_data | parse_json
                                 for bundle_product in bundle_products_data
                                   if bundle_product.id == item.variant_id
                                     assign true_original_price = bundle_product.price
@@ -1925,26 +1929,50 @@
                                 endfor
                               endif
 
+                              # Calculate true original line price and then apply discount
                               assign true_original_line_price = true_original_price | times: item.quantity
-                              assign calculated_total = calculated_total | plus: true_original_line_price
+                              assign discount_amount = true_original_line_price | times: discount_percent | divided_by: 100
+                              assign discounted_line_price = true_original_line_price | minus: discount_amount
+                              assign calculated_total = calculated_total | plus: discounted_line_price
+                            else
+                              # Invalid bundle - check if it has automatic discount
+                              if item.original_price != item.final_price
+                                # Invalid bundle with automatic discount - use final_line_price
+                                assign calculated_total = calculated_total | plus: item.final_line_price
+                              else
+                                # Invalid bundle without automatic discount - use true original price
+                                assign true_original_price = item.variant.price
+                                if item.properties._bundle_products_data
+                                  assign bundle_products_data = item.properties._bundle_products_data | parse_json
+                                  for bundle_product in bundle_products_data
+                                    if bundle_product.id == item.variant_id
+                                      assign true_original_price = bundle_product.price
+                                      break
+                                    endif
+                                  endfor
+                                endif
+
+                                assign true_original_line_price = true_original_price | times: item.quantity
+                                assign calculated_total = calculated_total | plus: true_original_line_price
+                              endif
+                            endif
+                          else
+                            # This is a regular product - check if it has automatic discount
+                            if item.original_price != item.final_price
+                              # Has automatic discount - use final_line_price
+                              assign calculated_total = calculated_total | plus: item.final_line_price
+                            else
+                              # No discount - use original_line_price
+                              assign calculated_total = calculated_total | plus: item.original_line_price
                             endif
                           endif
-                        else
-                          # This is a regular product - check if it has automatic discount
-                          if item.original_price != item.final_price
-                            # Has automatic discount - use final_line_price
-                            assign calculated_total = calculated_total | plus: item.final_line_price
-                          else
-                            # No discount - use original_line_price
-                            assign calculated_total = calculated_total | plus: item.original_line_price
-                          endif
-                        endif
-                      endfor
+                        endfor
 
-                      if settings.currency_code_enabled
-                        echo calculated_total | money_with_currency
-                      else
-                        echo calculated_total | money
+                        if settings.currency_code_enabled
+                          echo calculated_total | money_with_currency
+                        else
+                          echo calculated_total | money
+                        endif
                       endif
                     -%}
                   </span>
