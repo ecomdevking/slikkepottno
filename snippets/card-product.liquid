@@ -515,9 +515,8 @@
   // Prevent multiple script execution
   if (window.cardBundleScriptLoaded) {
     console.log('🚫 Card bundle script already loaded, skipping...');
-    return;
-  }
-  window.cardBundleScriptLoaded = true;
+  } else {
+    window.cardBundleScriptLoaded = true;
   
   console.log('🚀 CARD BUNDLE SCRIPT STARTING...');
   
@@ -548,12 +547,6 @@
     variantId,
     productId
   });
-
-  // Add a visible test element to the page
-  const testDiv = document.createElement('div');
-  testDiv.innerHTML = '🧪 BUNDLE SCRIPT IS RUNNING';
-  testDiv.style.cssText = 'position: fixed; top: 10px; right: 10px; background: red; color: white; padding: 10px; z-index: 9999; font-size: 14px;';
-  document.body.appendChild(testDiv);
   
   // Test if bundle button exists and set up direct handlers
   setTimeout(function() {
@@ -610,7 +603,6 @@
           console.log('🎯 BUNDLE BUTTON CLICKED!');
           event.preventDefault();
           event.stopPropagation();
-          alert('BUNDLE BUTTON CLICKED! This proves the button is working!');
           return false;
         });
         
@@ -649,7 +641,6 @@
         event.preventDefault();
         event.stopPropagation();
         event.stopImmediatePropagation();
-        alert('BUNDLE BUTTON CLICKED! This proves the button is working!');
         return false;
       }
     }
@@ -1081,4 +1072,5 @@
       }
       return originalXHROpen.call(this, method, url, ...args);
     };
+  } // End of else block for script execution check
 </script>

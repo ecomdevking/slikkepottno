@@ -78,7 +78,7 @@
     "social_pinterest_link": "https://no.pinterest.com/slikkepottno/",
     "social_tumblr_link": "",
     "social_vimeo_link": "",
-    "predictive_search_enabled": true,
+    "predictive_search_enabled": false,
     "predictive_search_type_enabled": false,
     "number_results_to_show": 10,
     "predictive_search_show_vendor": true,
@@ -164,11 +164,6 @@
       "back-in-stock-restock-alerts-4bb73be2-b7c2-4870-949f-c528145452a3": {
         "type": "shopify://apps/back-in-stock-restock-alerts/blocks/main/4bb73be2-b7c2-4870-949f-c528145452a3",
         "disabled": false,
-        "settings": {}
-      },
-      "11349500561483629931": {
-        "type": "shopify://apps/notify-me/blocks/app-embed/b399b727-6c85-44fc-9e21-63114bd72054",
-        "disabled": true,
         "settings": {}
       }
     },

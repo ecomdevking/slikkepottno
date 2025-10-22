@@ -333,7 +333,7 @@
           "type": "banner-card",
           "settings": {
             "color_scheme": "scheme-inverse",
-            "image": "shopify://shop_images/Blodige_cupcakes.jpg",
+            "image": "shopify://shop_images/Untitled_design-116.jpg",
             "image_overlay_opacity": 25,
             "column_span": 1,
             "row_span": 2,
@@ -343,10 +343,10 @@
             "content_alignment": "center",
             "content_position_mobile": "middle-center",
             "content_alignment_mobile": "center",
-            "card_link": "shopify://collections/halloween-produktpakker",
-            "subheading": "Gjør det enkelt!",
+            "card_link": "shopify://collections/julekalender",
+            "subheading": "Disse går unna!",
             "subheading_style": "",
-            "heading": "Ferdige produktpakker til Halloween",
+            "heading": "Se alle julekalendere",
             "highlight_style": "none",
             "highlight_font_style": "italic",
             "highlight_style_color": "",
@@ -987,6 +987,77 @@
         "divider_width": "fixed"
       }
     },
+    "featured_collection_UGHqmh": {
+      "type": "featured-collection",
+      "blocks": {
+        "collection_BJBE9K": {
+          "type": "collection",
+          "settings": {
+            "collection": "halloween-nyheter",
+            "title": "",
+            "show_banner": false,
+            "color_scheme": "",
+            "card_link": "",
+            "image_overlay_opacity": 0,
+            "content_position": "top-left",
+            "content_alignment": "left",
+            "subheading": "",
+            "subheading_style": "",
+            "heading": "",
+            "highlight_style": "none",
+            "highlight_font_style": "italic",
+            "highlight_style_color": "",
+            "highlight_text_color": "",
+            "heading_size": "h2",
+            "heading_size_mobile": "inherit",
+            "heading_size_custom": 18,
+            "description": "",
+            "text_size": "text-base",
+            "button_label": "Button label",
+            "button_style": "btn--primary",
+            "button_icon": "none"
+          }
+        }
+      },
+      "block_order": [
+        "collection_BJBE9K"
+      ],
+      "name": "t:sections.featured-collection.presets__1.name",
+      "settings": {
+        "container": "fixed",
+        "color_scheme": "",
+        "section_header_alignment": "left",
+        "section_header_alignment_mobile": "inherit",
+        "subheading": "",
+        "heading": "Sjekk disse Halloween-nyhetene!",
+        "highlight_style": "none",
+        "highlight_font_style": "italic",
+        "highlight_style_color": "",
+        "highlight_text_color": "",
+        "heading_size": "h1",
+        "description": "",
+        "text_size": "text-base",
+        "button_label": "",
+        "button_link": "",
+        "button_style": "btn--underline",
+        "button_icon": "none",
+        "limit": 8,
+        "columns": 4,
+        "column_gap": "medium",
+        "row_gap": "inherit",
+        "enable_slider": true,
+        "content_overflow": true,
+        "navigation_position": "bottom",
+        "pcard_image_ratio": "",
+        "columns_mobile": "1",
+        "swipe_on_mobile": true,
+        "show_progress_bar": true,
+        "padding_top": 50,
+        "padding_bottom": 50,
+        "show_section_divider": false,
+        "divider_width": "fixed"
+      }
+    },
     "favorite_products_cwYmCb": {
       "type": "favorite-products",
       "blocks": {
@@ -1261,6 +1332,7 @@
     "collection_cards_fFbiUR",
     "featured_products_tab_BhMHF6",
     "featured_blog_q9EYQj",
+    "featured_collection_UGHqmh",
     "favorite_products_cwYmCb",
     "lookbook_slider_rGFXFi",
     "image_with_text_overlay_LjKpGy"
